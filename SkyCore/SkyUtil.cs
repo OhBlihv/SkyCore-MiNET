@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace SkyCore
 {
-    public class Class1
+    public class SkyUtil
     {
+
+        public static void log(String line)
+        {
+            Console.WriteLine("[SkyCore] " + line);
+        }
+        
     }
 }
