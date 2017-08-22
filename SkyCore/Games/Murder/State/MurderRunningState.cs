@@ -286,6 +286,8 @@ namespace SkyCore.Games.Murder.State
             player.SetEffect(new Blindness {Duration = 5, Particles = false});
             player.SendTitle("§c§lYOU DIED§r");
 
+			player.Inventory.Clear();
+
             //TODO: Hide player from all living players
             player.SetGameMode(GameMode.Spectator);
         }
@@ -329,8 +331,14 @@ namespace SkyCore.Games.Murder.State
             //Update gun parts count
             else
             {
-                player.Inventory.SetInventorySlot(8, new ItemGunParts {Count = (byte) count});
-            }
+				PlayerInventory inventory = player.Inventory;
+
+				int currentSlot = inventory.InHandSlot;
+				
+				player.Inventory.SetInventorySlot(8, new ItemGunParts {Count = (byte) count});
+
+				inventory.SetHeldItemSlot(currentSlot);
+			}
 
             if (PlayerGunPartCounts.ContainsKey(player.Username))
             {
