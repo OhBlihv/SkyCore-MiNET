@@ -37,6 +37,7 @@ namespace SkyCore.Games.Murder.State
         public readonly Dictionary<PlayerLocation, MurderGunPartEntity> GunParts = new Dictionary<PlayerLocation, MurderGunPartEntity>();
 
         public readonly Dictionary<string, int> PlayerGunPartCounts = new Dictionary<string, int>();
+        public readonly Dictionary<string, int> PlayerAmmoCounts = new Dictionary<string, int>();
 
         public override void EnterState(GameLevel gameLevel)
         {
@@ -91,32 +92,13 @@ namespace SkyCore.Games.Murder.State
                     idx++;
                 }
 
-                gameLevel.DoForPlayersIn(player =>
-                {
-                    player.SendTitle("§7Track down the murderer!", TitleType.SubTitle);
-                    player.SendTitle("§a§lInnocent§r"); //Title
-                }, MurderTeam.Innocent);
-
-                gameLevel.DoForPlayersIn(player =>
-                {
-                    player.SendTitle("§7Track down the murderer!", TitleType.SubTitle);
-                    player.SendTitle("§9§lDetective§r"); //Title
-
-                    player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
-                    player.Inventory.SetInventorySlot(1, new ItemArrow{Count = 10});
-                }, MurderTeam.Detective);
-
-                gameLevel.DoForPlayersIn(player =>
-                {
-                    player.SendTitle("§7Kill all innocent players!", TitleType.SubTitle);
-                    player.SendTitle("§c§lMurderer§r"); //Title
-
-                    player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
-                }, MurderTeam.Murderer);
-
                 List<PlayerLocation> usedSpawnLocations = new List<PlayerLocation>();
                 gameLevel.DoForAllPlayers(player =>
                 {
+					//Pre-add all players to the map to avoid any unnecessary contains
+					PlayerAmmoCounts.Add(player.Username, 0);
+					PlayerGunPartCounts.Add(player.Username, 0);
+
                     player.SetGameMode(GameMode.Adventure);
 
                     //Avoid spawning two players in the same location
@@ -132,7 +114,32 @@ namespace SkyCore.Games.Murder.State
 
                     player.SetHideNameTag(true);
                 });
-            }
+
+				gameLevel.DoForPlayersIn(player =>
+				{
+					player.SendTitle("§7Track down the murderer!", TitleType.SubTitle);
+					player.SendTitle("§a§lInnocent§r"); //Title
+				}, MurderTeam.Innocent);
+
+				gameLevel.DoForPlayersIn(player =>
+				{
+					player.SendTitle("§7Track down the murderer!", TitleType.SubTitle);
+					player.SendTitle("§9§lDetective§r"); //Title
+
+					player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
+					player.Inventory.SetInventorySlot(1, new ItemArrow { Count = 10 });
+				}, MurderTeam.Detective);
+
+				gameLevel.DoForPlayersIn(player =>
+				{
+					player.SendTitle("§7Kill all innocent players!", TitleType.SubTitle);
+					player.SendTitle("§c§lMurderer§r"); //Title
+
+					player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
+
+					//PlayerAmmoCounts[player.Username] = 3; //Throwing Knives
+				}, MurderTeam.Murderer);
+			}
             catch (Exception e)
             {
                 Console.WriteLine(e);
@@ -167,21 +174,21 @@ namespace SkyCore.Games.Murder.State
             {
                 player.SendTitle($"§a§lINNOCENT §r§7{secondsLeft} Seconds Remaining\n" +
                                  $"\t              §7{GetPlayerGunParts(null, player)}/{MaxGunParts} Gun Parts\n" +
-                                 $"\t              §7{0}/10 Bullets", TitleType.ActionBar);
+                                 $"\t              §7{PlayerAmmoCounts[player.Username]}/10 Bullets", TitleType.ActionBar);
             }, MurderTeam.Innocent);
 
             gameLevel.DoForPlayersIn(player =>
             {
                 player.SendTitle($"§9§lDETECTIVE §r§7{secondsLeft} Seconds Remaining\n" +
                                  $"              §7{GetPlayerGunParts(null, player)}/{MaxGunParts} Gun Parts\n" +
-                                 $"              §7{0}/10 Bullets", TitleType.ActionBar);
+                                 $"              §7{PlayerAmmoCounts[player.Username]}/10 Bullets", TitleType.ActionBar);
             }, MurderTeam.Detective);
 
             gameLevel.DoForPlayersIn(player =>
-            {
-                player.SendTitle($"§c§lMURDERER §r§7{secondsLeft} Seconds Remaining\n" +
-                                 $"              §7{0}/3 Throwing Knives", TitleType.ActionBar);
-            }, MurderTeam.Murderer);
+			{
+				player.SendTitle($"§c§lMURDERER §r§7{secondsLeft} Seconds Remaining", TitleType.ActionBar); //\n" +
+				//$"              §7{PlayerAmmoCounts[player.Username]}/3 Throwing Knives", TitleType.ActionBar);
+			}, MurderTeam.Murderer);
 
             /*
              * Gun Parts
@@ -231,8 +238,7 @@ namespace SkyCore.Games.Murder.State
             {
                 gameLevel.SetPlayerTeam(target, MurderTeam.Spectator);
             }
-            //TODO: Check ammo counts
-            else if (itemInHand is ItemInnocentGun)
+            else if (itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
             {
                 var arrow = new Arrow(player, gameLevel) { Damage = 0 };
                 arrow.KnownPosition = (PlayerLocation)player.KnownPosition.Clone();
@@ -300,10 +306,7 @@ namespace SkyCore.Games.Murder.State
                 return -1; //Invalid amount
             }
 
-            int count;
-            PlayerGunPartCounts.TryGetValue(player.Username, out count);
-
-            return count;
+            return PlayerGunPartCounts[player.Username];
         }
 
         public int AddPlayerGunParts(MurderLevel gameLevel, SkyPlayer player)
@@ -326,6 +329,8 @@ namespace SkyCore.Games.Murder.State
                 inventory.SetInventorySlot(8, new ItemAir());
                 inventory.SetInventorySlot(0, new ItemInnocentGun());
 
+				PlayerAmmoCounts[player.Username] = 10; //TODO: Avoid hardcode?
+
                 inventory.SetHeldItemSlot(currentSlot);
             }
             //Update gun parts count
@@ -340,16 +345,9 @@ namespace SkyCore.Games.Murder.State
 				inventory.SetHeldItemSlot(currentSlot);
 			}
 
-            if (PlayerGunPartCounts.ContainsKey(player.Username))
-            {
-                PlayerGunPartCounts[player.Username] = count;
-            }
-            else
-            {
-                PlayerGunPartCounts.Add(player.Username, count);
-            }
+			PlayerGunPartCounts[player.Username] = count;
 
-            return count;
+			return count;
         }
 
     }
