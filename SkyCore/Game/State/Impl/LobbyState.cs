@@ -87,10 +87,8 @@ namespace SkyCore.Game.State.Impl
             {
                 foreach (SkyPlayer player in gameLevel.GetPlayers())
                 {
-					SkyUtil.log($"Sending to {player.Username}");
                     player.SendTitle(actionBarMessage, TitleType.ActionBar);
                 }
-				SkyUtil.log(actionBarMessage);
             }
 
             outTick = currentTick;

@@ -127,7 +127,6 @@ namespace SkyCore.Games.Murder.State
 					player.SendTitle("§9§lDetective§r"); //Title
 
 					player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
-					player.Inventory.SetInventorySlot(1, new ItemArrow { Count = 10 });
 				}, MurderTeam.Detective);
 
 				gameLevel.DoForPlayersIn(player =>
@@ -250,7 +249,9 @@ namespace SkyCore.Games.Murder.State
                 arrow.BroadcastMovement = true;
                 arrow.DespawnOnImpact = true;
                 arrow.SpawnEntity();
-            }
+
+				PlayerAmmoCounts[player.Username]--;
+			}
 
             return true;
         }
