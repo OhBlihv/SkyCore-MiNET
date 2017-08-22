@@ -169,7 +169,7 @@ namespace SkyCore.Game
         {
             GameTeam defaultTeam = GetDefaultTeam();
 
-            PlayerTeamDict.Add(player.Username, defaultTeam);
+			SetPlayerTeam(player, defaultTeam);
             SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName}");
 
             //player.SpawnLevel(this, new PlayerLocation(7.5, 181, -20.5));
@@ -291,6 +291,9 @@ namespace SkyCore.Game
 
             player.SetAllowFly(true);
             player.IsFlying = true;
+
+			player.SetGameMode(GameMode.Spectator);
+			player.SetSpectator(true);
 
             //Bump the player up into the air to signify death
             player.Knockback(new Vector3(0f, 0.5f, 0f));

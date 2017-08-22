@@ -88,15 +88,22 @@ namespace SkyCore.Games.Murder.State
 
             ThreadPool.QueueUserWorkItem(state =>
             {
-                Thread.Sleep(5000);
-                gameLevel.DoForPlayersIn(player =>
-                {
-                    player.SendTitle("§c§lGAME RESTARTING");
-                    player.SendTitle("§7in 5 seconds...", TitleType.SubTitle);
-                }, MurderTeam.Innocent, MurderTeam.Detective, MurderTeam.Murderer, MurderTeam.Spectator);
-                Thread.Sleep(5000);
+				try
+				{
+					Thread.Sleep(5000);
+					gameLevel.DoForPlayersIn(player =>
+					{
+						player.SendTitle("§c§lGAME RESTARTING");
+						player.SendTitle("§7in 5 seconds...", TitleType.SubTitle);
+					}, MurderTeam.Innocent, MurderTeam.Detective, MurderTeam.Murderer, MurderTeam.Spectator);
+					Thread.Sleep(5000);
 
-                gameLevel.UpdateGameState(new MurderLobbyState());
+					gameLevel.UpdateGameState(new MurderLobbyState());
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
             });
         }
 

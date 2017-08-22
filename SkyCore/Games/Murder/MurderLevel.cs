@@ -40,10 +40,12 @@ namespace SkyCore.Games.Murder
             {
                 case "murder-library":
                 {
-                    SpawnPoint = new PlayerLocation(255D, 70D, 255D);
+                    SpawnPoint = new PlayerLocation(255D, 54D, 255D);
 
-                    PlayerSpawnLocations.Add(new PlayerLocation(255D, 70D, 255D));
-                    GunPartLocations.Add(new PlayerLocation(255D, 70D, 255D));
+                    PlayerSpawnLocations.Add(new PlayerLocation(255D, 54D, 280D));
+                    PlayerSpawnLocations.Add(new PlayerLocation(265D, 54D, 275D));
+                    GunPartLocations.Add(new PlayerLocation(255D, 54D, 280D));
+                    GunPartLocations.Add(new PlayerLocation(265D, 54D, 275D));
                     break;
                 }
             }

@@ -36,6 +36,9 @@ namespace SkyCore
 
         public readonly ConcurrentDictionary<string, CoreGameController> GameModes = new ConcurrentDictionary<string, CoreGameController>();
 
+		public List<PendingTask> PendingTasks = new List<PendingTask>();
+		public delegate void PendingTask();
+
         public void OnEnable(PluginContext context)
         {
             Instance = this;
@@ -81,6 +84,16 @@ namespace SkyCore
 
                 player.PlayerJoin += OnPlayerJoin;
                 player.PlayerLeave += OnPlayerLeave;
+
+				if (PendingTasks.Count > 0)
+				{
+					foreach (Delegate pendingTask in PendingTasks)
+					{
+						pendingTask.DynamicInvoke();
+					}
+
+					PendingTasks.Clear();
+				}
 
                 if (PlayerNPC.PendingNpcs.Count > 0)
                 {

@@ -108,7 +108,6 @@ namespace SkyCore.Entities
                     {
                         action = player =>
                         {
-                            SkyUtil.log($"(3) Processing NPC Interact as {player.Username}");
                             switch (command)
                             {
                                 case "GID:murder":

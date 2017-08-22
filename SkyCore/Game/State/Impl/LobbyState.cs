@@ -44,7 +44,7 @@ namespace SkyCore.Game.State.Impl
             int currentPlayers  = gameLevel.GetPlayerCount(),
                 requiredPlayers = getRequiredPlayers(gameLevel);
 
-            string actionBarMessage = null;
+			string actionBarMessage = null;
 
             if (currentPlayers < requiredPlayers)
             {
@@ -75,10 +75,6 @@ namespace SkyCore.Game.State.Impl
 
                             gameLevel.UpdateGameState(GetNextGameState(gameLevel));
                         }
-                        /*else
-                        {
-                            //Ignore. State shouldn't be active
-                        }*/
                     }
                     else
                     {
@@ -91,8 +87,10 @@ namespace SkyCore.Game.State.Impl
             {
                 foreach (SkyPlayer player in gameLevel.GetPlayers())
                 {
+					SkyUtil.log($"Sending to {player.Username}");
                     player.SendTitle(actionBarMessage, TitleType.ActionBar);
                 }
+				SkyUtil.log(actionBarMessage);
             }
 
             outTick = currentTick;

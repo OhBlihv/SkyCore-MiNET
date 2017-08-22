@@ -15,26 +15,29 @@ namespace SkyCore.Games.Murder
         
         public MurderCoreGameController(SkyCoreAPI plugin) : base(plugin, "murder", "Murder Mystery", 
             new List<string>{"murder-library"})
-        {
-            Level level = plugin.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+		{
+			SkyCoreAPI.Instance.PendingTasks.Add(() =>
+			{
+				Level level = plugin.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
 
-            if (level == null)
-            {
-                Console.WriteLine($"§c§l(!) §r§cUnable to find level Overworld/world");
+				if (level == null)
+				{
+					Console.WriteLine($"§c§l(!) §r§cUnable to find level Overworld/world");
 
-                string worldNames = "";
-                foreach (Level levelLoop in plugin.Context.LevelManager.Levels)
-                {
-                    worldNames += levelLoop.LevelName + "(" + levelLoop.LevelId + "), ";
-                }
+					string worldNames = "";
+					foreach (Level levelLoop in plugin.Context.LevelManager.Levels)
+					{
+						worldNames += levelLoop.LevelName + "(" + levelLoop.LevelId + "), ";
+					}
 
-                Console.WriteLine($"§7§l* §r§7Valid Names: {worldNames}");
-            }
-            else
-            {
-                PlayerNPC.SpawnNPC(level, "§e§lMurder Mystery", new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F), "GID:murder");
-            }
-        }
+					Console.WriteLine($"§7§l* §r§7Valid Names: {worldNames}");
+				}
+				else
+				{
+					PlayerNPC.SpawnNPC(level, "§e§lMurder Mystery", new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F), "GID:murder");
+				}
+			});
+		}
 
         protected override GameLevel _getGameController()
         {

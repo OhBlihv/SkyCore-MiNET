@@ -227,7 +227,7 @@ namespace SkyCore.Games.Murder.State
             MurderLevel murderLevel = (MurderLevel) gameLevel;
             Item itemInHand = player.Inventory.GetItemInHand();
 
-            if (player == murderLevel.Murderer && itemInHand is ItemMurderKnife)
+            if (player == murderLevel.Murderer && itemInHand is ItemMurderKnife && target != null)
             {
                 gameLevel.SetPlayerTeam(target, MurderTeam.Spectator);
             }
