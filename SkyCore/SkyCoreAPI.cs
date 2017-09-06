@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,12 +33,27 @@ namespace SkyCore
 
         public PluginContext Context;
 
+		public string CurrentIp { get; private set; }
+
         public SkyPermissions Permissions { get; set; }
 
         public readonly ConcurrentDictionary<string, CoreGameController> GameModes = new ConcurrentDictionary<string, CoreGameController>();
 
-		public List<PendingTask> PendingTasks = new List<PendingTask>();
+		private List<PendingTask> PendingTasks = new List<PendingTask>();
 		public delegate void PendingTask();
+		private bool _shouldSchedule = true;
+		public void AddPendingTask(PendingTask pendingTask)
+		{
+			if (!_shouldSchedule)
+			{
+				pendingTask.Invoke();
+			}
+			else
+			{
+				PendingTasks.Add(pendingTask);
+			}
+		}
+
 
         public void OnEnable(PluginContext context)
         {
@@ -46,8 +62,11 @@ namespace SkyCore
 
             ServerPath = Environment.CurrentDirectory;
             SkyUtil.log($"Registered Server Path at '{ServerPath}'");
-            
-            this.Context = context;
+
+			CurrentIp = new WebClient().DownloadString("http://icanhazip.com").Replace("\n", "") + ":" + Config.GetProperty("port", "19132");
+			SkyUtil.log($"Registered current IP as {CurrentIp}");
+
+			Context = context;
 
             //
 
@@ -63,14 +82,6 @@ namespace SkyCore
                 {
                     level.SpawnPoint = new PlayerLocation(0D, 36D, 10D, 0f, 0f, 90f);
 
-                    /*for (int x = -5; x < 5; x++)
-                    {
-                        for (int z = -5; z < 5; z++)
-                        {
-                            args.Level.SetBlock(x, 99, z, 1); //Set block below spawn point to STONE
-                        }
-                    }*/
-
                     level.BlockBreak += LevelOnBlockBreak;
                     level.BlockPlace += LevelOnBlockPlace;
                 }
@@ -78,16 +89,18 @@ namespace SkyCore
 
             //Register listeners
             context.Server.PlayerFactory.PlayerCreated += (sender, args) =>
-            {
+			{
+				_shouldSchedule = false; //Avoid scheduling pending tasks once a player has joined
+
                 //SkyPlayer player = (SkyPlayer) args.Player;
                 MiNET.Player player = args.Player;
 
                 player.PlayerJoin += OnPlayerJoin;
-                player.PlayerLeave += OnPlayerLeave;
+                //player.PlayerLeave += OnPlayerLeave;
 
 				if (PendingTasks.Count > 0)
 				{
-					foreach (Delegate pendingTask in PendingTasks)
+					foreach (PendingTask pendingTask in PendingTasks)
 					{
 						pendingTask.DynamicInvoke();
 					}
@@ -95,29 +108,29 @@ namespace SkyCore
 					PendingTasks.Clear();
 				}
 
-                if (PlayerNPC.PendingNpcs.Count > 0)
-                {
-                    List<PlayerNPC> pendingNpcClone = new List<PlayerNPC>(PlayerNPC.PendingNpcs);
-                    PlayerNPC.PendingNpcs.Clear();
+				/*ThreadPool.QueueUserWorkItem(state =>
+				{
+					Thread.Sleep(1000);
 
-                    ThreadPool.QueueUserWorkItem(state =>
-                    {
-                        Thread.Sleep(1000);
-
-                        try
-                        {
-                            foreach (PlayerNPC pendingNpc in pendingNpcClone)
-                            {
-                                pendingNpc.SpawnEntity();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-                    });
-                }
-            };
+					try
+					{
+						//Add this player to any games if available and if this is the only game available
+						if (GameModes.Count == 1)
+						{
+							//Foreach, but only one value.
+							foreach (CoreGameController coreGameController in GameModes.Values)
+							{
+								coreGameController.QueuePlayer(player as SkyPlayer);
+								break;
+							}
+						}
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine(e);
+					}
+				});*/
+			};
 
             SkyUtil.log("Initialized!");
 
@@ -125,16 +138,31 @@ namespace SkyCore
             {
                 Thread.Sleep(1000);
 
-                SkyUtil.log("Setting up Custom Games...");
+				ExternalGameHandler.Init(); //Start listening for game servers
 
-                try
-                {
-                    _initializeCustomGame(new MurderCoreGameController(this));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+				string serverGame = Config.GetProperty("game-type", "none");
+				SkyUtil.log($"Setting up Custom Game {serverGame}...");
+				try
+				{
+					switch (serverGame)
+					{
+						case "murder":
+						{
+							SkyUtil.log("Initializing Murder Mystery...");
+							_initializeCustomGame(new MurderCoreGameController(this));
+							break;
+						}
+						case "none":
+						{
+							SkyUtil.log("Initializing Pure Hub...");
+							break;
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
             });
         }
 
@@ -198,12 +226,14 @@ namespace SkyCore
 
             player.SendPlayerInventory();
 
+	        int i = 0;
+
             ThreadPool.QueueUserWorkItem(state =>
             {
                 Thread.Sleep(2000);
 
                 //Group isn't initialized yet - wait.
-                SkyUtil.log($"Group for {player.Username} == {player.PlayerGroup} vs {PlayerGroup.Youtuber} == {player.PlayerGroup.CompareTo(PlayerGroup.Youtuber)}");
+                SkyUtil.log($"{++i} Group for {player.Username} == {player.PlayerGroup} vs {PlayerGroup.Youtuber} == {player.PlayerGroup.CompareTo(PlayerGroup.Youtuber)}");
 
                 GameMode targetGameMode;
                 if (player.PlayerGroup.CompareTo(PlayerGroup.Youtuber) >= 0)
@@ -242,13 +272,13 @@ namespace SkyCore
         
         }
 
-        private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
+        /*private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
         {
             if (eventArgs.Level is GameLevel)
             {
                 ((GameLevel) eventArgs.Level).RemovePlayer((SkyPlayer) eventArgs.Player);
             }
-        }
+        }*/
 
         [PacketHandler, Receive]
         public Package MessageHandler(McpeText message, MiNET.Player player)

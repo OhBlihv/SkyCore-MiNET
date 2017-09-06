@@ -11,6 +11,7 @@ using MiNET.Net;
 using MiNET.Plugins;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.Game;
 using SkyCore.Player;
 
 namespace SkyCore.Entities
@@ -110,9 +111,12 @@ namespace SkyCore.Entities
                         {
                             switch (command)
                             {
+								//TODO: Split around the colon
                                 case "GID:murder":
                                     player.SendMessage("Queueing for Murder");
-                                    SkyCoreAPI.Instance.GameModes["murder"].QueuePlayer(player);
+									//SkyUtil.log($"Sending {player.Username} to {ExternalGameHandler.GameRegistrations["murder"].ConnectingAddress}:{ExternalGameHandler.GameRegistrations["murder"].ConnectingPort}");
+                                    //SkyCoreAPI.Instance.GameModes["murder"].QueuePlayer(player);
+									ExternalGameHandler.AddPlayer(player, "murder");
                                     break;
                                 default:
                                     Console.WriteLine($"Unable to process game command {command}");
@@ -126,13 +130,13 @@ namespace SkyCore.Entities
                     }
                 }
 
-                PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action);
+				//Ensure this NPC can be seen
+				PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action) {Scale = 1.2};
 
-                npc.Scale = 1.2; //Ensure this NPC can be seen
-
-                npc.BroadcastEntityEvent();
+				npc.BroadcastEntityEvent();
                 npc.BroadcastSetEntityData();
 
+				SkyCoreAPI.Instance.AddPendingTask(() => npc.SpawnEntity());
                 /*try
                 {
                     npc.SpawnEntity();

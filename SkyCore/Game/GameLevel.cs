@@ -33,6 +33,8 @@ namespace SkyCore.Game
 
         public SkyCoreAPI Plugin { get; }
 
+		public string GameType { get; }
+
         public string GameId { get; }
 
         public GameState CurrentState { get; private set; }
@@ -44,13 +46,14 @@ namespace SkyCore.Game
 
         //
 
-        public GameLevel(SkyCoreAPI plugin, string gameId, String levelPath)
+        public GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath)
                 //: base(plugin.Context.LevelManager, gameId, AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath),
                 : base(plugin.Context.LevelManager, gameId, new AnvilWorldProvider(levelPath), 
                       plugin.Context.LevelManager.EntityManager, GameMode.Creative)
         {
             Plugin = plugin;
             GameId = gameId;
+	        GameType = gameType;
 
             AllowBreak = false;
             AllowBuild = false;
@@ -86,10 +89,14 @@ namespace SkyCore.Game
 
         protected abstract void InitializeTeamMap();
 
-        public void Close()
+        public override void Close()
         {
             _gameTick.Dispose();
             _gameTickThread.Abort();
+
+			base.Close();
+
+	        Plugin.Context.LevelManager.Levels.Remove(this);
         }
 
         public int GetPlayerCount()
@@ -173,7 +180,8 @@ namespace SkyCore.Game
             SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName}");
 
             //player.SpawnLevel(this, new PlayerLocation(7.5, 181, -20.5));
-            player.SpawnLevel(this, new PlayerLocation(255, 70, 255));
+            //player.SpawnLevel(this, new PlayerLocation(255, 70, 255));
+            player.SpawnLevel(this, SpawnPoint);
         }
         
         public void RemovePlayer(SkyPlayer player)
@@ -289,11 +297,14 @@ namespace SkyCore.Game
                 Particles = false
             });
 
-            player.SetAllowFly(true);
-            player.IsFlying = true;
+			player.SetEffect(new Blindness()
+			{
+				Duration = 100,
+				Particles = false
+			});
 
-			player.SetGameMode(GameMode.Spectator);
-			player.SetSpectator(true);
+			player.SetAllowFly(true);
+            player.IsFlying = true;
 
             //Bump the player up into the air to signify death
             player.Knockback(new Vector3(0f, 0.5f, 0f));

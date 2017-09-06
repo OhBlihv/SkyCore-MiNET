@@ -43,6 +43,8 @@ namespace SkyCore.Game
             
             GameName = neatName;
             RawName = gameName;
+
+			ExternalGameHandler.RegisterInternalGame(RawName);
             
             foreach(var levelName in levelNames)
             {
@@ -82,8 +84,15 @@ namespace SkyCore.Game
             }
         }
 
+		private int _tick = 1;
+
         protected void CoreGameTick()
         {
+			if (++_tick % 10 == 0)
+			{
+				CheckCapacity();
+			}
+
             //SkyUtil.log("Ticking Core");
             if (QueuedPlayers.IsEmpty)
             {
@@ -91,18 +100,32 @@ namespace SkyCore.Game
             }
 
             SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
-            foreach (GameLevel gameLevel in GameLevels.Values)
-            {
-                SkyPlayer nextPlayer;
-                while (!QueuedPlayers.IsEmpty)
-                {
-                    if (gameLevel.CurrentState.CanAddPlayer(gameLevel) && QueuedPlayers.TryDequeue(out nextPlayer))
-                    {
-                        SkyUtil.log($"Adding {nextPlayer.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
-                        gameLevel.AddPlayer(nextPlayer);
-                    }
-                }
-            }
+			lock (GameLevels)
+			{
+				foreach (GameLevel gameLevel in GameLevels.Values)
+				{
+					while (!QueuedPlayers.IsEmpty)
+					{
+						SkyPlayer nextPlayer;
+						if (!gameLevel.CurrentState.CanAddPlayer(gameLevel) || !QueuedPlayers.TryDequeue(out nextPlayer))
+						{
+							break; //Cannot add any more players
+						}
+
+						//Need to find something that indicates this player is loaded
+						if (nextPlayer.Level != null)
+						{
+							SkyUtil.log($"Adding {nextPlayer.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
+							gameLevel.AddPlayer(nextPlayer);
+						}
+						else
+						{
+							//Re-queue this player :(
+							QueuedPlayers.Enqueue(nextPlayer);
+						}
+					}
+				}
+			}
 
             //If we're running out of free slots, create a new game lobby
             if (!QueuedPlayers.IsEmpty)
@@ -116,16 +139,105 @@ namespace SkyCore.Game
             }
         }
 
-        public GameLevel GetGameController()
+	    public void InstantQueuePlayer(SkyPlayer player)
+	    {
+			SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
+		    lock (GameLevels)
+		    {
+			    foreach (GameLevel gameLevel in GameLevels.Values)
+			    {
+				    if (!gameLevel.CurrentState.CanAddPlayer(gameLevel))
+				    {
+						QueuePlayer(player);
+					    break; //Cannot add any more players
+				    }
+
+				    SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
+				    gameLevel.AddPlayer(player);
+
+					//Need to find something that indicates this player is loaded
+					/*if (player.Level != null)
+				    {
+					    SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
+					    gameLevel.AddPlayer(player);
+				    }
+				    else
+				    {
+					    //Re-queue this player :(
+					    QueuedPlayers.Enqueue(player);
+				    }*/
+				}
+		    }
+		}
+
+		///<summary>Ensures at least 1 game is available to join. If not, creates one to fill capacity</summary>
+		public void CheckCapacity()
+		{
+			List<GameLevel> availableGames = new List<GameLevel>();
+			List<GameLevel> closingGames   = new List<GameLevel>();
+			lock (GameLevels)
+			{
+				foreach (GameLevel gameLevel in GameLevels.Values)
+				{
+					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
+					{
+						availableGames.Add(gameLevel);
+					}
+					else if (gameLevel.CurrentState.GetEnumState(gameLevel) == StateType.Closing)
+					{
+						closingGames.Add(gameLevel);
+					}
+				}
+			}
+
+			lock (GameLevels)
+			{
+				foreach (GameLevel gameLevel in closingGames)
+				{
+					SkyUtil.log($"Closing game {gameLevel.GameId}...");
+					gameLevel.Close();
+
+					GameLevel removedGame;
+					GameLevels.TryRemove(gameLevel.GameId, out removedGame);
+				}
+			}
+
+			if (availableGames.Count == 0)
+			{
+				GetGameController(); //Create a new game for the pool
+			}
+			//Clean up unnecessary games
+			else if (availableGames.Count >= 5)
+			{
+				lock (GameLevels)
+				{
+					//Start at the most recently created game
+					for (int i = availableGames.Count - 1; i >= 0; i--)
+					{
+						GameLevel gameLevel = availableGames[i];
+
+						gameLevel.Close();
+
+						if (!GameLevels.TryRemove(gameLevel.GameId, out _))
+						{
+							SkyUtil.log($"Failed to remove game id:{gameLevel.GameId} from GameLevels");
+						}
+					}
+				}
+			}
+		}
+
+        public void GetGameController()
         {
             GameLevel gameLevel = _getGameController();
 
             if (gameLevel != null)
-            {
-                GameLevels.TryAdd(gameLevel.GameId, gameLevel);
-            }
-
-            return gameLevel;
+			{
+				lock (GameLevels)
+				{
+					GameLevels.TryAdd(gameLevel.GameId, gameLevel);
+				}
+			}
         }
 
         protected abstract GameLevel _getGameController();
@@ -142,6 +254,11 @@ namespace SkyCore.Game
 
         public void QueuePlayer(SkyPlayer player)
         {
+			if (player == null)
+			{
+				return;
+			}
+
             if (!QueuedPlayers.Contains(player))
             {
                 QueuedPlayers.Enqueue(player);

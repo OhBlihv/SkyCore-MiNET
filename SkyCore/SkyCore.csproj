@@ -53,15 +53,22 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\MiNET\src\MiNET\MiNET\bin\Debug\MiNET.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.9\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SharpAvi, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpAvi.2.1.0\lib\net45\SharpAvi.dll</HintPath>
     </Reference>
+    <Reference Include="StackExchange.Redis, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StackExchange.Redis.1.2.6\lib\net46\StackExchange.Redis.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
@@ -73,10 +80,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Database\DatabaseSource.cs" />
     <Compile Include="Entities\Holograms\Hologram.cs" />
     <Compile Include="Entities\Holograms\HologramController.cs" />
     <Compile Include="Entities\Holograms\TickingHologram.cs" />
     <Compile Include="Entities\PlayerNPC.cs" />
+    <Compile Include="Games\Murder\Entities\GunProjectile.cs" />
     <Compile Include="Games\Murder\Entities\MurderGunPartEntity.cs" />
     <Compile Include="Games\Murder\Items\ItemGunParts.cs" />
     <Compile Include="Games\Murder\Items\ItemInnocentGun.cs" />
@@ -88,7 +97,9 @@
     <Compile Include="Games\Murder\State\MurderEndState.cs" />
     <Compile Include="Games\Murder\State\MurderLobbyState.cs" />
     <Compile Include="Games\Murder\State\MurderRunningState.cs" />
+    <Compile Include="Game\ExternalGameHandler.cs" />
     <Compile Include="Game\State\GameTeam.cs" />
+    <Compile Include="Game\State\Impl\VoidGameState.cs" />
     <Compile Include="Game\State\Impl\EndGameState.cs" />
     <Compile Include="Game\State\Impl\LobbyState.cs" />
     <Compile Include="Game\CoreGameController.cs" />
@@ -97,6 +108,7 @@
     <Compile Include="Game\State\Impl\RunningState.cs" />
     <Compile Include="Game\State\StateType.cs" />
     <Compile Include="Permissions\SkyPermissions.cs" />
+    <Compile Include="Player\SkyFoodManager.cs" />
     <Compile Include="Player\SkyHealthManager.cs" />
     <Compile Include="Player\SkyPlayer.cs" />
     <Compile Include="Player\SkyPlayerFactory.cs" />
@@ -107,6 +119,7 @@
     <Compile Include="Util\Enumeration.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

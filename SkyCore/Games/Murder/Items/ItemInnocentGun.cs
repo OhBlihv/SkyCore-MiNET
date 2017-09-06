@@ -8,10 +8,11 @@ using MiNET.Entities.Projectiles;
 using MiNET.Items;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.Games.Murder.Entities;
 
 namespace SkyCore.Games.Murder.Items
 {
-    class ItemInnocentGun : ItemGoldHoe
+    class ItemInnocentGun : ItemBow
     {
 
         private NbtCompound _extraData;
@@ -48,11 +49,11 @@ namespace SkyCore.Games.Murder.Items
         {
             float force = 2.0f;
 
-            Arrow arrow = new Arrow(player, world, 2, force >= 1.0);
+			GunProjectile arrow = new GunProjectile(player, world, 2, force >= 1.0);
             arrow.PowerLevel = 1;
             arrow.KnownPosition = (PlayerLocation)player.KnownPosition.Clone();
             arrow.KnownPosition.Y += 1.62f;
-            arrow.Velocity = arrow.KnownPosition.GetHeadDirection() * (float)((double)force * 2.0 * 1.5);
+            arrow.Velocity = arrow.KnownPosition.GetHeadDirection() * (float)(force * 2.0 * 1.5);
             arrow.KnownPosition.Yaw = (float)arrow.Velocity.GetYaw();
             arrow.KnownPosition.Pitch = (float)arrow.Velocity.GetPitch();
             arrow.BroadcastMovement = true;

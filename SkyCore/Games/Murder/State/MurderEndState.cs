@@ -18,6 +18,11 @@ namespace SkyCore.Games.Murder.State
         {
             base.EnterState(gameLevel);
 
+			gameLevel.DoForAllPlayers(player =>
+			{
+				player.Inventory.Clear();
+			});
+
             MurderVictoryType victoryType;
 
             //Innocents Win (Murderer Dead)
@@ -85,26 +90,6 @@ namespace SkyCore.Games.Murder.State
                     player.SendTitle("§c§lYOU LOSE");
                 }, MurderTeam.Murderer);
             }
-
-            ThreadPool.QueueUserWorkItem(state =>
-            {
-				try
-				{
-					Thread.Sleep(5000);
-					gameLevel.DoForPlayersIn(player =>
-					{
-						player.SendTitle("§c§lGAME RESTARTING");
-						player.SendTitle("§7in 5 seconds...", TitleType.SubTitle);
-					}, MurderTeam.Innocent, MurderTeam.Detective, MurderTeam.Murderer, MurderTeam.Spectator);
-					Thread.Sleep(5000);
-
-					gameLevel.UpdateGameState(new MurderLobbyState());
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
-            });
         }
 
         public override GameState GetNextGameState(GameLevel gameLevel)

@@ -504,10 +504,12 @@ namespace SkyCore.Commands
             player.SendMessage($"Pos: {player.Level.LevelId}:{knownLocation.X},{knownLocation.Y},{knownLocation.Z}");
         }
 
-        [Command(Name = "transfer")]
+		[Command(Name = "transfer")]
         [Authorize(Permission = UserPermission.Admin)]
-        public void CommandTransfer(MiNET.Player player, string address, ushort port = 19132)
-        {
+        public void CommandTransfer(MiNET.Player player, string address, ushort serverPort = 19132)
+		{
+			ushort port = serverPort;
+
             McpeTransfer transferPacket = new McpeTransfer
             {
                 serverAddress = address,
@@ -515,10 +517,11 @@ namespace SkyCore.Commands
             };
 
             player.SendMessage($"§e§l(!) §r§eSending you to {address}:{port}...");
+			SkyUtil.log($"Sending {player.Username} to {address}:{port}");
             player.SendPackage(transferPacket);
         }
 
-        [Command(Name = "maptest")]
+		[Command(Name = "maptest")]
         [Authorize(Permission = UserPermission.Admin)]
         public void CommandTestMap(MiNET.Player player)
         {

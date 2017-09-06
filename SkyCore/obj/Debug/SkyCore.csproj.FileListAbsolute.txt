@@ -22,3 +22,7 @@ S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SkyCore.dll.CodeAnalysi
 S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SkyCore.dll.lastcodeanalysissucceeded
 S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.pdb
 S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.csproj.CoreCompileInputs.cache
+S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\StackExchange.Redis.dll
+S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\StackExchange.Redis.xml
+S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SkyCore.dll.config
+S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MySql.Data.dll

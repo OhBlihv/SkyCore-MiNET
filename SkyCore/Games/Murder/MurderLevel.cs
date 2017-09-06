@@ -26,7 +26,7 @@ namespace SkyCore.Games.Murder
         public SkyPlayer Murderer { get; set; }
         public SkyPlayer Detective { get; set; }
 
-        public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, gameId, levelPath)
+        public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "murder", gameId, levelPath)
         {
             string levelName;
             {

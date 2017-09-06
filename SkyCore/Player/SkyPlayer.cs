@@ -17,11 +17,12 @@ namespace SkyCore.Player
 {
     public class SkyPlayer : MiNET.Player
     {
-        private static ILog Log = LogManager.GetLogger(typeof(SkyPlayer));
 
         public SkyCoreAPI skyCoreApi;
 
         public PlayerGroup PlayerGroup { get; set; }
+
+		public bool IsGameSpectator { get; set; }
 
         public void setPlayerGroup(PlayerGroup playerGroup)
         {
@@ -45,12 +46,9 @@ namespace SkyCore.Player
                 return;
             }
 
-            base.InitializePlayer();
-
             try
             {
                 SkyUtil.log("Initialising Player");
-                base.InitializePlayer();
 
                 if (CertificateData.ExtraData.Xuid == null)
                 {
@@ -74,12 +72,33 @@ namespace SkyCore.Player
                 
                 SkyUtil.log($"Set {Username}'s name to {DisplayName}");
 
-                //Scale = 2.0D;
+				//Initialize once we've loaded the group etc.
+	            base.InitializePlayer();
 
-                _hasJoined = true;
+				//Scale = 2.0D;
+
+				_hasJoined = true;
 
                 IsSpawned = true;
-            }
+
+	            try
+	            {
+		            //Add this player to any games if available and if this is the only game available
+		            if (SkyCoreAPI.Instance.GameModes.Count == 1)
+		            {
+			            //Foreach, but only one value.
+			            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
+			            {
+				            coreGameController.InstantQueuePlayer(this);
+				            break;
+			            }
+		            }
+	            }
+	            catch (Exception e)
+	            {
+		            Console.WriteLine(e);
+	            }
+			}
             catch (Exception e)
             {
                 Console.WriteLine(e);

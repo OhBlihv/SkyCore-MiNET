@@ -9,9 +9,12 @@ namespace SkyCore.Game.State.Impl
 
     public abstract class LobbyState : GameState
     {
-        public override void EnterState(GameLevel gameController)
+        public override void EnterState(GameLevel gameLevel)
         {
-            
+            gameLevel.DoForAllPlayers(player =>
+			{
+				player.RemoveAllEffects();
+			});
         }
 
         public override void LeaveState(GameLevel gameController)

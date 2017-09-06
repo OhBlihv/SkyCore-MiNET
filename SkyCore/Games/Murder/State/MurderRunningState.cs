@@ -113,6 +113,8 @@ namespace SkyCore.Games.Murder.State
                     player.Teleport(spawnLocation);
 
                     player.SetHideNameTag(true);
+
+	                player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
                 });
 
 				gameLevel.DoForPlayersIn(player =>
@@ -127,6 +129,8 @@ namespace SkyCore.Games.Murder.State
 					player.SendTitle("§9§lDetective§r"); //Title
 
 					player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
+
+					PlayerAmmoCounts[player.Username] = int.MaxValue;
 				}, MurderTeam.Detective);
 
 				gameLevel.DoForPlayersIn(player =>
@@ -180,7 +184,7 @@ namespace SkyCore.Games.Murder.State
             {
                 player.SendTitle($"§9§lDETECTIVE §r§7{secondsLeft} Seconds Remaining\n" +
                                  $"              §7{GetPlayerGunParts(null, player)}/{MaxGunParts} Gun Parts\n" +
-                                 $"              §7{PlayerAmmoCounts[player.Username]}/10 Bullets", TitleType.ActionBar);
+                                 $"              §7Unlimited/10 Bullets", TitleType.ActionBar);
             }, MurderTeam.Detective);
 
             gameLevel.DoForPlayersIn(player =>
@@ -235,7 +239,7 @@ namespace SkyCore.Games.Murder.State
 
             if (player == murderLevel.Murderer && itemInHand is ItemMurderKnife && target != null)
             {
-                gameLevel.SetPlayerTeam(target, MurderTeam.Spectator);
+                KillPlayer((MurderLevel) gameLevel, target);
             }
             else if (itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
             {
@@ -289,14 +293,20 @@ namespace SkyCore.Games.Murder.State
         {
             murderLevel.SetPlayerTeam(player, MurderTeam.Spectator);
 
-            player.SetEffect(new Invisibility{Duration = int.MaxValue, Particles = false});
-            player.SetEffect(new Blindness {Duration = 5, Particles = false});
-            player.SendTitle("§c§lYOU DIED§r");
-
 			player.Inventory.Clear();
 
-            //TODO: Hide player from all living players
-            player.SetGameMode(GameMode.Spectator);
+			player.SetEffect(new Invisibility { Duration = int.MaxValue, Particles = false });
+			player.SetEffect(new Blindness { Duration = 20, Particles = false });
+
+			if (player == murderLevel.Murderer ||
+				murderLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0)
+			{
+				//Message appears once game ends
+			}
+			else
+			{
+				player.SendTitle("§c§lYOU DIED§r");
+			}
         }
 
         public int GetPlayerGunParts(MurderLevel gameLevel, SkyPlayer player)
