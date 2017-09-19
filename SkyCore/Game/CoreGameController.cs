@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -197,8 +198,7 @@ namespace SkyCore.Game
 					SkyUtil.log($"Closing game {gameLevel.GameId}...");
 					gameLevel.Close();
 
-					GameLevel removedGame;
-					GameLevels.TryRemove(gameLevel.GameId, out removedGame);
+					GameLevels.TryRemove(gameLevel.GameId, out _);
 				}
 			}
 

@@ -9,10 +9,11 @@ using MiNET.Items;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Games.Murder.Entities;
+using SkyCore.Util;
 
 namespace SkyCore.Games.Murder.Items
 {
-    class ItemInnocentGun : ItemBow
+    public class ItemInnocentGun : ItemBow
     {
 
         private NbtCompound _extraData;
@@ -47,15 +48,22 @@ namespace SkyCore.Games.Murder.Items
 
         public override void Release(Level world, MiNET.Player player, BlockCoordinates blockCoordinates, long timeUsed)
         {
+	        if (player.Experience > 0.1f)
+	        {
+		        return;
+	        }
+
             float force = 2.0f;
 
-			GunProjectile arrow = new GunProjectile(player, world, 2, force >= 1.0);
-            arrow.PowerLevel = 1;
-            arrow.KnownPosition = (PlayerLocation)player.KnownPosition.Clone();
-            arrow.KnownPosition.Y += 1.62f;
+	        GunProjectile arrow = new GunProjectile(player, world, 2, force >= 1.0)
+	        {
+		        PowerLevel = 1,
+		        KnownPosition = (PlayerLocation) player.KnownPosition.Clone()
+	        };
+	        arrow.KnownPosition.Y += 1.62f;
             arrow.Velocity = arrow.KnownPosition.GetHeadDirection() * (float)(force * 2.0 * 1.5);
-            arrow.KnownPosition.Yaw = (float)arrow.Velocity.GetYaw();
-            arrow.KnownPosition.Pitch = (float)arrow.Velocity.GetPitch();
+            arrow.KnownPosition.Yaw = (float) arrow.Velocity.GetYaw();
+            arrow.KnownPosition.Pitch = (float) arrow.Velocity.GetPitch();
             arrow.BroadcastMovement = true;
             arrow.DespawnOnImpact = true;
             arrow.SpawnEntity();

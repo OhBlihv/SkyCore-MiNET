@@ -54,7 +54,6 @@ namespace SkyCore
 			}
 		}
 
-
         public void OnEnable(PluginContext context)
         {
             Instance = this;
@@ -95,8 +94,12 @@ namespace SkyCore
                 //SkyPlayer player = (SkyPlayer) args.Player;
                 MiNET.Player player = args.Player;
 
-                player.PlayerJoin += OnPlayerJoin;
-                //player.PlayerLeave += OnPlayerLeave;
+				//Only add this join listener for hubs
+				if (GameModes.Count == 0)
+				{
+					player.PlayerJoin += OnPlayerJoin;
+				}
+				player.PlayerLeave += OnPlayerLeave;
 
 				if (PendingTasks.Count > 0)
 				{
@@ -220,9 +223,7 @@ namespace SkyCore
             if (player == null) throw new ArgumentNullException(nameof(eventArgs.Player));
             Console.Write(" for " + player.Username + "\n");
 
-            player.Inventory.Slots[3] = new ItemMap() {Count = 1};
-            player.Inventory.Slots[4] = new ItemItemFrame() {Count = 1};
-            player.Inventory.Slots[5] = new ItemEmptyMap() {Count = 1};
+            player.Inventory.Slots[4] = new ItemCompass() {Count = 1};
 
             player.SendPlayerInventory();
 
@@ -272,13 +273,13 @@ namespace SkyCore
         
         }
 
-        /*private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
+        private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
         {
             if (eventArgs.Level is GameLevel)
             {
                 ((GameLevel) eventArgs.Level).RemovePlayer((SkyPlayer) eventArgs.Player);
             }
-        }*/
+        }
 
         [PacketHandler, Receive]
         public Package MessageHandler(McpeText message, MiNET.Player player)

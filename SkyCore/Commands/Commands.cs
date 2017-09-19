@@ -37,7 +37,113 @@ namespace SkyCore.Commands
             this.skyCoreApi = skyCoreApi;
         }
 
-        [Command(Name = "gamemode", Aliases = new[] {"gm"})]
+	    [Command(Name = "hub")]
+	    [Authorize(Permission = UserPermission.Any)]
+	    public void CommandHub(MiNET.Player player)
+	    {
+			MoveToLobby(player);
+		}
+
+	    [Command(Name = "lobby")]
+	    [Authorize(Permission = UserPermission.Any)]
+	    public void CommandLobby(MiNET.Player player)
+	    {
+		    MoveToLobby(player);
+	    }
+
+	    public void MoveToLobby(MiNET.Player player)
+	    {
+			player.SendMessage("§e§l(!)§r §eMoving to Hub...");
+
+		    McpeTransfer transferPacket = new McpeTransfer
+		    {
+			    serverAddress = "184.171.171.26",
+			    port = 19132
+		    };
+
+		    player.SendPackage(transferPacket);
+		}
+
+	    [Command(Name = "popuptest")]
+	    [Authorize(Permission = UserPermission.Any)]
+	    public void CommandPopupTest(MiNET.Player player, string popup, string actionbar)
+	    {
+		    player.SendTitle("\n\n\n" + actionbar, TitleType.ActionBar);
+			player.SendMessage(popup, MessageType.Popup);
+	    }
+
+		[Command(Name = "neatjoin")]
+	    [Authorize(Permission = UserPermission.Admin)]
+	    public void CommandNeatJoin(MiNET.Player player, int lineCount)
+	    {
+		    string lines = "";
+		    for (int i = 0; i < lineCount; i++)
+		    {
+			    string content = $"";
+			    if (i == 1)
+			    {
+				    content = $"§e§lBETA";
+			    }
+				else if (i == 4)
+			    {
+				    content = $"§f§lNETWORK";
+			    }
+
+				lines += content + "\n";
+			    //lines += $"{i}\n";
+		    }
+
+		    player.SendTitle(lines, TitleType.SubTitle);
+		    //player.SendTitle("1\n2\n3\n4\n5", TitleType.SubTitle);
+		    player.SendTitle("§d§lSKYTONIA");
+	    }
+
+		[Command(Name = "subtitletest")]
+	    [Authorize(Permission = UserPermission.Admin)]
+	    public void CommandSubtitle(MiNET.Player player, int lineCount)
+		{
+			string lines = "";
+			for (int i = 0; i < lineCount; i++)
+			{
+				lines += $"{i}\n";
+			}
+
+		    player.SendTitle(lines, TitleType.SubTitle);
+		    //player.SendTitle("1\n2\n3\n4\n5", TitleType.SubTitle);
+			player.SendTitle(" ");
+	    }
+
+	    [Command(Name = "actionbartest")]
+	    [Authorize(Permission = UserPermission.Admin)]
+	    public void CommandActionBar(MiNET.Player player, int lineCount)
+	    {
+			string lines = "";
+		    for (int i = 0; i < lineCount; i++)
+		    {
+			    lines += $"{i}\n";
+		    }
+
+		    player.SendTitle(lines, TitleType.ActionBar);
+			//player.SendTitle("1\n2\n3\n4\n5", TitleType.ActionBar);
+			player.SendTitle(" ");
+	    }
+
+	    [Command(Name = "titletest")]
+	    [Authorize(Permission = UserPermission.Admin)]
+	    public void CommandTitle(MiNET.Player player, int lineCount)
+	    {
+			//player.SendTitle("1\n2\n3\n4\n5\n6\n7\n8\n9\n10", TitleType.SubTitle);
+			string lines = "";
+		    for (int i = 0; i < lineCount; i++)
+		    {
+			    lines += $"{i}\n";
+		    }
+
+		    player.SendTitle(lines, TitleType.Title);
+			//player.SendTitle(" ");
+		}
+
+		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
         [Authorize(Permission = UserPermission.Admin)]
         public void CommandGamemode(MiNET.Player player, int gamemodeId = 0)
         {
@@ -676,7 +782,7 @@ namespace SkyCore.Commands
             {
                 bitmap = new Bitmap(filename);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine("Failed reading file " + filename);
                 bitmap = new Bitmap(128, 128);

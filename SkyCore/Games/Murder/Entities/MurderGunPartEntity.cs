@@ -58,11 +58,11 @@ namespace SkyCore.Games.Murder.Entities
                     }
                     {
                         //Self
-                        int amount = GameState.AddPlayerGunParts((MurderLevel) Level, (SkyPlayer) player);
-                        if (amount >= 0)
+                        /*int amount = */GameState.AddPlayerGunParts((MurderLevel) Level, (SkyPlayer) player);
+                        /*if (amount >= 0)
                         {
                             player.SendMessage($"Picked up gun part {amount}/{5}!");
-                        }
+                        }*/
 
                         GameState.GunParts.Remove(SpawnLocation);
 

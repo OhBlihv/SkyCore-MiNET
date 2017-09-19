@@ -29,6 +29,8 @@ namespace SkyCore.Game
         //Team -> Player(s) //TODO: Possibly remove due to complexity?
         protected readonly Dictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
 
+		protected readonly List<PlayerLocation> LobbySpawnLocations = new List<PlayerLocation>();
+
         //
 
         public SkyCoreAPI Plugin { get; }
@@ -46,7 +48,7 @@ namespace SkyCore.Game
 
         //
 
-        public GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath)
+        public GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, PlayerLocation lobbySpawnLocation)
                 //: base(plugin.Context.LevelManager, gameId, AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath),
                 : base(plugin.Context.LevelManager, gameId, new AnvilWorldProvider(levelPath), 
                       plugin.Context.LevelManager.EntityManager, GameMode.Creative)
@@ -54,6 +56,8 @@ namespace SkyCore.Game
             Plugin = plugin;
             GameId = gameId;
 	        GameType = gameType;
+
+			LobbySpawnLocations.Add(lobbySpawnLocation);
 
             AllowBreak = false;
             AllowBuild = false;
@@ -94,6 +98,11 @@ namespace SkyCore.Game
             _gameTick.Dispose();
             _gameTickThread.Abort();
 
+			DoForAllPlayers(player =>
+			{
+				RemovePlayer(player);
+			});
+
 			base.Close();
 
 	        Plugin.Context.LevelManager.Levels.Remove(this);
@@ -125,6 +134,11 @@ namespace SkyCore.Game
 
             foreach (GameTeam team in teams)
             {
+	            if (!TeamPlayerDict.ContainsKey(team))
+	            {
+		            continue; //Ignore if invalid
+	            }
+
                 if (playerList == null)
                 {
                     playerList = TeamPlayerDict[team];
@@ -164,6 +178,12 @@ namespace SkyCore.Game
 
                 CurrentState.OnTick(this, tick, out tick);
 
+				//Process player action/popup bars
+	            foreach (SkyPlayer player in GetAllPlayers())
+	            {
+		            player.BarHandler.DoTick();
+	            }
+
                 Tick = tick; //Workaround?
             }
             catch (Exception e)
@@ -181,21 +201,36 @@ namespace SkyCore.Game
 
             //player.SpawnLevel(this, new PlayerLocation(7.5, 181, -20.5));
             //player.SpawnLevel(this, new PlayerLocation(255, 70, 255));
-            player.SpawnLevel(this, SpawnPoint);
+            player.SpawnLevel(this, LobbySpawnLocations[0]);
+
+			CurrentState.InitializePlayer(this, player);
         }
         
-        public void RemovePlayer(SkyPlayer player)
+        public new void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
         {
-            PlayerTeamDict.Remove(player.Username);
+	        CurrentState.HandleLeave(this, (SkyPlayer)player);
 
-            Level level = LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
-            if (level == null)
-            {
-                player.Disconnect("Unable to send you back to the hub!");
-                return;
-            }
+	        PlayerTeamDict.TryGetValue(player.Username, out var gameTeam);
 
-            player.SpawnLevel(level, level.SpawnPoint);
+			if (gameTeam != null)
+	        {
+		        PlayerTeamDict.Remove(player.Username);
+		        TeamPlayerDict[gameTeam].Remove((SkyPlayer) player);
+	        }
+
+			player.RemoveAllEffects();
+
+	        if (removeFromWorld && player.Level == this)
+	        {
+				Level level = LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+		        if (level == null)
+		        {
+			        player.Disconnect("Unable to send you back to the hub!");
+			        return;
+		        }
+
+		        player.SpawnLevel(level, level.SpawnPoint);
+			}
         }
 
         public GameTeam GetPlayerTeam(SkyPlayer player)

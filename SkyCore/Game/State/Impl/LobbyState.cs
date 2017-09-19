@@ -24,12 +24,15 @@ namespace SkyCore.Game.State.Impl
 
         public override bool CanAddPlayer(GameLevel gameLevel)
         {
-            return true;
+	        return gameLevel.GetPlayerCount() < gameLevel.GetMaxPlayers();
         }
 
-        public override void InitializePlayer(GameLevel gameController, SkyPlayer player)
+        public override void InitializePlayer(GameLevel gameLevel, SkyPlayer player)
         {
-            player.SendMessage($"{ChatColors.Yellow}{player.PlayerGroup.Prefix}{player.Username} joined ({gameController.GetPlayerCount()}/{gameController.GetMaxPlayers()})");
+			gameLevel.DoForAllPlayers(gamePlayer =>
+			{
+				gamePlayer.BarHandler.AddMinorLine($"§e{player.PlayerGroup.Prefix}{player.Username} joined ({gameLevel.GetPlayerCount()}/{gameLevel.GetMaxPlayers()})");
+			});
         }
 
         public override void HandleLeave(GameLevel gameController, SkyPlayer player)
@@ -45,7 +48,7 @@ namespace SkyCore.Game.State.Impl
         public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
             int currentPlayers  = gameLevel.GetPlayerCount(),
-                requiredPlayers = getRequiredPlayers(gameLevel);
+                requiredPlayers = GetRequiredPlayers(gameLevel);
 
 			string actionBarMessage = null;
 
@@ -56,7 +59,7 @@ namespace SkyCore.Game.State.Impl
                 //Only update action bar every second
                 if (currentTick % 2 == 0)
                 {
-                    actionBarMessage = $"{ChatColors.Yellow}{gameLevel.GetPlayerCount()}/{getRequiredPlayers(gameLevel)} players required for start";
+	                actionBarMessage = $"§d§lStarting Soon:§r §7({gameLevel.GetPlayerCount()}/{GetRequiredPlayers(gameLevel)}) §fPlayers Required...";
                 }
             }
             else
@@ -69,19 +72,26 @@ namespace SkyCore.Game.State.Impl
                 //Only update action bar every second
                 if (currentTick % 2 == 0)
                 {
-                    int secondsRemaining = (getCountdownTicks() - (currentTick - startCountdownTick)) / 2;
+                    int secondsRemaining = (GetCountdownTicks() - (currentTick - startCountdownTick)) / 2;
                     if (secondsRemaining <= 0)
                     {
                         if (secondsRemaining == 0)
                         {
-                            actionBarMessage = $"{ChatColors.Yellow}Starting Game...";
+                            actionBarMessage = "§d§lGame Starting:§r §fBeginning Now...";
 
                             gameLevel.UpdateGameState(GetNextGameState(gameLevel));
                         }
                     }
                     else
                     {
-                        actionBarMessage = $"{ChatColors.Yellow}Starting Game in {secondsRemaining} seconds...";
+	                    if (secondsRemaining == 1)
+	                    {
+							actionBarMessage = $"§d§lGame Starting:§r §7{secondsRemaining} §fSecond Remaining...";
+						}
+	                    else
+	                    {
+							actionBarMessage = $"§d§lGame Starting:§r §7{secondsRemaining} §fSeconds Remaining...";
+						}
                     }
                 }
             }
@@ -90,7 +100,7 @@ namespace SkyCore.Game.State.Impl
             {
                 foreach (SkyPlayer player in gameLevel.GetPlayers())
                 {
-                    player.SendTitle(actionBarMessage, TitleType.ActionBar);
+	                player.BarHandler.AddMajorLine(actionBarMessage, 2);
                 }
             }
 
@@ -103,12 +113,12 @@ namespace SkyCore.Game.State.Impl
 
         private int startCountdownTick = -1;
 
-        protected int getCountdownTicks()
+        protected int GetCountdownTicks()
         {
             return 20; //10 seconds by default
         }
 
-        protected int getRequiredPlayers(GameLevel gameLevel)
+        protected int GetRequiredPlayers(GameLevel gameLevel)
         {
             return 2;
             //return (int) (gameLevel.GetMaxPlayers() * 0.8D);

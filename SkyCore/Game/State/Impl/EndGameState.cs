@@ -16,48 +16,12 @@ namespace SkyCore.Game.State.Impl
 {
     public abstract class EndGameState : GameState
     {
+
+	    private int _timeRemaining = 10; //5 Seconds
+
         public override void EnterState(GameLevel gameLevel)
         {
-			ThreadPool.QueueUserWorkItem(state =>
-			{
-				try
-				{
-					Thread.Sleep(5000);
-					gameLevel.DoForAllPlayers(player =>
-					{
-						player.SendTitle("§7in 5 seconds...", TitleType.SubTitle);
-						player.SendTitle("§c§lGAME RESTARTING");
-					});
-					Thread.Sleep(5000);
-
-					MiNET.Player[] remainingPlayers = gameLevel.GetAllPlayers();
-					if (remainingPlayers.Length > 0)
-					{
-						Level hubLevel = SkyCoreAPI.Instance.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
-
-						foreach (MiNET.Player player in remainingPlayers)
-						{
-							if (hubLevel == null)
-							{
-								//TODO: Avoid kicking them?
-								player.Disconnect("Unable to enter hub.");
-							}
-							else
-							{
-								hubLevel.AddPlayer(player, true);
-							}
-						}
-
-						Thread.Sleep(2000);
-					}
-
-					gameLevel.UpdateGameState(new VoidGameState());
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
-			});
+			
 		}
 
         public override void LeaveState(GameLevel gameLevel)
@@ -93,7 +57,56 @@ namespace SkyCore.Game.State.Impl
         public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
             outTick = currentTick;
-        }
+
+	        if (_timeRemaining-- >= 0)
+	        {
+		        int timeRemaining = _timeRemaining / 2;
+		        string message;
+		        if (timeRemaining != 1)
+		        {
+			        message = $"§d§lGame Ended:§r §fNext Game starts in §7{timeRemaining} §fSeconds...";
+
+		        }
+		        else
+		        {
+			        message = $"§d§lGame Ended:§r §fNext Game starts in §7{timeRemaining} §fSecond...";
+		        }
+
+				gameLevel.DoForAllPlayers(player =>
+				{
+					player.SendTitle(message, TitleType.ActionBar);
+				});
+			}
+	        else
+	        {
+				MiNET.Player[] remainingPlayers = gameLevel.GetAllPlayers();
+		        if (remainingPlayers.Length > 0)
+		        {
+			        Level hubLevel = SkyCoreAPI.Instance.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+
+			        foreach (MiNET.Player player in remainingPlayers)
+			        {
+				        if (hubLevel == null)
+				        {
+					        //TODO: Avoid kicking them?
+					        player.Disconnect("Unable to enter hub.");
+				        }
+				        else
+				        {
+					        player.SendTitle($"§d§lGame Ending: §r§fMoving to New Game...", TitleType.ActionBar);
+
+							gameLevel.RemovePlayer(player);
+							
+							ExternalGameHandler.RequeuePlayer((SkyPlayer) player, gameLevel.GameType);
+				        }
+			        }
+		        }
+
+				Thread.Sleep(5000);
+
+				gameLevel.UpdateGameState(new VoidGameState());
+			}
+		}
 
         public override GameState GetNextGameState(GameLevel gameLevel)
         {

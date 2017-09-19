@@ -13,6 +13,7 @@ using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Entities
 {
@@ -41,10 +42,6 @@ namespace SkyCore.Entities
             {
                 SkyUtil.log($"(2) Processing NPC Interact as {player.Username}");
                 Action((SkyPlayer)player);
-            }
-            else
-            {
-                player.SendMessage("It Works!");
             }
         }
 
@@ -107,16 +104,16 @@ namespace SkyCore.Entities
                 {
                     if (command.StartsWith("GID:"))
                     {
-                        action = player =>
+						action = player =>
                         {
-                            switch (command)
+	                        player.FreezePlayer = true; //Avoid movement
+							switch (command)
                             {
 								//TODO: Split around the colon
                                 case "GID:murder":
+									
                                     player.SendMessage("Queueing for Murder");
-									//SkyUtil.log($"Sending {player.Username} to {ExternalGameHandler.GameRegistrations["murder"].ConnectingAddress}:{ExternalGameHandler.GameRegistrations["murder"].ConnectingPort}");
-                                    //SkyCoreAPI.Instance.GameModes["murder"].QueuePlayer(player);
-									ExternalGameHandler.AddPlayer(player, "murder");
+									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, "murder"), 200);
                                     break;
                                 default:
                                     Console.WriteLine($"Unable to process game command {command}");

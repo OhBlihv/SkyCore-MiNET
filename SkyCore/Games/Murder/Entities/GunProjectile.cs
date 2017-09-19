@@ -247,7 +247,7 @@ namespace SkyCore.Games.Murder.Entities
 			return true;
 		}
 
-		public bool SetIntersectLocation(BoundingBox bbox, Vector3 location)
+		public new bool SetIntersectLocation(BoundingBox bbox, Vector3 location)
 		{
 			Ray ray = new Ray(location - Velocity, Vector3.Normalize(Velocity));
 			double? distance = ray.Intersects(bbox);

@@ -18,7 +18,7 @@ namespace SkyCore.Entities.Holograms
 
         public int Tick = 0;
 
-        public abstract void OnTick();
+        public override abstract void OnTick();
 
         /*public override void OnTick()
         {

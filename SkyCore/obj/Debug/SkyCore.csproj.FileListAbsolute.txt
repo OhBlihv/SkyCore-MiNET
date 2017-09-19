@@ -26,3 +26,5 @@ S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\StackExchange.Redis.dll
 S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\StackExchange.Redis.xml
 S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SkyCore.dll.config
 S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MySql.Data.dll
+S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\YamlDotNet.dll
+S:\Git\TreasureWars\C#\SkyCore\SkyCore\SkyCore\bin\Debug\YamlDotNet.xml

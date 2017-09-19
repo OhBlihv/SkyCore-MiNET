@@ -10,31 +10,47 @@ using MiNET.Utils;
 using log4net;
 using MiNET.Items;
 using MiNET.Worlds;
+using SkyCore.Database;
 using SkyCore.Entities;
 using SkyCore.Game;
+using SkyCore.Util;
 
 namespace SkyCore.Player
 {
     public class SkyPlayer : MiNET.Player
     {
 
-        public SkyCoreAPI skyCoreApi;
+        public SkyCoreAPI SkyCoreApi;
 
         public PlayerGroup PlayerGroup { get; set; }
 
 		public bool IsGameSpectator { get; set; }
 
-        public void setPlayerGroup(PlayerGroup playerGroup)
+		public BarHandler BarHandler { get; private set; }
+
+        public void SetPlayerGroup(PlayerGroup playerGroup)
         {
             PlayerGroup = playerGroup;
 
             //Initialize Player UserPermission level for commands
             PermissionLevel = playerGroup.PermissionLevel;
-        }
+
+	        string prefix = PlayerGroup.Prefix;
+	        if (prefix.Length > 2)
+	        {
+		        prefix += " ";
+	        }
+
+	        SetDisplayName(prefix + Username);
+	        SetNameTag(prefix + Username);
+	        this.SetHideNameTag(false);
+
+	        SkyUtil.log($"Set {Username}'s name to {DisplayName}");
+		}
 
         public SkyPlayer(MiNetServer server, IPEndPoint endpoint, SkyCoreAPI skyCoreApi) : base(server, endpoint)
         {
-            this.skyCoreApi = skyCoreApi;
+            this.SkyCoreApi = skyCoreApi;
         }
 
         private bool _hasJoined = false;
@@ -56,21 +72,44 @@ namespace SkyCore.Player
                     //return;
                 }
 
-                SkyUtil.log("Reading Group for " + Username);
-                setPlayerGroup(skyCoreApi.Permissions.getPlayerGroup(Username));
-                SkyUtil.log($"Initialized as {PlayerGroup}({PermissionLevel})");
+				BarHandler = new BarHandler(this);
+				
+				SetPlayerGroup(PlayerGroup.Player);
 
-                string prefix = PlayerGroup.Prefix;
-                if (prefix.Length > 2)
-                {
-                    prefix += " ";
-                }
+				RunnableTask.RunTask(() =>
+				{
+					new DatabaseAction().Query(
+						"SELECT `group_name` FROM player_groups WHERE `player_xuid`=@id",
+						(command) =>
+						{
+							command.Parameters.AddWithValue("@id", CertificateData.ExtraData.Xuid);
+						},
+						(reader) =>
+						{
+							PlayerGroup playerGroup;
+							PlayerGroup.ValueOf(reader.GetString(0), out playerGroup);
 
-                SetDisplayName(prefix + Username);
-                SetNameTag(prefix + Username);
-                this.SetHideNameTag(false);
-                
-                SkyUtil.log($"Set {Username}'s name to {DisplayName}");
+							if (playerGroup == null)
+							{
+								playerGroup = PlayerGroup.Player;
+							}
+
+							SetPlayerGroup(playerGroup);
+						},
+						new Action(delegate
+						{
+							SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({PermissionLevel})");
+
+							/*if (Username.Equals("OhBlihv"))
+							{
+								setPlayerGroup(PlayerGroup.Admin);
+								SkyUtil.log("Overriding OhBlihv's group to Admin");
+							}*/
+						})
+					);
+				});
+
+                SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({PermissionLevel})");
 
 				//Initialize once we've loaded the group etc.
 	            base.InitializePlayer();
@@ -137,10 +176,10 @@ namespace SkyCore.Player
 
             if (target is PlayerNPC)
             {
-                if (message.actionId == 2)
+                if (message.actionId == 1 || message.actionId == 2)
                 {
                     SkyUtil.log($"Processing NPC Interact as {Username}");
-                    (target as PlayerNPC)?.OnInteract(this);
+                    (target as PlayerNPC).OnInteract(this);
                 }
             }
             else
@@ -154,7 +193,14 @@ namespace SkyCore.Player
             base.HandleMcpeInteract(message);
         }
 
-        public override void SpawnLevel(Level toLevel, PlayerLocation spawnPoint, bool useLoadingScreen = false, Func<Level> levelFunc = null, Action postSpawnAction = null)
+	    protected override void OnPlayerLeave(PlayerEventArgs e)
+	    {
+			BarHandler.Clear();
+
+		    base.OnPlayerLeave(e);
+	    }
+
+		public override void SpawnLevel(Level toLevel, PlayerLocation spawnPoint, bool useLoadingScreen = false, Func<Level> levelFunc = null, Action postSpawnAction = null)
         {
             for (int i = 0; i < Inventory.Slots.Count; ++i)
             {

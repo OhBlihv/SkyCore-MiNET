@@ -30,19 +30,19 @@ namespace SkyCore.Games.Murder.State
             {
                 victoryType = MurderVictoryType.MURDERER_DEAD;
 
-                gameLevel.DoForPlayersIn(player =>
-                {
-                    player.SendTitle($"§c§lYOU LOSE§r\n" +
-                                     $"" +
-                                     $"§7The §aINNOCENTS §7have killed the §cMURDERER!§r", TitleType.ActionBar);
-                    player.SendTitle("§e§lYOU LOSE§r");
-                }, MurderTeam.Murderer);
+				MiNET.Player murderer = ((MurderLevel)gameLevel).Murderer;
 
-                gameLevel.DoForPlayersIn(player =>
+	            ((SkyPlayer) murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 2, 4);
+	            murderer.SendTitle("§e§lYOU LOSE§r");
+
+				gameLevel.DoForPlayersIn(player =>
                 {
-                    player.SendTitle($"§a§lYOU WIN§r\n" +
-                                     $"" +
-                                     $"§7The §aINNOCENTS §7have killed the §cMURDERER!§r", TitleType.ActionBar);
+	                if (player == murderer)
+	                {
+		                return;
+	                }
+
+	                ((SkyPlayer)murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 2, 4);
                     player.SendTitle("§a§lYOU WIN§r");
                 }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
             }
@@ -53,18 +53,14 @@ namespace SkyCore.Games.Murder.State
 
                 gameLevel.DoForPlayersIn(player =>
                 {
-                    player.SendTitle($"§a§lYOU WIN§r\n" +
-                                     $"" +
-                                     $"§7The §cMURDERER §7have killed all §aINNOCENTS!§r", TitleType.ActionBar);
-                    player.SendTitle("§a§lYOU WIN§r");
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 2);
+					player.SendTitle("§a§lYOU WIN§r");
                 }, MurderTeam.Murderer);
 
                 //TODO: DO properly
                 gameLevel.DoForPlayersIn(player =>
                 {
-                    player.SendTitle($"§c§lYOU LOSE§r\n" +
-                                     $"" +
-                                     $"§7The §cMURDERER §7have killed all §aINNOCENTS!§r", TitleType.ActionBar);
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 2);
                     player.SendTitle("§c§lYOU LOSE");
                 }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
             }
@@ -75,18 +71,13 @@ namespace SkyCore.Games.Murder.State
 
                 gameLevel.DoForPlayersIn(player =>
                 {
-                    player.SendTitle($"§a§lYOU WIN§r\n" +
-                                     $"\n" +
-                                     $"§7The §cMURDERER §7has run out of time!§r", TitleType.ActionBar);
-
-                    player.SendTitle("§a§lYOU WIN");
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 2);
+					player.SendTitle("§a§lYOU WIN");
                 }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
 
                 gameLevel.DoForPlayersIn(player =>
                 {
-                    player.SendTitle($"§c§lYOU LOSE§r\n" +
-                                     $"\n" +
-                                     $"§7The §cMURDERER §7has run out of time!§r", TitleType.ActionBar);
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 2);
                     player.SendTitle("§c§lYOU LOSE");
                 }, MurderTeam.Murderer);
             }

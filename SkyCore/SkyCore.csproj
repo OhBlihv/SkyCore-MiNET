@@ -77,10 +77,13 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="YamlDotNet, Version=4.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.4.2.1\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\Commands.cs" />
-    <Compile Include="Database\DatabaseSource.cs" />
+    <Compile Include="Database\DatabaseAction.cs" />
     <Compile Include="Entities\Holograms\Hologram.cs" />
     <Compile Include="Entities\Holograms\HologramController.cs" />
     <Compile Include="Entities\Holograms\TickingHologram.cs" />
@@ -116,7 +119,11 @@
     <Compile Include="SkyCoreAPI.cs" />
     <Compile Include="SkyUtil.cs" />
     <Compile Include="Util\AnvilProviderFactory.cs" />
+    <Compile Include="Util\BarHandler.cs" />
     <Compile Include="Util\Enumeration.cs" />
+    <Compile Include="Util\File\FlatFile.cs" />
+    <Compile Include="Util\RunnableTask.cs" />
+    <Compile Include="Util\TitleUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

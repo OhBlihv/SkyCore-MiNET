@@ -8,6 +8,7 @@ using MiNET;
 using MiNET.Plugins;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
+using SkyCore.Database;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -16,8 +17,10 @@ namespace SkyCore.Permissions
 
     public class PlayerGroup : Enumeration
     {
-        
-        public static readonly PlayerGroup Player    = new PlayerGroup(0, "Player", "§7", "§7", UserPermission.Any);
+
+	    public static readonly List<PlayerGroup> Values = new List<PlayerGroup>();
+
+		public static readonly PlayerGroup Player    = new PlayerGroup(0, "Player", "§7", "§7", UserPermission.Any);
         public static readonly PlayerGroup Vip       = new PlayerGroup(1, "VIP", "§a", "§a[VIP]", UserPermission.Any);
         public static readonly PlayerGroup Pro       = new PlayerGroup(2, "PRO", "§b", "§b[PRO]", UserPermission.Any);
         public static readonly PlayerGroup Mvp       = new PlayerGroup(3, "MVP", "§d", "§d[MVP]", UserPermission.Any);
@@ -27,9 +30,23 @@ namespace SkyCore.Permissions
         public static readonly PlayerGroup Youtuber  = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]", UserPermission.Host);
         public static readonly PlayerGroup Admin     = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]", UserPermission.Admin);
 
-        //
+		//
 
-        private int _enumVal { get; }
+		static PlayerGroup()
+		{
+			RunnableTask.RunTask(() =>
+			{
+				new DatabaseAction().Query(
+					"CREATE TABLE IF NOT EXISTS `player_groups` (\n" +
+					"`player_xuid`       varchar(50),\n" +
+					"`group_name`        varchar(50),\n" +
+					" PRIMARY KEY(`player_xuid`)\n" +
+					");",
+					null, null, null);
+			});
+		}
+
+		private int _enumVal { get; }
 
         public string GroupName { get; }
 
@@ -47,6 +64,8 @@ namespace SkyCore.Permissions
             GroupColour = groupColour;
             Prefix = prefix;
             PermissionLevel = permissionLevel;
+
+			Values.Add(this);
         }
 
         public int compareTo(PlayerGroup playerGroup)
@@ -139,17 +158,38 @@ namespace SkyCore.Permissions
             {
                 player.SendMessage($"{ChatColors.Red}Unrecognized group name '{targetGroupName}'.");
                 string possibleGroups = "";
-                foreach (PlayerGroup groupLoop in Enum.GetValues(typeof(PlayerGroup)))
+                foreach (PlayerGroup groupLoop in PlayerGroup.Values)
                 {
-                    possibleGroups += groupLoop + ",";
+                    possibleGroups += groupLoop.GroupName + ",";
                 }
 
                 player.SendMessage($"Possible Groups: {possibleGroups}");
                 return;
             }
 
-            ((SkyPlayer) player).setPlayerGroup(targetGroup);
-            player.SendMessage($"{ChatColors.Yellow}Updated {player.Username}'s group to {targetGroup}");
+            ((SkyPlayer) target).SetPlayerGroup(targetGroup);
+
+	        RunnableTask.RunTask(() =>
+	        {
+		        new DatabaseAction().Execute(
+					"INSERT INTO `player_groups`\n" +
+					"  (`player_xuid`, `group_name`)\n" +
+			        "VALUES\n" +
+					"  (@xuid, @group)\n" +
+			        "ON DUPLICATE KEY UPDATE\n" +
+					"  `player_xuid`    = VALUES(`player_xuid`),\n" +
+					"  `group_name`     = VALUES(`group_name`);",
+					(command) =>
+			        {
+				        command.Parameters.AddWithValue("@xuid", target.CertificateData.ExtraData.Xuid);
+				        command.Parameters.AddWithValue("@group", targetGroup.GroupName);
+			        },
+			        new Action(delegate
+			        {
+						player.SendMessage($"{ChatColors.Yellow}Updated {target.Username}'s group to {targetGroup.GroupName}");
+					})
+		        );
+	        });
         }
 
         [Command(Name = "perm get")]
@@ -171,7 +211,7 @@ namespace SkyCore.Permissions
                 return;
             }
 
-            player.SendMessage($"{ChatColors.Yellow}{player.Username} is currently rank '{((SkyPlayer)player).PlayerGroup}'");
+            player.SendMessage($"{ChatColors.Yellow}{target.Username} is currently rank '{((SkyPlayer)player).PlayerGroup.GroupName}'");
         }
 
     }

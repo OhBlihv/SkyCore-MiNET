@@ -23,7 +23,7 @@ namespace SkyCore.Entities
             KnownPosition = playerLocation;
         }
 
-        public virtual void SetNameTag(string nameTag)
+        public override void SetNameTag(string nameTag)
         {
             NameTag = nameTag;
 

@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MiNET;
+using MiNET.Blocks;
 using MiNET.Effects;
 using MiNET.Entities;
 using MiNET.Entities.Projectiles;
 using MiNET.Entities.World;
 using MiNET.Items;
+using MiNET.Particles;
+using MiNET.Sounds;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
@@ -25,11 +29,15 @@ namespace SkyCore.Games.Murder.State
     class MurderRunningState : RunningState
     {
 
+	    private const int MaxGameTime = 120;
+	    private const int PreStartTime = 10;
+
         private const int MaxGunParts = 5;
 
         private readonly Random _random = new Random();
 
-        private int endTick = 5000; //Default value
+        private int _endTick = -1; //Default value
+	    private bool _isStarted = false;
 
         private static readonly List<PlayerLocation> GunPartLocations = new List<PlayerLocation>();
         private static readonly List<PlayerLocation> PlayerSpawnLocations = new List<PlayerLocation>();
@@ -54,94 +62,123 @@ namespace SkyCore.Games.Murder.State
                 PlayerSpawnLocations.Add(((MurderLevel)gameLevel).PlayerSpawnLocations[0]);
             }
 
+	        _endTick = gameLevel.Tick + MaxGameTime + PreStartTime;
+
             try
             {
-                //endTick = gameLevel.Tick + 240; //2 Minutes
-                endTick = gameLevel.Tick + 120; //60 Seconds
+				RunnableTask.RunTask(() =>
+	            {
+					//Create new collection due to iterating over a live list
+					ICollection<MiNET.Player> players = new List<MiNET.Player>(gameLevel.Players.Values);
+		            foreach (MiNET.Player player in players)
+		            {
+			            player.SetEffect(new Blindness{Duration = 80,Particles = false}); //Should be 3 seconds?
+		            }
 
-                //Create new collection due to iterating over a live list
-                ICollection<MiNET.Player> players = new List<MiNET.Player>(gameLevel.Players.Values);
+		            List<PlayerLocation> usedSpawnLocations = new List<PlayerLocation>();
+		            gameLevel.DoForAllPlayers(player =>
+		            {
+			            //Pre-add all players to the map to avoid any unnecessary contains
+			            PlayerAmmoCounts.Add(player.Username, 0);
+			            PlayerGunPartCounts.Add(player.Username, 0);
 
-                int murdererIdx = _random.Next(players.Count),
-                    detectiveIdx = 0;
+			            player.SetGameMode(GameMode.Adventure);
 
-                int idx = 0;
-                while (++idx < 50 && (detectiveIdx = _random.Next(players.Count)) == murdererIdx)
-                {
-                    //
-                }
+			            //Avoid spawning two players in the same location
+			            PlayerLocation spawnLocation;
+			            while (usedSpawnLocations.Contains((spawnLocation = PlayerSpawnLocations[_random.Next(PlayerSpawnLocations.Count)])))
+			            {
+				            //
+			            }
 
-                Console.WriteLine($"Rolled Murderer as {murdererIdx} Detective as {detectiveIdx} with 0-{players.Count - 1} possible indexes");
+			            usedSpawnLocations.Add(spawnLocation);
 
-                idx = 0;
-                foreach (SkyPlayer player in players)
-                {
-                    if (idx == murdererIdx)
-                    {
-                        gameLevel.SetPlayerTeam(player, MurderTeam.Murderer);
-                    }
-                    else if (idx == detectiveIdx)
-                    {
-                        gameLevel.SetPlayerTeam(player, MurderTeam.Detective);
-                    }
-                    else
-                    {
-                        gameLevel.SetPlayerTeam(player, MurderTeam.Innocent);
-                    }
+			            player.Teleport(spawnLocation);
 
-                    idx++;
-                }
+			            player.SetHideNameTag(true);
 
-                List<PlayerLocation> usedSpawnLocations = new List<PlayerLocation>();
-                gameLevel.DoForAllPlayers(player =>
-                {
-					//Pre-add all players to the map to avoid any unnecessary contains
-					PlayerAmmoCounts.Add(player.Username, 0);
-					PlayerGunPartCounts.Add(player.Username, 0);
+			            player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
 
-                    player.SetGameMode(GameMode.Adventure);
+						SkyUtil.log($"Moving speed from {player.MovementSpeed} to 0 during freeze phase");
+			            player.MovementSpeed = 0.001f;
+		            });
 
-                    //Avoid spawning two players in the same location
-                    PlayerLocation spawnLocation;
-                    while (usedSpawnLocations.Contains((spawnLocation = PlayerSpawnLocations[_random.Next(PlayerSpawnLocations.Count)])))
-                    {
-                        //
-                    }
+					List<MurderTeam> teamRotation = new List<MurderTeam> { MurderTeam.Murderer, MurderTeam.Detective, MurderTeam.Innocent };
+		            for (int i = 0; i < 12; i++)
+		            {
+			            MurderTeam team = teamRotation[i % 3];
+						foreach (MiNET.Player player in players)
+						{
+							TitleUtil.SendCenteredSubtitle(player, team.TeamPrefix + "§l" + team.TeamName);
+						}
 
-                    usedSpawnLocations.Add(spawnLocation);
+						SkyUtil.log($"Printed scroll {i}/12, with {team.TeamPrefix + "§l" + team.TeamName}");
+			            Thread.Sleep(250);
+		            }
 
-                    player.Teleport(spawnLocation);
+					int murdererIdx = _random.Next(players.Count),
+						detectiveIdx = 0;
 
-                    player.SetHideNameTag(true);
+					int idx = 0;
+					while (++idx < 50 && (detectiveIdx = _random.Next(players.Count)) == murdererIdx)
+					{
+						//
+					}
 
-	                player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
-                });
+					Console.WriteLine($"Rolled Murderer as {murdererIdx} Detective as {detectiveIdx} with 0-{players.Count - 1} possible indexes");
 
-				gameLevel.DoForPlayersIn(player =>
-				{
-					player.SendTitle("§7Track down the murderer!", TitleType.SubTitle);
-					player.SendTitle("§a§lInnocent§r"); //Title
-				}, MurderTeam.Innocent);
+					idx = 0;
+					foreach (SkyPlayer player in players)
+					{
+						if (idx == murdererIdx)
+						{
+							gameLevel.SetPlayerTeam(player, MurderTeam.Murderer);
+						}
+						else if (idx == detectiveIdx)
+						{
+							gameLevel.SetPlayerTeam(player, MurderTeam.Detective);
+						}
+						else
+						{
+							gameLevel.SetPlayerTeam(player, MurderTeam.Innocent);
+						}
 
-				gameLevel.DoForPlayersIn(player =>
-				{
-					player.SendTitle("§7Track down the murderer!", TitleType.SubTitle);
-					player.SendTitle("§9§lDetective§r"); //Title
+						idx++;
+					}
 
-					player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
+					gameLevel.DoForPlayersIn(player =>
+					{
+						TitleUtil.SendCenteredSubtitle(player, "§a§lInnocent§r\n§7Track down the murderer!");
+					}, MurderTeam.Innocent);
 
-					PlayerAmmoCounts[player.Username] = int.MaxValue;
-				}, MurderTeam.Detective);
+					gameLevel.DoForPlayersIn(player =>
+					{
+						TitleUtil.SendCenteredSubtitle(player, "§9§lDetective§r\n§7Track down the murderer!");
 
-				gameLevel.DoForPlayersIn(player =>
-				{
-					player.SendTitle("§7Kill all innocent players!", TitleType.SubTitle);
-					player.SendTitle("§c§lMurderer§r"); //Title
+						player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
+						SkyUtil.log($"In Slot 0 = {player.Inventory.GetSlots()[0].GetType().FullName}");
 
-					player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
+						PlayerAmmoCounts[player.Username] = int.MaxValue;
+					}, MurderTeam.Detective);
 
-					//PlayerAmmoCounts[player.Username] = 3; //Throwing Knives
-				}, MurderTeam.Murderer);
+					gameLevel.DoForPlayersIn(player =>
+					{
+						TitleUtil.SendCenteredSubtitle(player, "§c§lMurderer§r\n§7Kill all innocent players!");
+
+						player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
+
+						player.HungerManager.Hunger = 20; //Set food to 'able to run' level.
+
+						//PlayerAmmoCounts[player.Username] = 3; //Throwing Knives
+					}, MurderTeam.Murderer);
+
+					gameLevel.DoForAllPlayers(player =>
+					{
+						player.MovementSpeed = 0.1f;
+					});
+
+		            _isStarted = true;
+	            });
 			}
             catch (Exception e)
             {
@@ -161,35 +198,78 @@ namespace SkyCore.Games.Murder.State
             GunParts.Clear();
         }
 
-        public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
+		public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
-            base.OnTick(gameLevel, currentTick, out outTick);
+	        base.OnTick(gameLevel, currentTick, out outTick);
 
-            int secondsLeft = (endTick - currentTick) / 2;
+            int secondsLeft = (_endTick - currentTick) / 2;
 
-            if (secondsLeft == 0)
-            {
-                gameLevel.UpdateGameState(GetNextGameState(gameLevel));
-                return;
-            }
+	        if (secondsLeft > (MaxGameTime / 2))
+	        {
+		        return; //Ignore until the ticker has finished
+	        }
+	        if (secondsLeft == 0)
+	        {
+		        gameLevel.UpdateGameState(GetNextGameState(gameLevel));
+		        return;
+	        }
+
+	        {
+				PlayerLocation soundLocation = PlayerSpawnLocations[_random.Next(PlayerSpawnLocations.Count)];
+		        Vector3 soundVector = new Vector3(soundLocation.X, soundLocation.Y, soundLocation.Z);
+
+		        Sound sound;
+
+		        switch (_random.Next(2))
+		        {
+			        case 0:
+				        sound = new DoorCloseSound(soundVector);
+				        break;
+					case 1:
+						sound = new FizzSound(soundVector);
+						break;
+					default:
+						sound = new BlazeFireballSound(soundVector);
+						break;
+		        }
+
+		        sound.Spawn(gameLevel);
+			}
+
+	        string neatRemaining;
+	        {
+		        int minutes = 0;
+				while (secondsLeft >= 60)
+				{
+					secondsLeft -= 60;
+					minutes++;
+				}
+
+		        neatRemaining = minutes + ":";
+
+		        if (secondsLeft < 10)
+		        {
+			        neatRemaining += "0" + secondsLeft;
+		        }
+		        else
+		        {
+			        neatRemaining += secondsLeft;
+		        }
+	        }
 
             gameLevel.DoForPlayersIn(player =>
             {
-                player.SendTitle($"§a§lINNOCENT §r§7{secondsLeft} Seconds Remaining\n" +
-                                 $"\t              §7{GetPlayerGunParts(null, player)}/{MaxGunParts} Gun Parts\n" +
-                                 $"\t              §7{PlayerAmmoCounts[player.Username]}/10 Bullets", TitleType.ActionBar);
+				player.BarHandler.AddMajorLine($"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerAmmo(gameLevel as MurderLevel, player)}/10 §fBullets...", 2);
             }, MurderTeam.Innocent);
 
             gameLevel.DoForPlayersIn(player =>
             {
-                player.SendTitle($"§9§lDETECTIVE §r§7{secondsLeft} Seconds Remaining\n" +
-                                 $"              §7{GetPlayerGunParts(null, player)}/{MaxGunParts} Gun Parts\n" +
-                                 $"              §7Unlimited/10 Bullets", TitleType.ActionBar);
+	            player.BarHandler.AddMajorLine($"§9§lDETECTIVE§r §7| {neatRemaining} Remaining §7| §dUnlimited §fBullets...", 2);
             }, MurderTeam.Detective);
 
             gameLevel.DoForPlayersIn(player =>
 			{
-				player.SendTitle($"§c§lMURDERER §r§7{secondsLeft} Seconds Remaining", TitleType.ActionBar); //\n" +
+				player.BarHandler.AddMajorLine($"§c§lMURDERER§r {neatRemaining} Remaining", 2);
 				//$"              §7{PlayerAmmoCounts[player.Username]}/3 Throwing Knives", TitleType.ActionBar);
 			}, MurderTeam.Murderer);
 
@@ -243,9 +323,18 @@ namespace SkyCore.Games.Murder.State
             }
             else if (itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
             {
-                var arrow = new Arrow(player, gameLevel) { Damage = 0 };
-                arrow.KnownPosition = (PlayerLocation)player.KnownPosition.Clone();
-                arrow.KnownPosition.Y += 1.62f;
+				SkyUtil.log($"Experience: {player.Experience}");
+	            if (player.Experience > 0.05f)
+	            {
+		            return true;
+	            }
+
+				var arrow = new Arrow(player, gameLevel)
+	            {
+		            Damage = 0,
+		            KnownPosition = (PlayerLocation) player.KnownPosition.Clone()
+	            };
+	            arrow.KnownPosition.Y += 1.62f;
 
                 arrow.Velocity = arrow.KnownPosition.GetHeadDirection() * (2 * 2.0f * 1.5f);
                 arrow.KnownPosition.Yaw = (float)arrow.Velocity.GetYaw();
@@ -255,6 +344,26 @@ namespace SkyCore.Games.Murder.State
                 arrow.SpawnEntity();
 
 				PlayerAmmoCounts[player.Username]--;
+
+				const float levelOneFullBarXp = 6.65f;
+
+	            player.Experience = 0;
+	            player.AddExperience(levelOneFullBarXp, true);
+
+				const int updateTicks = 60;
+	            const int timerMillis = 50;
+	            RunnableTask.RunTaskTimer(() =>
+	            {
+
+					player.AddExperience(-(levelOneFullBarXp / updateTicks), true);
+
+	            }, timerMillis, updateTicks);
+
+				//Reset to 0XP
+				RunnableTask.RunTaskLater(() =>
+				{
+					player.AddExperience(-1000, true);
+				}, timerMillis * (updateTicks + 1));
 			}
 
             return true;
@@ -297,8 +406,28 @@ namespace SkyCore.Games.Murder.State
 
 			player.SetEffect(new Invisibility { Duration = int.MaxValue, Particles = false });
 			player.SetEffect(new Blindness { Duration = 20, Particles = false });
+			
+			Random random = new Random();
+	        for (int i = 0; i < 30; i++)
+	        {
+		        /*DestroyBlockParticle particle = new DestroyBlockParticle(murderLevel, new RedstoneBlock())
+		        {
+			        Position = new Vector3(player.KnownPosition.X,
+					(float) (player.KnownPosition.Y + 0.1 + i),
+					player.KnownPosition.Z)
+		        };*/
 
-			if (player == murderLevel.Murderer ||
+				ItemBreakParticle particle = new ItemBreakParticle(murderLevel, new ItemRedstone())
+				{
+					Position = new Vector3(player.KnownPosition.X - 1 + ((float)random.NextDouble() * 1),
+						(float)(player.KnownPosition.Y + 0.5f + ((float) random.NextDouble() * 1)),
+						player.KnownPosition.Z - 1 + ((float)random.NextDouble() * 1))
+				};
+
+		        particle.Spawn();
+			}
+
+	        if (player == murderLevel.Murderer ||
 				murderLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0)
 			{
 				//Message appears once game ends
@@ -308,6 +437,16 @@ namespace SkyCore.Games.Murder.State
 				player.SendTitle("§c§lYOU DIED§r");
 			}
         }
+
+	    public int GetPlayerAmmo(MurderLevel gameLevel, SkyPlayer player)
+	    {
+		    if (PlayerAmmoCounts.ContainsKey(player.Username))
+		    {
+			    return PlayerAmmoCounts[player.Username];
+			}
+
+		    return 0;
+	    }
 
         public int GetPlayerGunParts(MurderLevel gameLevel, SkyPlayer player)
         {
@@ -327,6 +466,8 @@ namespace SkyCore.Games.Murder.State
             {
                 return -1; //Murderer cannot pick up gun parts
             }
+
+			player.BarHandler.AddMinorLine("§ePicked Up Gun Parts!");
 
             int count = GetPlayerGunParts(gameLevel, player) + 1;
 

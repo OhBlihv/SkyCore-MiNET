@@ -32,8 +32,9 @@ namespace SkyCore.Game.State.Impl
 
         public override void HandleLeave(GameLevel gameLevel, SkyPlayer player)
         {
-            
-        }
+	        //Simulate removal by setting teams
+	        gameLevel.SetPlayerTeam(player, null);
+		}
 
         public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
