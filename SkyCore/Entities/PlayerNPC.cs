@@ -11,6 +11,7 @@ using MiNET.Net;
 using MiNET.Plugins;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.Entities.Holograms;
 using SkyCore.Game;
 using SkyCore.Player;
 using SkyCore.Util;
@@ -106,7 +107,7 @@ namespace SkyCore.Entities
                     {
 						action = player =>
                         {
-	                        player.FreezePlayer = true; //Avoid movement
+	                        //player.FreezePlayer = true; //Avoid movement //TODO: Set speed to 0
 							switch (command)
                             {
 								//TODO: Split around the colon
@@ -134,17 +135,16 @@ namespace SkyCore.Entities
                 npc.BroadcastSetEntityData();
 
 				SkyCoreAPI.Instance.AddPendingTask(() => npc.SpawnEntity());
-                /*try
-                {
-                    npc.SpawnEntity();
-                }
-                catch (Exception e)
-                {
-                    //PendingNpcs.Add(npc);
-                    Console.WriteLine(e);
-                }*/
 
-                PendingNpcs.Add(npc);
+				//Spawn a hologram with player counts //TODO: Split around the colon
+	            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, spawnLocation, "murder");
+
+	            hologram.BroadcastEntityEvent();
+	            hologram.BroadcastSetEntityData();
+
+	            SkyCoreAPI.Instance.AddPendingTask(() => hologram.SpawnEntity());
+
+				PendingNpcs.Add(npc);
 
                 Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
             }

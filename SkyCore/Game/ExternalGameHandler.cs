@@ -22,6 +22,8 @@ namespace SkyCore.Game
 
 		private static readonly ConnectionMultiplexer RedisPool;
 
+		public static int TotalPlayers { get; private set; }
+
 		static ExternalGameHandler()
 		{
 			RedisPool = ConnectionMultiplexer.Connect("localhost");
@@ -31,6 +33,25 @@ namespace SkyCore.Game
 
 		public static void Init()
 		{
+			SkyCoreAPI.Instance.Context.Server.MotdProvider = new SkyMotdProvider();
+			new Thread(delegate ()
+			{
+
+				while (!SkyCoreAPI.IsDisabled)
+				{
+					Thread.Sleep(1000); // Update every 1 second
+
+					int totalPlayers = 0;
+					foreach (GameInfo gameInfo in GameRegistrations.Values)
+					{
+						totalPlayers += gameInfo.CurrentPlayers;
+					}
+
+					TotalPlayers = totalPlayers;
+				}
+
+			}).Start();
+
 			RedisPool.GetSubscriber().SubscribeAsync("game_register", (channel, message) =>
 			{
 				/*
@@ -99,6 +120,7 @@ namespace SkyCore.Game
 			 */
 			subscriber.SubscribeAsync($"{gameName}_info", (channel, message) =>
 			{
+				SkyUtil.log($"Received update for {channel} > {message}");
 				string[] messageSplit = ((string)message).Split(':');
 
 				int currentPlayers, availableGames;
@@ -112,13 +134,27 @@ namespace SkyCore.Game
 
 		public static void RegisterInternalGame(string gameName)
 		{
+			new Thread(delegate()
+			{
+
+				while (!SkyCoreAPI.IsDisabled)
+				{
+					Thread.Sleep(1000); // Update every 1 second
+
+					GameInfo gameInfo = GameRegistrations[gameName];
+					SkyUtil.log($"Sending update on {gameName}_info as " + gameInfo.CurrentPlayers + ":" + gameInfo.AvailableGames);
+					RedisPool.GetSubscriber().PublishAsync($"{gameName}_info", gameInfo.CurrentPlayers + ":" + gameInfo.AvailableGames);
+				}
+
+			}).Start();
+
 			ISubscriber subscriber = RedisPool.GetSubscriber();
 
 			//Temp - Sending server is gameName
 			subscriber.PublishAsync("game_register",
 				$"{gameName}:{gameName}:{Config.GetProperty("ip", SkyCoreAPI.Instance.CurrentIp)}:{Config.GetProperty("port", "19132")}");
 
-			GameRegistrations.TryAdd("murder", new GameInfo("local", gameName));
+			GameRegistrations.TryAdd(gameName, new GameInfo("local", gameName));
 
 			/*subscriber.SubscribeAsync($"{gameName}_join", (channel, message) =>
 			{
@@ -187,9 +223,9 @@ namespace SkyCore.Game
 
 		public string GameName { get; }
 
-		public int CurrentPlayers { get; private set; }
+		public int CurrentPlayers { get; set; }
 
-		public int AvailableGames { get; private set; }
+		public int AvailableGames { get; set; }
 
 		public long LastUpdate { get; private set; }
 

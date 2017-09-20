@@ -95,20 +95,29 @@ namespace SkyCore.Game
 			}
 
             //SkyUtil.log("Ticking Core");
-            if (QueuedPlayers.IsEmpty)
+            /*if (QueuedPlayers.IsEmpty)
             {
                 return;
-            }
+            }*/
 
-            SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
+            //SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 			lock (GameLevels)
 			{
+				GameInfo gameInfo = ExternalGameHandler.GameRegistrations[RawName];
+				gameInfo.update(0, 0); //Reset
+
 				foreach (GameLevel gameLevel in GameLevels.Values)
 				{
+					//Update player counts
+					gameInfo.CurrentPlayers += gameLevel.GetPlayerCount();
+					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
+					{
+						gameInfo.AvailableGames++;
+					}
+
 					while (!QueuedPlayers.IsEmpty)
 					{
-						SkyPlayer nextPlayer;
-						if (!gameLevel.CurrentState.CanAddPlayer(gameLevel) || !QueuedPlayers.TryDequeue(out nextPlayer))
+						if (!gameLevel.CurrentState.CanAddPlayer(gameLevel) || !QueuedPlayers.TryDequeue(out var nextPlayer))
 						{
 							break; //Cannot add any more players
 						}
@@ -126,6 +135,8 @@ namespace SkyCore.Game
 						}
 					}
 				}
+
+				//SkyUtil.log($"GameInfo at {gameInfo.CurrentPlayers} with {gameInfo.AvailableGames}");
 			}
 
             //If we're running out of free slots, create a new game lobby

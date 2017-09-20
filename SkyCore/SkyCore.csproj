@@ -86,6 +86,7 @@
     <Compile Include="Database\DatabaseAction.cs" />
     <Compile Include="Entities\Holograms\Hologram.cs" />
     <Compile Include="Entities\Holograms\HologramController.cs" />
+    <Compile Include="Entities\Holograms\PlayerCountHologram.cs" />
     <Compile Include="Entities\Holograms\TickingHologram.cs" />
     <Compile Include="Entities\PlayerNPC.cs" />
     <Compile Include="Games\Murder\Entities\GunProjectile.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Games\Murder\State\MurderLobbyState.cs" />
     <Compile Include="Games\Murder\State\MurderRunningState.cs" />
     <Compile Include="Game\ExternalGameHandler.cs" />
+    <Compile Include="Game\SkyMotdProvider.cs" />
     <Compile Include="Game\State\GameTeam.cs" />
     <Compile Include="Game\State\Impl\VoidGameState.cs" />
     <Compile Include="Game\State\Impl\EndGameState.cs" />

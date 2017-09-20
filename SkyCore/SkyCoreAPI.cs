@@ -28,6 +28,8 @@ namespace SkyCore
     {
         
         public static SkyCoreAPI Instance { get; set; }
+
+		public static bool IsDisabled { get; private set; }
         
         public static string ServerPath { get; private set; }
 
@@ -187,6 +189,8 @@ namespace SkyCore
 
         public void OnDisable()
         {
+	        IsDisabled = true;
+
             foreach (Level level in Context.LevelManager.Levels)
             {
                 foreach (MiNET.Player player in level.Players.Values)
