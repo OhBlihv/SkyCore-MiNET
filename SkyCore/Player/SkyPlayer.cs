@@ -14,6 +14,7 @@ using MiNET.Worlds;
 using SkyCore.Database;
 using SkyCore.Entities;
 using SkyCore.Game;
+using SkyCore.Game.State;
 using SkyCore.Util;
 
 namespace SkyCore.Player
@@ -30,6 +31,12 @@ namespace SkyCore.Player
 		public BarHandler BarHandler { get; private set; }
 
 		private List<Action> _postLoginActions = new List<Action>();
+
+		//Game Settings
+			
+		public GameTeam GameTeam { get; set; }
+
+		//
 
 	    public void AddPostLoginTask(Action action)
 	    {
@@ -186,7 +193,7 @@ namespace SkyCore.Player
                 return;
             }
 
-            SkyUtil.log($"Animate Id:{message.actionId} ({Username})");
+            //SkyUtil.log($"Animate Id:{message.actionId} ({Username})");
 
             if (Level is GameLevel && ((GameLevel) Level).DoInteract(message.actionId, this, null))
             {
@@ -204,14 +211,14 @@ namespace SkyCore.Player
                 return;
             }
 
-            SkyUtil.log($"Interact Id:{message.actionId} ({Username})");
+            //SkyUtil.log($"Interact Id:{message.actionId} ({Username})");
             MiNET.Entities.Entity target = Level.GetEntity(message.targetRuntimeEntityId);
 
             if (target is PlayerNPC)
             {
                 if (message.actionId == 1 || message.actionId == 2)
                 {
-                    SkyUtil.log($"Processing NPC Interact as {Username}");
+                    //SkyUtil.log($"Processing NPC Interact as {Username}");
                     (target as PlayerNPC).OnInteract(this);
                 }
             }

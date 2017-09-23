@@ -15,7 +15,7 @@ namespace SkyCore.Games.BuildBattle.State
 	class BuildBattleVoteState : RunningState
 	{
 
-		private const int MaxVoteTime = 10 * 2;
+		private const int MaxVoteTime = 30 * 2;
 
 		private int _currentVotingTeam = -1;
 		private SkyPlayer _currentVotingPlayer = null;
@@ -67,7 +67,7 @@ namespace SkyCore.Games.BuildBattle.State
 					{
 						nextVotePlayer = teamPlayer[0];
 					}
-				} while (nextVotePlayer == null && _currentVotingTeam < 10);
+				} while (nextVotePlayer == null && _currentVotingTeam < buildLevel.BuildTeams.Count - 1);
 
 				if (nextVotePlayer == null)
 				{

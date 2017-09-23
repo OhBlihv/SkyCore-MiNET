@@ -41,8 +41,8 @@ namespace SkyCore.Game
 
         public GameState CurrentState { get; private set; }
 
-        protected readonly Thread _gameTickThread;
-        protected HighPrecisionTimer _gameTick;
+        protected readonly Thread GameLevelTickThread;
+        protected HighPrecisionTimer GameLevelTick;
 
         public int Tick { get; private set; }
 
@@ -61,8 +61,9 @@ namespace SkyCore.Game
 
 			LobbySpawnLocations.Add(lobbySpawnLocation);
 
-            AllowBreak = false;
-            AllowBuild = false;
+			//Handled in GameState
+            //AllowBreak = false;
+            //AllowBuild = false;
 
             EnableBlockTicking = false;
             EnableChunkTicking = false;
@@ -84,21 +85,34 @@ namespace SkyCore.Game
             CurrentState = GetInitialState();
             CurrentState.EnterState(this);
 
-            _gameTickThread = new Thread(() =>
+            GameLevelTickThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
 
-                _gameTick = new HighPrecisionTimer(500, PreGameTick, true);
+                GameLevelTick = new HighPrecisionTimer(500, PreGameTick, true);
             });
-            _gameTickThread.Start();
+            GameLevelTickThread.Start();
+
+			BlockBreak += HandleBlockBreak;
+			BlockPlace += HandleBlockPlace;
         }
 
-        protected abstract void InitializeTeamMap();
+		protected virtual void HandleBlockPlace(object sender, BlockPlaceEventArgs e)
+		{
+			e.Cancel = CurrentState.HandleBlockPlace(this, e.Player as SkyPlayer, e.ExistingBlock, e.TargetBlock);
+		}
+
+	    protected virtual void HandleBlockBreak(object sender, BlockBreakEventArgs e)
+		{
+			e.Cancel = CurrentState.HandleBlockBreak(this, e.Player as SkyPlayer, e.Block, e.Drops);
+		}
+
+		protected abstract void InitializeTeamMap();
 
         public override void Close()
         {
-            _gameTick.Dispose();
-            _gameTickThread.Abort();
+            GameLevelTick.Dispose();
+            GameLevelTickThread.Abort();
 
 			DoForAllPlayers(player =>
 			{
@@ -220,6 +234,9 @@ namespace SkyCore.Game
 		        TeamPlayerDict[gameTeam].Remove((SkyPlayer) player);
 	        }
 
+			//Enforce removing the attached team
+	        ((SkyPlayer) player).GameTeam = null;
+
 			player.RemoveAllEffects();
 
 	        if (removeFromWorld && player.Level == this)
@@ -267,6 +284,8 @@ namespace SkyCore.Game
             {
                 PlayerTeamDict.Add(player.Username, team);
             }
+
+	        player.GameTeam = team; //Attach to the player
 
             SkyUtil.log($"Updating {player.Username}'s team from {(oldTeam == null ? "null" : oldTeam.DisplayName)} to {(team == null ? "null" : team.DisplayName)}");
 

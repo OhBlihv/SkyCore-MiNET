@@ -34,7 +34,7 @@ namespace SkyCore.Punishments
 
 		public bool IsActive()
 		{
-			return false; //TODO
+			return Expiry.CompareTo(DateTime.Now) >= 0;
 		}
 
 	}
