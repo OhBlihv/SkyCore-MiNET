@@ -4,6 +4,7 @@ using MiNET.Net;
 using SkyCore.Commands;
 using SkyCore.Permissions;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading;
 using MiNET.Utils;
@@ -27,6 +28,21 @@ namespace SkyCore.Player
 		public bool IsGameSpectator { get; set; }
 
 		public BarHandler BarHandler { get; private set; }
+
+		private List<Action> _postLoginActions = new List<Action>();
+
+	    public void AddPostLoginTask(Action action)
+	    {
+		    if (_isRankLoaded)
+		    {
+			    action.Invoke();
+		    }
+		    else
+		    {
+			    _postLoginActions.Add(action);
+		    }
+	    }
+
 
         public void SetPlayerGroup(PlayerGroup playerGroup)
         {
@@ -54,6 +70,7 @@ namespace SkyCore.Player
         }
 
         private bool _hasJoined = false;
+	    private bool _isRankLoaded = false;
 
         public override void InitializePlayer()
         {
@@ -96,6 +113,7 @@ namespace SkyCore.Player
 						},
 						new Action(delegate
 						{
+							_isRankLoaded = true;
 							SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommadPermission})");
 
 							if (PlayerGroup == PlayerGroup.Admin)
@@ -108,6 +126,11 @@ namespace SkyCore.Player
 							{
 								SetGameMode(GameMode.Adventure);
 								UseCreativeInventory = false;
+							}
+
+							foreach (Action action in _postLoginActions)
+							{
+								action.Invoke();
 							}
 
 							/*if (Username.Equals("OhBlihv"))

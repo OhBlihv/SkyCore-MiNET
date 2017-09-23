@@ -29,11 +29,16 @@ namespace SkyCore.Game.State.Impl
 
         public override void InitializePlayer(GameLevel gameLevel, SkyPlayer player)
         {
-			gameLevel.DoForAllPlayers(gamePlayer =>
+			//Runs the join message once the player's permissions have loaded
+			player.AddPostLoginTask(() =>
 			{
-				//§f(§e{gameLevel.GetPlayerCount()}/{gameLevel.GetMaxPlayers()}§f)
-				gamePlayer.BarHandler.AddMinorLine($"§e{player.PlayerGroup.Prefix} {player.Username}§r §7entered the game!");
+				gameLevel.DoForAllPlayers(gamePlayer =>
+				{
+					//§f(§e{gameLevel.GetPlayerCount()}/{gameLevel.GetMaxPlayers()}§f)
+					gamePlayer.BarHandler.AddMinorLine($"§e{player.PlayerGroup.Prefix} {player.Username}§r §7entered the game!");
+				});
 			});
+			
         }
 
         public override void HandleLeave(GameLevel gameController, SkyPlayer player)
