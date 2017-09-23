@@ -35,8 +35,6 @@ namespace SkyCore.Games.Murder.State
 
         private const int MaxGunParts = 5;
 
-        private readonly Random _random = new Random();
-
         private int _endTick = -1; //Default value
 	    private bool _isStarted = false;
 
@@ -87,7 +85,7 @@ namespace SkyCore.Games.Murder.State
 
 			            //Avoid spawning two players in the same location
 			            PlayerLocation spawnLocation;
-			            while (usedSpawnLocations.Contains((spawnLocation = PlayerSpawnLocations[_random.Next(PlayerSpawnLocations.Count)])))
+			            while (usedSpawnLocations.Contains((spawnLocation = PlayerSpawnLocations[Random.Next(PlayerSpawnLocations.Count)])))
 			            {
 				            //
 			            }
@@ -130,11 +128,11 @@ namespace SkyCore.Games.Murder.State
 			            Thread.Sleep(250);
 		            }
 
-					int murdererIdx = _random.Next(players.Count),
+					int murdererIdx = Random.Next(players.Count),
 						detectiveIdx = 0;
 
 					int idx = 0;
-					while (++idx < 50 && (detectiveIdx = _random.Next(players.Count)) == murdererIdx)
+					while (++idx < 50 && (detectiveIdx = Random.Next(players.Count)) == murdererIdx)
 					{
 						//
 					}
@@ -175,16 +173,10 @@ namespace SkyCore.Games.Murder.State
 						PlayerAmmoCounts[player.Username] = int.MaxValue;
 					}, MurderTeam.Detective);
 
-					gameLevel.DoForPlayersIn(player =>
-					{
-						TitleUtil.SendCenteredSubtitle(player, "§c§l  Murderer§r\n§7Kill all innocent players!");
-
-						player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
-
-						player.HungerManager.Hunger = 20; //Set food to 'able to run' level.
-
-						//PlayerAmmoCounts[player.Username] = 3; //Throwing Knives
-					}, MurderTeam.Murderer);
+		            gameLevel.DoForPlayersIn(player =>
+		            {
+						InitializeMurderer(player);
+		            }, MurderTeam.Murderer);
 
 					gameLevel.DoForAllPlayers(player =>
 					{
@@ -220,7 +212,51 @@ namespace SkyCore.Games.Murder.State
             GunParts.Clear();
         }
 
-		public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
+	    public void InitializeMurderer(SkyPlayer player)
+	    {
+		    TitleUtil.SendCenteredSubtitle(player, "§c§l  Murderer§r\n§7Kill all innocent players!");
+
+		    player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
+
+		    player.HungerManager.Hunger = 20; //Set food to 'able to run' level.
+
+		    //PlayerAmmoCounts[player.Username] = 3; //Throwing Knives
+		}
+
+	    public override void HandleLeave(GameLevel gameLevel, SkyPlayer player)
+	    {
+		    base.HandleLeave(gameLevel, player);
+
+		    if (((MurderLevel) gameLevel).Murderer == player)
+		    {
+			    //Re-select murderer
+			    List<SkyPlayer> players = gameLevel.GetPlayersInTeam(MurderTeam.Innocent);
+				int murdererIdx = Random.Next(players.Count);
+
+			    int i = 0;
+				foreach (SkyPlayer gamePlayer in players)
+			    {
+				    if (++i == murdererIdx)
+				    {
+					    gameLevel.SetPlayerTeam(gamePlayer, MurderTeam.Murderer);
+
+					    InitializeMurderer(gamePlayer);
+						gameLevel.DoForAllPlayers(playerLoop =>
+						{
+							if (playerLoop == gamePlayer)
+							{
+								return;
+							}
+
+							TitleUtil.SendCenteredSubtitle(playerLoop, "§fA new §c§lMurderer\n§fhas been selected");
+						});
+					    break;
+				    }
+			    }
+		    }
+	    }
+
+	    public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
 	        base.OnTick(gameLevel, currentTick, out outTick);
 
@@ -322,7 +358,7 @@ namespace SkyCore.Games.Murder.State
 	            while (++spawnCount < maxSpawnAmount)
 	            {
 		            int rollCount = 0;
-		            while (++rollCount < 10 && GunParts.ContainsKey(spawnLocation = GunPartLocations[_random.Next(GunPartLocations.Count)]))
+		            while (++rollCount < 10 && GunParts.ContainsKey(spawnLocation = GunPartLocations[Random.Next(GunPartLocations.Count)]))
 		            {
 			            //
 		            }

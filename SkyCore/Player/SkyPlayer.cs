@@ -57,7 +57,6 @@ namespace SkyCore.Player
 
         public override void InitializePlayer()
         {
-			SkyUtil.log("a");
             if (_hasJoined)
             {
                 return;
@@ -67,7 +66,7 @@ namespace SkyCore.Player
             {
                 if (CertificateData.ExtraData.Xuid == null)
                 {
-                    Disconnect("§aXBOX §caccount required to login.");
+                    Disconnect("§cAn §2§lXBOX§r §caccount required to login to §dSkytonia §eNetwork");
 					return;
                 }
 

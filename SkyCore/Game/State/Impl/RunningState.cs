@@ -13,6 +13,9 @@ namespace SkyCore.Game.State.Impl
 {
     public abstract class RunningState : GameState
     {
+
+	    public readonly Random Random = new Random();
+
         public override void EnterState(GameLevel gameLevel)
         {
             
