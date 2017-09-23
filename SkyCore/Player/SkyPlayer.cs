@@ -65,28 +65,18 @@ namespace SkyCore.Player
 
             try
             {
-                SkyUtil.log("Initialising Player");
-
                 if (CertificateData.ExtraData.Xuid == null)
                 {
                     Disconnect("§aXBOX §caccount required to login.");
-	                SkyUtil.log("no xbox account");
 					return;
                 }
 
-	            SkyUtil.log("adding bar handler");
-
 				BarHandler = new BarHandler(this);
-
-	            SkyUtil.log("set bar handler");
 
 				SetPlayerGroup(PlayerGroup.Player);
 
-	            SkyUtil.log("set player group and bar handler");
-
 				RunnableTask.RunTask(() =>
 				{
-					SkyUtil.log("starting permission sql");
 					new DatabaseAction().Query(
 						"SELECT `group_name` FROM player_groups WHERE `player_xuid`=@id",
 						(command) =>
@@ -213,6 +203,23 @@ namespace SkyCore.Player
 
             base.HandleMcpeInteract(message);
         }
+
+		public bool Freeze { get; set; }
+
+	    public override void HandleMcpeMovePlayer(McpeMovePlayer message)
+	    {
+		    if (Freeze)
+		    {
+				//Allow players to fall
+			    if (Math.Abs(message.x - KnownPosition.X) > 0.1 || Math.Abs(message.x - KnownPosition.Z) > 0.1)
+			    {
+					SendMovePlayer(true);
+				    return;
+				}
+		    }
+
+		    base.HandleMcpeMovePlayer(message);
+	    }
 
 	    protected override void OnPlayerLeave(PlayerEventArgs e)
 	    {

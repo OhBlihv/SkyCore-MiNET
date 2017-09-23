@@ -98,20 +98,32 @@ namespace SkyCore.Games.Murder.State
 
 			            player.SetHideNameTag(true);
 
-			            player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
+			            //SkyUtil.log($"Moving speed from {player.MovementSpeed} to 0 during freeze phase");
 
-						SkyUtil.log($"Moving speed from {player.MovementSpeed} to 0 during freeze phase");
+			            player.Freeze = true;
+
+						player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
 						player.MovementSpeed = 0f;
 						player.SendUpdateAttributes();
 					});
 
 					List<MurderTeam> teamRotation = new List<MurderTeam> { MurderTeam.Murderer, MurderTeam.Detective, MurderTeam.Innocent };
+					int offset = new Random().Next(teamRotation.Count);
 		            for (int i = 0; i < 12; i++)
 		            {
-			            MurderTeam team = teamRotation[i % 3];
-						foreach (MiNET.Player player in players)
+			            MurderTeam team = teamRotation[(offset + i) % 3];
+						foreach (SkyPlayer player in players)
 						{
 							TitleUtil.SendCenteredSubtitle(player, team.TeamPrefix + "§l" + team.TeamName + "\n");
+
+							//Poorly enforce speed
+							if (i == 0 || i == 11)
+							{
+								player.Freeze = true;
+
+								player.MovementSpeed = 0f;
+								player.SendUpdateAttributes();
+							}
 						}
 
 						SkyUtil.log($"Printed scroll {i}/12, with {team.TeamPrefix + "§l" + team.TeamName}");
@@ -176,8 +188,15 @@ namespace SkyCore.Games.Murder.State
 
 					gameLevel.DoForAllPlayers(player =>
 					{
+						player.SetAllowFly(false);
+						player.IsFlying = false;
+
+						player.SendAdventureSettings();
+
 						player.MovementSpeed = 0.1f;
 						player.SendUpdateAttributes();
+
+						player.Freeze = false;
 					});
 
 		            _isStarted = true;
@@ -275,6 +294,19 @@ namespace SkyCore.Games.Murder.State
 				player.BarHandler.AddMajorLine($"§c§lMURDERER§r §7| {neatRemaining} §fRemaining...", 2);
 				//$"              §7{PlayerAmmoCounts[player.Username]}/3 Throwing Knives", TitleType.ActionBar);
 			}, MurderTeam.Murderer);
+
+			/*
+			 * Dodgy Anti-Cheat
+			 */
+
+			gameLevel.DoForAllPlayers(player =>
+			{
+				if (player.IsSprinting && gameLevel.GetPlayerTeam(player) != MurderTeam.Murderer)
+				{
+					player.SetSprinting(false);
+					//TODO: Enforce some freeze for hacking players?
+				}
+			});
 
             /*
              * Gun Parts
