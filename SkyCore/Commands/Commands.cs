@@ -77,13 +77,14 @@ namespace SkyCore.Commands
 	    {
 			player.SendMessage("§e§l(!)§r §eMoving to Hub...");
 
-		    McpeTransfer transferPacket = new McpeTransfer
+		    /*McpeTransfer transferPacket = new McpeTransfer
 		    {
 			    serverAddress = "184.171.171.26",
 			    port = 19132
 		    };
 
-		    player.SendPackage(transferPacket);
+		    player.SendPackage(transferPacket);*/
+			ExternalGameHandler.AddPlayer((SkyPlayer) player, "hub");
 		}
 
 	    [Command(Name = "popuptest")]

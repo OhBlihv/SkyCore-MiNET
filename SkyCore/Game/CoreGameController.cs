@@ -268,7 +268,7 @@ namespace SkyCore.Game
             return $"{RawName}{++NextGameId}";
         }
 
-        public void QueuePlayer(SkyPlayer player)
+        public virtual void QueuePlayer(SkyPlayer player)
         {
 			if (player == null)
 			{

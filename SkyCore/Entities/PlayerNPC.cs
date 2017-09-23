@@ -141,13 +141,13 @@ namespace SkyCore.Entities
 				}
 
 				//Ensure this NPC can be seen
-				PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action) {Scale = 1.2};
+				//PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action) {Scale = 1.2};
 				//PlayerMob npc = new PlayerMob("Name", level);
 
 				//npc.BroadcastEntityEvent();
                 //npc.BroadcastSetEntityData();
 
-				SkyCoreAPI.Instance.AddPendingTask(() => npc.SpawnEntity());
+				//SkyCoreAPI.Instance.AddPendingTask(() => npc.SpawnEntity());
 
 				//Spawn a hologram with player counts //TODO: Split around the colon
 	            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, spawnLocation, gameName);

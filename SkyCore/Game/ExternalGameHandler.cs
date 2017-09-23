@@ -93,43 +93,28 @@ namespace SkyCore.Game
 			{
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
-					Level level = SkyCoreAPI.Instance.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+					Level level = SkyCoreAPI.Instance.GetHubLevel();
 
-					if (level == null)
+					string neatName = gameName;
+					PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);
+
+					switch (gameName)
 					{
-						Console.WriteLine($"§c§l(!) §r§cUnable to find level Overworld/world");
-
-						string worldNames = "";
-						foreach (Level levelLoop in SkyCoreAPI.Instance.Context.LevelManager.Levels)
+						case "murder":
 						{
-							worldNames += levelLoop.LevelName + "(" + levelLoop.LevelId + "), ";
+							neatName = "§c§lMurder Mystery";
+							npcLocation = new PlayerLocation(-1.5D, 30D, 16.5D, 180F, 180F, 0F);
+							break;
 						}
-
-						Console.WriteLine($"§7§l* §r§7Valid Names: {worldNames}");
-					}
-					else
-					{
-						string neatName = gameName;
-						PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);
-
-						switch (gameName)
+						case "build-battle":
 						{
-							case "murder":
-							{
-								neatName = "§c§lMurder Mystery";
-								npcLocation = new PlayerLocation(-1.5D, 30D, 16.5D, 180F, 180F, 0F);
-								break;
-							}
-							case "build-battle":
-							{
-								neatName = "§e§lBuild Battle";
-								npcLocation = new PlayerLocation(2.5D, 30D, 16.5D, 180F, 180F, 0F);
-								break;
-							}
+							neatName = "§e§lBuild Battle";
+							npcLocation = new PlayerLocation(2.5D, 30D, 16.5D, 180F, 180F, 0F);
+							break;
 						}
-
-						PlayerNPC.SpawnNPC(level, $"§e§l{neatName}", npcLocation, $"GID:{gameName}");
 					}
+
+					PlayerNPC.SpawnNPC(level, $"§e§l{neatName}", npcLocation, $"GID:{gameName}");
 				});
 			}
 
@@ -189,6 +174,12 @@ namespace SkyCore.Game
 			if (!GameRegistrations.ContainsKey(gameName))
 			{
 				player.SendMessage($"{ChatColors.Red}No game existed for the name '{gameName}'");
+				return;
+			}
+
+			if (gameName.Equals("hub"))
+			{
+				SkyCoreAPI.Instance.GameModes[gameName].QueuePlayer(player);
 				return;
 			}
 

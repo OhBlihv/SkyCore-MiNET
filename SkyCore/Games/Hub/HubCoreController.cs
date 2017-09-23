@@ -9,6 +9,9 @@ namespace SkyCore.Games.Hub
 {
 	public class HubCoreController : CoreGameController
 	{
+
+		private Level _hubLevel = null;
+
 		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>())
 		{
 			_tick = 1;
@@ -21,10 +24,15 @@ namespace SkyCore.Games.Hub
 
 		protected override void CoreGameTick()
 		{
+			if(_hubLevel == null)
+			{
+				return;
+			}
+
 			//Update BarHandlers for all online players every 500 milliseconds (10 ticks)
 			if (++_tick % 10 == 0)
 			{
-				foreach (SkyPlayer player in SkyCoreAPI.Instance.GetAllOnlinePlayers())
+				foreach (SkyPlayer player in _hubLevel.Players.Values)
 				{
 					player.BarHandler?.DoTick();
 				}
@@ -34,9 +42,6 @@ namespace SkyCore.Games.Hub
 			{
 				return; //Only update player counts every 100 ticks (5 seconds)
 			}
-
-			Level level = SkyCoreAPI.Instance.Context.LevelManager.Levels.FirstOrDefault(l =>
-				l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
 
 			GameInfo gameInfo;
 			try
@@ -56,16 +61,23 @@ namespace SkyCore.Games.Hub
 
 			gameInfo.update(0, 0); //Reset
 
-			if (level != null)
-			{
-				gameInfo.CurrentPlayers = level.PlayerCount;
-				gameInfo.AvailableGames = 1;
-			}
+			gameInfo.CurrentPlayers = _hubLevel.PlayerCount;
+			gameInfo.AvailableGames = 1;
+		}
+
+		public override void QueuePlayer(SkyPlayer player)
+		{
+			InstantQueuePlayer(player);
 		}
 
 		public override void InstantQueuePlayer(SkyPlayer player)
 		{
+			if (_hubLevel == null)
+			{
+				_hubLevel = SkyCoreAPI.Instance.GetHubLevel();
+			}
 
+			player.SpawnLevel(_hubLevel, _hubLevel.SpawnPoint);
 		}
 
 		public override void CheckCapacity()

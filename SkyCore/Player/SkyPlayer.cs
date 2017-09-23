@@ -15,6 +15,7 @@ using SkyCore.Database;
 using SkyCore.Entities;
 using SkyCore.Game;
 using SkyCore.Game.State;
+using SkyCore.Games.Hub;
 using SkyCore.Util;
 
 namespace SkyCore.Player
@@ -163,11 +164,16 @@ namespace SkyCore.Player
 	            try
 	            {
 		            //Add this player to any games if available and if this is the only game available
-		            if (!SkyCoreApi.GameType.Equals("hub") && SkyCoreAPI.Instance.GameModes.Count == 1)
+		            if (!SkyCoreApi.GameType.Equals("hub") && SkyCoreAPI.Instance.GameModes.Count <= 2)
 		            {
 			            //Foreach, but only one value.
 			            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
 			            {
+				            if (coreGameController is HubCoreController)
+				            {
+					            continue;
+				            }
+
 				            coreGameController.InstantQueuePlayer(this);
 				            break;
 			            }

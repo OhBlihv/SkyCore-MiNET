@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Numerics;
 using System.Threading;
@@ -173,19 +174,17 @@ namespace SkyCore
 							_initializeCustomGame(new BuildBattleCoreGameController(this));
 							break;
 						}
-						case "none":
-						{
-							SkyUtil.log("Initializing Pure Hub Handling...");
-							_initializeCustomGame(new HubCoreController(this));
-							break;
-						}
 					}
 				}
 				catch (Exception e)
 				{
 					Console.WriteLine(e.StackTrace);
 				}
-            });
+
+				//All servers have their own local hub
+	            SkyUtil.log("Initializing Pure Hub Handling...");
+	            _initializeCustomGame(new HubCoreController(this));
+			});
         }
 
         private void _initializeCustomGame(CoreGameController coreGameController)
@@ -353,7 +352,20 @@ namespace SkyCore
             return $"{rank}{username}";
         }
 
-        public SkyPlayer GetPlayer(string username)
+	    public Level GetHubLevel()
+	    {
+		    Level level = Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+
+		    if (level == null)
+		    {
+			    Console.WriteLine($"§c§l(!) §r§cUnable to find level Overworld/world. Returning 0th level.");
+			    return Context.LevelManager.Levels[0];
+		    }
+
+		    return level;
+	    }
+
+	    public SkyPlayer GetPlayer(string username)
         {
             username = username.ToLower();
             
