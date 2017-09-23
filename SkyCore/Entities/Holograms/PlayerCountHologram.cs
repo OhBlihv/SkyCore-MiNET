@@ -31,6 +31,8 @@ namespace SkyCore.Entities.Holograms
 			}
 			catch (Exception e)
 			{
+				SkyUtil.log($"Looking for '{_gameName}'");
+				SkyUtil.log(ExternalGameHandler.GameRegistrations.Keys.ToArray().ToString());
 				Console.WriteLine(e);
 			}
 

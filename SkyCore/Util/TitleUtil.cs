@@ -21,19 +21,57 @@ namespace SkyCore.Util
 			int i = 0;
 			while (i++ < 3)
 			{
-				subtitleString += "\n";
+				subtitleString += "§r\n";
 			}
 
+			int longestLine = 0;
+			List<string> centeredLines = new List<string>();
 			foreach(string line in content.Split('\n'))
 			{
 				i++;
 
-				subtitleString += line + "\n";
+				centeredLines.Add(line);
+
+				int lineLength = TextUtil.GetLineLength(line);
+				if (lineLength > longestLine)
+				{
+					longestLine = lineLength;
+				}
+			}
+
+			//foreach (string line in centeredLines)
+			foreach (string line in content.Split('\n'))
+			{
+				string centeredLine = line;
+
+				//int j = centeredLine.Length;
+				int j = TextUtil.GetLineLength(centeredLine);
+				//SkyUtil.log($"({longestLine - centeredLine.Length} < {j}) - ({longestLine} - {centeredLine.Length})");
+				if (j < longestLine)
+				{
+					//int spaceLength = TextUtil.GetCharLength(' ');
+
+					do
+					{
+						//SkyUtil.log($"Adding space to ({j} < {longestLine - centeredLine.Length}) - ({longestLine} - {centeredLine.Length})");
+						centeredLine = " " + centeredLine;
+
+						//j += 3; //(3 is the length of the space character)
+						//j += spaceLength; //(3 is the length of the space character)
+						j += 6; //(3 is the length of the space character)
+					} while (j < longestLine);
+
+					centeredLine = " " + centeredLine; //Add one more space for good luck
+
+					centeredLine = "§f" + centeredLine;
+				}
+
+				subtitleString += centeredLine + "\n";
 			}
 
 			while (i++ < 10)
 			{
-				subtitleString += "\n";
+				subtitleString += "§f\n";
 			}
 
 			player.SendTitle("§f", TitleType.AnimationTimes, fadein, fadeOut, stayTime);

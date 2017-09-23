@@ -20,6 +20,7 @@ namespace SkyCore.Player
             Console.WriteLine("Creating new SkyPlayer");
             //pd.Username = pd.Username.Replace(" ", "_"); //Replace spaces with underscores
             var player = new SkyPlayer(server, endPoint, SkyCoreApi);
+			//var player = new MiNET.Player(server, endPoint);
             player.HealthManager = new SkyHealthManager(player);
             player.HungerManager = new SkyFoodManager(player);
             player.MaxViewDistance = 7;

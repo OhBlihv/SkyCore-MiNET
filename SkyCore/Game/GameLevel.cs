@@ -50,7 +50,9 @@ namespace SkyCore.Game
 
         public GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, PlayerLocation lobbySpawnLocation)
                 //: base(plugin.Context.LevelManager, gameId, AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath),
-                : base(plugin.Context.LevelManager, gameId, new AnvilWorldProvider(levelPath), 
+                : base(plugin.Context.LevelManager, gameId, 
+					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath),
+					//new AnvilWorldProvider(levelPath), 
                       plugin.Context.LevelManager.EntityManager, GameMode.Creative)
         {
             Plugin = plugin;

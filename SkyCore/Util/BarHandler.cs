@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MiNET;
+using MiNET.Worlds;
 using SkyCore.Player;
 
 namespace SkyCore.Util
@@ -85,7 +86,17 @@ namespace SkyCore.Util
 				}
 				else if(!isContentAlreadyVisible)
 				{
-					_player.SendMessage(visibleContent, MessageType.Popup);
+					string content;
+					if (_player.GameMode == GameMode.Creative)
+					{
+						content = $"{visibleContent}";
+					}
+					else
+					{
+						content = $"{visibleContent}";
+					}
+
+					_player.SendMessage(content, MessageType.Popup);
 					isContentAlreadyVisible = true;
 				}
 			}
@@ -97,6 +108,8 @@ namespace SkyCore.Util
 
 			removedKeys.Clear();
 
+			isContentAlreadyVisible = false;
+
 			foreach (int priorityKey in _barContentQueue.Keys)
 			{
 				string visibleContent = ProcessContentQueue(_barContentQueue[priorityKey]);
@@ -106,8 +119,19 @@ namespace SkyCore.Util
 				}
 				else if(!isContentAlreadyVisible)
 				{
-					_player.SendTitle("", TitleType.AnimationTimes, 6, 6, 10);
-					_player.SendTitle($"\n \n \n{visibleContent}", TitleType.ActionBar);
+					_player.SendTitle("", TitleType.AnimationTimes, 6, 6, 20);
+
+					string content;
+					if (_player.GameMode == GameMode.Creative)
+					{
+						content = $"§f\n§f\n§f\n{visibleContent}";
+					}
+					else
+					{
+						content = $"§f\n{visibleContent}\n§f\n§f";
+					}
+
+					_player.SendTitle(content, TitleType.ActionBar);
 					isContentAlreadyVisible = true;
 				}
 			}

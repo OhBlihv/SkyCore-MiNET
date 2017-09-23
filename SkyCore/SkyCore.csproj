@@ -89,6 +89,14 @@
     <Compile Include="Entities\Holograms\PlayerCountHologram.cs" />
     <Compile Include="Entities\Holograms\TickingHologram.cs" />
     <Compile Include="Entities\PlayerNPC.cs" />
+    <Compile Include="Games\BuildBattle\BuildBattleCoreGameController.cs" />
+    <Compile Include="Games\BuildBattle\BuildBattleLevel.cs" />
+    <Compile Include="Games\BuildBattle\BuildBattleTeam.cs" />
+    <Compile Include="Games\BuildBattle\State\BuildBattleBuildState.cs" />
+    <Compile Include="Games\BuildBattle\State\BuildBattleEndState.cs" />
+    <Compile Include="Games\BuildBattle\State\BuildBattleLobbyState.cs" />
+    <Compile Include="Games\BuildBattle\State\BuildBattleVoteState.cs" />
+    <Compile Include="Games\Hub\HubCoreController.cs" />
     <Compile Include="Games\Murder\Entities\GunProjectile.cs" />
     <Compile Include="Games\Murder\Entities\MurderGunPartEntity.cs" />
     <Compile Include="Games\Murder\Items\ItemGunParts.cs" />
@@ -118,6 +126,8 @@
     <Compile Include="Player\SkyPlayer.cs" />
     <Compile Include="Player\SkyPlayerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Punishments\PunishCore.cs" />
+    <Compile Include="Punishments\PunishmentCommands.cs" />
     <Compile Include="SkyCoreAPI.cs" />
     <Compile Include="SkyUtil.cs" />
     <Compile Include="Util\AnvilProviderFactory.cs" />
@@ -125,6 +135,7 @@
     <Compile Include="Util\Enumeration.cs" />
     <Compile Include="Util\File\FlatFile.cs" />
     <Compile Include="Util\RunnableTask.cs" />
+    <Compile Include="Util\TextUtil.cs" />
     <Compile Include="Util\TitleUtil.cs" />
   </ItemGroup>
   <ItemGroup>

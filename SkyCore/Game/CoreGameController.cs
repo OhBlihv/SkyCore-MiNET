@@ -58,6 +58,11 @@ namespace SkyCore.Game
                 SkyUtil.log($"Added world at {fullLevelPath}");
             }
 
+			if (LevelNames.Count == 0)
+			{
+				SkyUtil.log($"No Levels configured for {gameName}");
+			}
+
             GameTickThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
@@ -85,9 +90,9 @@ namespace SkyCore.Game
             }
         }
 
-		private int _tick = 1;
+		protected int _tick = 1;
 
-        protected void CoreGameTick()
+        protected virtual void CoreGameTick()
         {
 			if (++_tick % 10 == 0)
 			{
@@ -151,7 +156,7 @@ namespace SkyCore.Game
             }
         }
 
-	    public void InstantQueuePlayer(SkyPlayer player)
+	    public virtual void InstantQueuePlayer(SkyPlayer player)
 	    {
 			SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 		    lock (GameLevels)
@@ -183,7 +188,7 @@ namespace SkyCore.Game
 		}
 
 		///<summary>Ensures at least 1 game is available to join. If not, creates one to fill capacity</summary>
-		public void CheckCapacity()
+		public virtual void CheckCapacity()
 		{
 			List<GameLevel> availableGames = new List<GameLevel>();
 			List<GameLevel> closingGames   = new List<GameLevel>();

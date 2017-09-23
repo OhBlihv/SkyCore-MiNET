@@ -17,6 +17,8 @@ using MiNET.Worlds;
 using SkyCore.Commands;
 using SkyCore.Entities;
 using SkyCore.Game;
+using SkyCore.Games.BuildBattle;
+using SkyCore.Games.Hub;
 using SkyCore.Games.Murder;
 using SkyCore.Permissions;
 using SkyCore.Player;
@@ -38,6 +40,8 @@ namespace SkyCore
 		public string CurrentIp { get; private set; }
 
         public SkyPermissions Permissions { get; set; }
+
+		public string GameType { get; private set; }
 
         public readonly ConcurrentDictionary<string, CoreGameController> GameModes = new ConcurrentDictionary<string, CoreGameController>();
 
@@ -85,6 +89,8 @@ namespace SkyCore
 
                     level.BlockBreak += LevelOnBlockBreak;
                     level.BlockPlace += LevelOnBlockPlace;
+
+	                level.CurrentWorldTime = 6000; //Midday
                 }
             };
 
@@ -107,7 +113,10 @@ namespace SkyCore
 				{
 					foreach (PendingTask pendingTask in PendingTasks)
 					{
-						pendingTask.DynamicInvoke();
+						RunnableTask.RunTaskLater(() =>
+						{
+							pendingTask.DynamicInvoke();
+						}, 5000);
 					}
 
 					PendingTasks.Clear();
@@ -147,6 +156,7 @@ namespace SkyCore
 
 				string serverGame = Config.GetProperty("game-type", "none");
 				SkyUtil.log($"Setting up Custom Game {serverGame}...");
+	            GameType = serverGame;
 				try
 				{
 					switch (serverGame)
@@ -157,16 +167,23 @@ namespace SkyCore
 							_initializeCustomGame(new MurderCoreGameController(this));
 							break;
 						}
+						case "build-battle":
+						{
+							SkyUtil.log("Initializing Build Battle...");
+							_initializeCustomGame(new BuildBattleCoreGameController(this));
+							break;
+						}
 						case "none":
 						{
-							SkyUtil.log("Initializing Pure Hub...");
+							SkyUtil.log("Initializing Pure Hub Handling...");
+							_initializeCustomGame(new HubCoreController(this));
 							break;
 						}
 					}
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e);
+					Console.WriteLine(e.StackTrace);
 				}
             });
         }
@@ -240,21 +257,13 @@ namespace SkyCore
                 //Group isn't initialized yet - wait.
                 SkyUtil.log($"{++i} Group for {player.Username} == {player.PlayerGroup} vs {PlayerGroup.Youtuber} == {player.PlayerGroup.CompareTo(PlayerGroup.Youtuber)}");
 
-                GameMode targetGameMode;
-                if (player.PlayerGroup.CompareTo(PlayerGroup.Youtuber) >= 0)
-                {
-                    targetGameMode = GameMode.Creative;
-                }
-                else
-                {
-                    targetGameMode = GameMode.Adventure;
-                }
-                player.SetGameMode(targetGameMode);
+                player.SendTitle("§f", TitleType.Clear);
+                player.SendTitle("§f", TitleType.AnimationTimes, 6, 6, 20 * 10);
+                player.SendTitle("§f", TitleType.ActionBar, 6, 6, 20 * 10);
+                player.SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
+                player.SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
 
-                player.SendTitle(null, TitleType.Clear);
-                player.SendTitle(null, TitleType.AnimationTimes, 6, 6, 20 * 10);
-
-                player.SendTitle($"{ChatColors.Gold}Welcome {player.Username}\n{ChatColors.LightPurple}~ To the Skytonia Network ~", TitleType.ActionBar);
+                //player.SendTitle($"{ChatColors.Gold}Welcome {player.Username}\n{ChatColors.LightPurple}~ To the Skytonia Network ~", TitleType.ActionBar);
                 Console.WriteLine(" (Joined!)");
                 
                 /*try
@@ -279,6 +288,11 @@ namespace SkyCore
 
         private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
         {
+	        if (o == null)
+	        {
+		        return;
+	        }
+
             if (eventArgs.Level is GameLevel)
             {
                 ((GameLevel) eventArgs.Level).RemovePlayer((SkyPlayer) eventArgs.Player);
@@ -296,7 +310,7 @@ namespace SkyCore
             
             text = TextUtils.RemoveFormatting(text);
 
-            string formattedText = $"{GetNameTag(player)}:{ChatColors.White} {text}";
+            string formattedText = $"{GetNameTag(player)}{ChatColors.Gray}: {ChatColors.White}{text}";
             SkyUtil.log($"Broadcasting to {player.Level.LevelId}: {formattedText}");
             player.Level.BroadcastMessage(formattedText, MessageType.Raw);
 
@@ -357,6 +371,20 @@ namespace SkyCore
 
             return (SkyPlayer) foundPlayer;
         }
+
+	    public List<SkyPlayer> GetAllOnlinePlayers()
+	    {
+			List<SkyPlayer> players = new List<SkyPlayer>();
+			foreach (Level level in Context.LevelManager.Levels)
+			{
+				foreach (MiNET.Player player in level.Players.Values)
+				{
+					players.Add(player as SkyPlayer);
+				}
+			}
+
+		    return players;
+	    }
 
     }
 }

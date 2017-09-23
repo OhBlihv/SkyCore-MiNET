@@ -12,6 +12,7 @@ using MiNET.Entities;
 using MiNET.Entities.Projectiles;
 using MiNET.Entities.World;
 using MiNET.Items;
+using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Sounds;
 using MiNET.Utils;
@@ -100,8 +101,9 @@ namespace SkyCore.Games.Murder.State
 			            player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
 
 						SkyUtil.log($"Moving speed from {player.MovementSpeed} to 0 during freeze phase");
-			            player.MovementSpeed = 0.001f;
-		            });
+						player.MovementSpeed = 0f;
+						player.SendUpdateAttributes();
+					});
 
 					List<MurderTeam> teamRotation = new List<MurderTeam> { MurderTeam.Murderer, MurderTeam.Detective, MurderTeam.Innocent };
 		            for (int i = 0; i < 12; i++)
@@ -109,7 +111,7 @@ namespace SkyCore.Games.Murder.State
 			            MurderTeam team = teamRotation[i % 3];
 						foreach (MiNET.Player player in players)
 						{
-							TitleUtil.SendCenteredSubtitle(player, team.TeamPrefix + "§l" + team.TeamName);
+							TitleUtil.SendCenteredSubtitle(player, team.TeamPrefix + "§l" + team.TeamName + "\n");
 						}
 
 						SkyUtil.log($"Printed scroll {i}/12, with {team.TeamPrefix + "§l" + team.TeamName}");
@@ -148,12 +150,12 @@ namespace SkyCore.Games.Murder.State
 
 					gameLevel.DoForPlayersIn(player =>
 					{
-						TitleUtil.SendCenteredSubtitle(player, "§a§lInnocent§r\n§7Track down the murderer!");
+						TitleUtil.SendCenteredSubtitle(player, "§a§lInnocent §r\n§7Track down the murderer!");
 					}, MurderTeam.Innocent);
 
 					gameLevel.DoForPlayersIn(player =>
 					{
-						TitleUtil.SendCenteredSubtitle(player, "§9§lDetective§r\n§7Track down the murderer!");
+						TitleUtil.SendCenteredSubtitle(player, "§9§lDetective §r\n§7Track down the murderer!");
 
 						player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
 						SkyUtil.log($"In Slot 0 = {player.Inventory.GetSlots()[0].GetType().FullName}");
@@ -163,7 +165,7 @@ namespace SkyCore.Games.Murder.State
 
 					gameLevel.DoForPlayersIn(player =>
 					{
-						TitleUtil.SendCenteredSubtitle(player, "§c§lMurderer§r\n§7Kill all innocent players!");
+						TitleUtil.SendCenteredSubtitle(player, "§c§l  Murderer§r\n§7Kill all innocent players!");
 
 						player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
 
@@ -175,6 +177,7 @@ namespace SkyCore.Games.Murder.State
 					gameLevel.DoForAllPlayers(player =>
 					{
 						player.MovementSpeed = 0.1f;
+						player.SendUpdateAttributes();
 					});
 
 		            _isStarted = true;
@@ -214,7 +217,7 @@ namespace SkyCore.Games.Murder.State
 		        return;
 	        }
 
-	        {
+	        /*{
 				PlayerLocation soundLocation = PlayerSpawnLocations[_random.Next(PlayerSpawnLocations.Count)];
 		        Vector3 soundVector = new Vector3(soundLocation.X, soundLocation.Y, soundLocation.Z);
 
@@ -234,7 +237,7 @@ namespace SkyCore.Games.Murder.State
 		        }
 
 		        sound.Spawn(gameLevel);
-			}
+			}*/
 
 	        string neatRemaining;
 	        {
@@ -269,7 +272,7 @@ namespace SkyCore.Games.Murder.State
 
             gameLevel.DoForPlayersIn(player =>
 			{
-				player.BarHandler.AddMajorLine($"§c§lMURDERER§r {neatRemaining} Remaining", 2);
+				player.BarHandler.AddMajorLine($"§c§lMURDERER§r §7| {neatRemaining} §fRemaining...", 2);
 				//$"              §7{PlayerAmmoCounts[player.Username]}/3 Throwing Knives", TitleType.ActionBar);
 			}, MurderTeam.Murderer);
 
@@ -278,32 +281,34 @@ namespace SkyCore.Games.Murder.State
              */
 
             //Every 5 Seconds -- Can't spawn any gun parts if the spawned amount == the total locations
-            if (currentTick % 1 == 0 && GunParts.Count != GunPartLocations.Count)
+            if (currentTick % 10 == 0 && GunParts.Count != GunPartLocations.Count)
             {
                 PlayerLocation spawnLocation = null;
 
-                int rollCount = 0;
-                while (++rollCount < 10 && GunParts.ContainsKey((spawnLocation = GunPartLocations[_random.Next(GunPartLocations.Count)])))
-                {
-                    //
-                }
+	            int maxSpawnAmount = gameLevel.GetMaxPlayers();
+	            int spawnCount = 0;
+	            while (++spawnCount < maxSpawnAmount)
+	            {
+		            int rollCount = 0;
+		            while (++rollCount < 10 && GunParts.ContainsKey(spawnLocation = GunPartLocations[_random.Next(GunPartLocations.Count)]))
+		            {
+			            //
+		            }
 
-                if (rollCount == 10)
-                {
-                    spawnLocation = null; //Invalidate. All spots allocated.
-                }
+		            if (rollCount == 10)
+		            {
+			            break; //No more spawn points available.
+		            }
 
-                if (spawnLocation != null)
-                {
-                    MurderGunPartEntity item = new MurderGunPartEntity(this, (MurderLevel) gameLevel, spawnLocation);
+		            if (spawnLocation != null)
+		            {
+			            MurderGunPartEntity item = new MurderGunPartEntity(this, (MurderLevel)gameLevel, spawnLocation);
 
-                    GunParts.Add(spawnLocation, item);
+			            GunParts.Add(spawnLocation, item);
 
-                    //item.Gravity = 2D;
-                    //item.Velocity = Vector3.Zero;
-
-                    gameLevel.AddEntity(item);
-                }
+			            gameLevel.AddEntity(item);
+		            }
+				}
             }
         }
 
@@ -355,16 +360,10 @@ namespace SkyCore.Games.Murder.State
 	            RunnableTask.RunTaskTimer(() =>
 	            {
 
-					player.AddExperience(-(levelOneFullBarXp / updateTicks), true);
+		            player.AddExperience(-(levelOneFullBarXp / updateTicks), true);
 
-	            }, timerMillis, updateTicks);
-
-				//Reset to 0XP
-				RunnableTask.RunTaskLater(() =>
-				{
-					player.AddExperience(-1000, true);
-				}, timerMillis * (updateTicks + 1));
-			}
+	            }, timerMillis, updateTicks + 2);
+            }
 
             return true;
         }
@@ -467,9 +466,15 @@ namespace SkyCore.Games.Murder.State
                 return -1; //Murderer cannot pick up gun parts
             }
 
-			player.BarHandler.AddMinorLine("§ePicked Up Gun Parts!");
+	        McpeLevelEvent levelEvent = McpeLevelEvent.CreateObject();
+	        levelEvent.eventId = 1051;
+	        levelEvent.data = 1;
+	        levelEvent.position = player.KnownPosition.ToVector3();
+	        levelEvent.AddReferences(1);
 
-            int count = GetPlayerGunParts(gameLevel, player) + 1;
+	        player.SendPackage(levelEvent);
+
+			int count = GetPlayerGunParts(gameLevel, player) + 1;
 
             if (count == MaxGunParts)
             {

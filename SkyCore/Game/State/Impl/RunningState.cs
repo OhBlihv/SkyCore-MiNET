@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MiNET;
+using MiNET.Entities;
+using MiNET.Items;
 using MiNET.Utils;
 using SkyCore.Player;
 
@@ -45,5 +48,16 @@ namespace SkyCore.Game.State.Impl
         {
             return StateType.Running;
         }
-    }
+
+	    public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+	    {
+		    return true;
+	    }
+
+	    public override void HandleDamage(GameLevel gameLevel, Entity source, Entity target, Item item, int damage, DamageCause damageCause)
+	    {
+		    
+	    }
+
+	}
 }

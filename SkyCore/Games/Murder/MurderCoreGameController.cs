@@ -30,7 +30,7 @@ namespace SkyCore.Games.Murder
         }
 
 	    [Command(Name = "location")]
-	    [Authorize(Permission = UserPermission.Any)]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandHub(MiNET.Player player, string action = "", string type = "")
 	    {
 		    if (action.Length == 0 || type.Length == 0)
@@ -39,8 +39,7 @@ namespace SkyCore.Games.Murder
 			    return;
 		    }
 
-		    MurderLevel murderLevel = player.Level as MurderLevel;
-			if (murderLevel == null)
+		    if (!(player.Level is MurderLevel murderLevel))
 		    {
 			    player.SendMessage("§cYou must be in a murder game to use this command!");
 			    return;

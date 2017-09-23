@@ -24,6 +24,7 @@ using SkyCore.Game;
 using SkyCore.Games.Murder;
 using SkyCore.Permissions;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Commands
 {
@@ -37,15 +38,36 @@ namespace SkyCore.Commands
             this.skyCoreApi = skyCoreApi;
         }
 
-	    [Command(Name = "hub")]
-	    [Authorize(Permission = UserPermission.Any)]
+	    [Command(Name = "dtest")]
+	    [Authorize(Permission = CommandPermission.Admin)]
+	    public void CommandDTest(MiNET.Player player)
+	    {
+		    TitleUtil.SendCenteredSubtitle(player, "§9§lDetective §r\n§7Track down the murderer!");
+		}
+
+	    [Command(Name = "itest")]
+	    [Authorize(Permission = CommandPermission.Admin)]
+	    public void CommandITest(MiNET.Player player)
+	    {
+			TitleUtil.SendCenteredSubtitle(player, "§a§lInnocent §r\n§7Track down the murderer!");
+		}
+
+	    [Command(Name = "mtest")]
+	    [Authorize(Permission = CommandPermission.Admin)]
+	    public void CommandMTest(MiNET.Player player)
+	    {
+			TitleUtil.SendCenteredSubtitle(player, "§c§l  Murderer§r\n§7Kill all innocent players!");
+		}
+
+		[Command(Name = "hub")]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandHub(MiNET.Player player)
 	    {
 			MoveToLobby(player);
 		}
 
 	    [Command(Name = "lobby")]
-	    [Authorize(Permission = UserPermission.Any)]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandLobby(MiNET.Player player)
 	    {
 		    MoveToLobby(player);
@@ -65,15 +87,17 @@ namespace SkyCore.Commands
 		}
 
 	    [Command(Name = "popuptest")]
-	    [Authorize(Permission = UserPermission.Any)]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandPopupTest(MiNET.Player player, string popup, string actionbar)
 	    {
-		    player.SendTitle("\n\n\n" + actionbar, TitleType.ActionBar);
-			player.SendMessage(popup, MessageType.Popup);
+		    SkyPlayer skyPlayer = (SkyPlayer) player;
+
+			skyPlayer.BarHandler.AddMajorLine(popup);
+			skyPlayer.BarHandler.AddMinorLine(actionbar);
 	    }
 
 		[Command(Name = "neatjoin")]
-	    [Authorize(Permission = UserPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Admin)]
 	    public void CommandNeatJoin(MiNET.Player player, int lineCount)
 	    {
 		    string lines = "";
@@ -99,7 +123,7 @@ namespace SkyCore.Commands
 	    }
 
 		[Command(Name = "subtitletest")]
-	    [Authorize(Permission = UserPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Admin)]
 	    public void CommandSubtitle(MiNET.Player player, int lineCount)
 		{
 			string lines = "";
@@ -114,7 +138,7 @@ namespace SkyCore.Commands
 	    }
 
 	    [Command(Name = "actionbartest")]
-	    [Authorize(Permission = UserPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Admin)]
 	    public void CommandActionBar(MiNET.Player player, int lineCount)
 	    {
 			string lines = "";
@@ -129,7 +153,7 @@ namespace SkyCore.Commands
 	    }
 
 	    [Command(Name = "titletest")]
-	    [Authorize(Permission = UserPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Admin)]
 	    public void CommandTitle(MiNET.Player player, int lineCount)
 	    {
 			//player.SendTitle("1\n2\n3\n4\n5\n6\n7\n8\n9\n10", TitleType.SubTitle);
@@ -143,15 +167,25 @@ namespace SkyCore.Commands
 			//player.SendTitle(" ");
 		}
 
+		[Command(Name = "speed")]
+		[Authorize(Permission = CommandPermission.Admin)]
+		public void CommandGamemode(MiNET.Player player, float speed = 0.1f)
+		{
+			player.MovementSpeed = speed;
+			player.SendAdventureSettings();
+			
+			player.SendMessage($"§eUpdated movement speed to {speed}");
+		}
+
 		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandGamemode(MiNET.Player player, int gamemodeId = 0)
         {
             CommandGamemode(player, player.Username, gamemodeId);
         }
 
         [Command(Name = "gamemode", Aliases = new[] {"gm"})]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandGamemode(MiNET.Player player, string targetName = "", int gamemodeId = 0)
         {
             MiNET.Player target;
@@ -205,7 +239,7 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "fly")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandFly(MiNET.Player player, string targetName = "")
         {
             MiNET.Player targetPlayer;
@@ -252,7 +286,7 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "hologram")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandHologram(MiNET.Player player, string hologramText)
         {
             try
@@ -298,15 +332,41 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "join")]
-        [Authorize(Permission = UserPermission.Admin)]
-        public void CommandJoin(MiNET.Player player)
+        [Authorize(Permission = CommandPermission.Admin)]
+        public void CommandJoin(MiNET.Player player, string gameName)
         {
-            player.SendMessage($"{ChatColors.Yellow}Queueing in next murder game...");
-            skyCoreApi.GameModes["murder"].QueuePlayer((SkyPlayer) player);
+	        try
+	        {
+		        switch (gameName.ToLower())
+		        {
+			        case "murder":
+			        {
+				        ExternalGameHandler.AddPlayer((SkyPlayer)player, "murder");
+				        break;
+			        }
+			        case "build-battle":
+			        {
+						ExternalGameHandler.AddPlayer((SkyPlayer)player, "build-battle");
+						break;
+			        }
+			        default:
+			        {
+				        player.SendMessage($"{ChatColors.Red}Unable to resolve game '{gameName}'.");
+				        return;
+			        }
+		        }
+
+		        player.SendMessage($"{ChatColors.Yellow}Joining {gameName}...");
+			}
+	        catch (Exception e)
+	        {
+		        Console.WriteLine(e);
+				player.SendMessage("Unable to join " + gameName);
+	        }
         }
 
         [Command(Name = "npc")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandNPC(MiNET.Player executingPlayer, string npcName, string command = "")
         {
             try
@@ -368,7 +428,7 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "scale")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandScale(MiNET.Player player, string scaleString, string targetName = "")
         {
             MiNET.Player targetPlayer;
@@ -401,7 +461,7 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "spawnmob")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandSpawnMob(MiNET.Player player, string entityName, string mobName = "", string mobScale = "")
         {
             entityName = entityName.ToLower();
@@ -574,7 +634,7 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "world")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandWorld(MiNET.Player player, string worldName)
         {
             if (worldName.Equals("world-treasurewars"))
@@ -602,16 +662,16 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "getpos")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandGetPos(MiNET.Player player)
         {
             PlayerLocation knownLocation = player.KnownPosition;
 
-            player.SendMessage($"Pos: {player.Level.LevelId}:{knownLocation.X},{knownLocation.Y},{knownLocation.Z}");
+            player.SendMessage($"Pos: {player.Level.LevelId}:{knownLocation.X},{knownLocation.Y},{knownLocation.Z}:{knownLocation.HeadYaw}:{knownLocation.Pitch}");
         }
 
 		[Command(Name = "transfer")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandTransfer(MiNET.Player player, string address, ushort serverPort = 19132)
 		{
 			ushort port = serverPort;
@@ -628,7 +688,7 @@ namespace SkyCore.Commands
         }
 
 		[Command(Name = "maptest")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandTestMap(MiNET.Player player)
         {
             player.SendMessage("_o_");

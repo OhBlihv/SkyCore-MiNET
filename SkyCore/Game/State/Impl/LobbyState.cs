@@ -31,7 +31,8 @@ namespace SkyCore.Game.State.Impl
         {
 			gameLevel.DoForAllPlayers(gamePlayer =>
 			{
-				gamePlayer.BarHandler.AddMinorLine($"§e{player.PlayerGroup.Prefix}{player.Username} joined ({gameLevel.GetPlayerCount()}/{gameLevel.GetMaxPlayers()})");
+				//§f(§e{gameLevel.GetPlayerCount()}/{gameLevel.GetMaxPlayers()}§f)
+				gamePlayer.BarHandler.AddMinorLine($"§e{player.PlayerGroup.Prefix} {player.Username}§r §7entered the game!");
 			});
         }
 

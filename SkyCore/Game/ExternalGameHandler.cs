@@ -89,27 +89,49 @@ namespace SkyCore.Game
 			ExternalGameInfo gameInfo = new ExternalGameInfo(connectingAddress, connectingPort, targetServer, gameName);
 			GameRegistrations.TryAdd(gameName, gameInfo);
 
-			SkyCoreAPI.Instance.AddPendingTask(() =>
+			if (!gameName.Equals("hub"))
 			{
-				Level level = SkyCoreAPI.Instance.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
-
-				if (level == null)
+				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
-					Console.WriteLine($"§c§l(!) §r§cUnable to find level Overworld/world");
+					Level level = SkyCoreAPI.Instance.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
 
-					string worldNames = "";
-					foreach (Level levelLoop in SkyCoreAPI.Instance.Context.LevelManager.Levels)
+					if (level == null)
 					{
-						worldNames += levelLoop.LevelName + "(" + levelLoop.LevelId + "), ";
-					}
+						Console.WriteLine($"§c§l(!) §r§cUnable to find level Overworld/world");
 
-					Console.WriteLine($"§7§l* §r§7Valid Names: {worldNames}");
-				}
-				else
-				{
-					PlayerNPC.SpawnNPC(level, $"§e§l{gameName}", new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F), $"GID:{gameName}");
-				}
-			});
+						string worldNames = "";
+						foreach (Level levelLoop in SkyCoreAPI.Instance.Context.LevelManager.Levels)
+						{
+							worldNames += levelLoop.LevelName + "(" + levelLoop.LevelId + "), ";
+						}
+
+						Console.WriteLine($"§7§l* §r§7Valid Names: {worldNames}");
+					}
+					else
+					{
+						string neatName = gameName;
+						PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);
+
+						switch (gameName)
+						{
+							case "murder":
+							{
+								neatName = "§c§lMurder Mystery";
+								npcLocation = new PlayerLocation(-1.5D, 30D, 16.5D, 180F, 180F, 0F);
+								break;
+							}
+							case "build-battle":
+							{
+								neatName = "§e§lBuild Battle";
+								npcLocation = new PlayerLocation(2.5D, 30D, 16.5D, 180F, 180F, 0F);
+								break;
+							}
+						}
+
+						PlayerNPC.SpawnNPC(level, $"§e§l{neatName}", npcLocation, $"GID:{gameName}");
+					}
+				});
+			}
 
 			ISubscriber subscriber = RedisPool.GetSubscriber();
 
@@ -120,7 +142,7 @@ namespace SkyCore.Game
 			 */
 			subscriber.SubscribeAsync($"{gameName}_info", (channel, message) =>
 			{
-				SkyUtil.log($"Received update for {channel} > {message}");
+				//SkyUtil.log($"Received update for {channel} > {message}");
 				string[] messageSplit = ((string)message).Split(':');
 
 				int currentPlayers, availableGames;
@@ -142,7 +164,7 @@ namespace SkyCore.Game
 					Thread.Sleep(1000); // Update every 1 second
 
 					GameInfo gameInfo = GameRegistrations[gameName];
-					SkyUtil.log($"Sending update on {gameName}_info as " + gameInfo.CurrentPlayers + ":" + gameInfo.AvailableGames);
+					//SkyUtil.log($"Sending update on {gameName}_info as " + gameInfo.CurrentPlayers + ":" + gameInfo.AvailableGames);
 					RedisPool.GetSubscriber().PublishAsync($"{gameName}_info", gameInfo.CurrentPlayers + ":" + gameInfo.AvailableGames);
 				}
 

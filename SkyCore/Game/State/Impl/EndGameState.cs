@@ -65,7 +65,6 @@ namespace SkyCore.Game.State.Impl
 		        if (timeRemaining != 1)
 		        {
 			        message = $"§d§lGame Ended:§r §fNext Game starts in §7{timeRemaining} §fSeconds...";
-
 		        }
 		        else
 		        {
@@ -74,7 +73,8 @@ namespace SkyCore.Game.State.Impl
 
 				gameLevel.DoForAllPlayers(player =>
 				{
-					player.SendTitle(message, TitleType.ActionBar);
+					//player.SendTitle(message, TitleType.ActionBar);
+					player.BarHandler.AddMajorLine(message);
 				});
 			}
 	        else
@@ -93,7 +93,7 @@ namespace SkyCore.Game.State.Impl
 				        }
 				        else
 				        {
-					        player.SendTitle($"§d§lGame Ending: §r§fMoving to New Game...", TitleType.ActionBar);
+					        ((SkyPlayer) player).BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."));
 
 							gameLevel.RemovePlayer(player);
 							

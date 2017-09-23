@@ -27,14 +27,16 @@ namespace SkyCore.Entities
 
         private onInteract Action;
 
-        public PlayerNPC(string name, Level level, PlayerLocation playerLocation, onInteract action = null, MiNetServer server = null) : base(name, level)
+        public PlayerNPC(string name, Level level, PlayerLocation playerLocation, onInteract action = null) : base(name, level)
         {
+	        /*NameTag = name;
             KnownPosition = playerLocation;
-            Skin = new Skin {Texture = Skin.GetTextureFromFile("Skin.png")};
+			Skin = new Skin { SkinData = Skin.GetTextureFromFile("Skin.png")};
+	        EntityId = 52;
 
-            Scale = 1.8D; //Ensure this NPC is visible
+			Scale = 1.8D; //Ensure this NPC is visible
 
-            Action = action;
+            Action = action;*/
         }
 
         public void OnInteract(MiNET.Player player)
@@ -100,23 +102,27 @@ namespace SkyCore.Entities
                     npcName = "";
                 }
 
+				string gameName = command;
                 onInteract action = null;
                 if (!String.IsNullOrEmpty(command))
                 {
                     if (command.StartsWith("GID:"))
-                    {
+					{
+						gameName = command.Split(':')[1];
 						action = player =>
                         {
 	                        //player.FreezePlayer = true; //Avoid movement //TODO: Set speed to 0
-							switch (command)
+							switch (gameName)
                             {
-								//TODO: Split around the colon
-                                case "GID:murder":
-									
-                                    player.SendMessage("Queueing for Murder");
-									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, "murder"), 200);
+                                case "murder":
+                                    player.SendMessage($"Queueing for {gameName}");
+									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
                                     break;
-                                default:
+								case "build-battle":
+									player.SendMessage($"Queueing for {gameName}");
+									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
+									break;
+								default:
                                     Console.WriteLine($"Unable to process game command {command}");
                                     break;
                             }
@@ -128,23 +134,44 @@ namespace SkyCore.Entities
                     }
                 }
 
+				if (gameName.Equals(command))
+				{
+					SkyUtil.log($"Unknown game command '{command}'");
+					return;
+				}
+
 				//Ensure this NPC can be seen
 				PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action) {Scale = 1.2};
+				//PlayerMob npc = new PlayerMob("Name", level);
 
-				npc.BroadcastEntityEvent();
-                npc.BroadcastSetEntityData();
+				//npc.BroadcastEntityEvent();
+                //npc.BroadcastSetEntityData();
 
 				SkyCoreAPI.Instance.AddPendingTask(() => npc.SpawnEntity());
 
 				//Spawn a hologram with player counts //TODO: Split around the colon
-	            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, spawnLocation, "murder");
+	            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, spawnLocation, gameName);
 
 	            hologram.BroadcastEntityEvent();
 	            hologram.BroadcastSetEntityData();
 
 	            SkyCoreAPI.Instance.AddPendingTask(() => hologram.SpawnEntity());
 
-				PendingNpcs.Add(npc);
+				{
+					PlayerLocation betaLocation = (PlayerLocation) spawnLocation.Clone();
+					betaLocation.Y += 2.80f;
+
+					//Spawn a hologram with player counts //TODO: Split around the colon
+					Hologram betaHologram = new Hologram(npcName, level, betaLocation);
+					betaHologram.SetNameTag("§e§lBETA");
+
+					betaHologram.BroadcastEntityEvent();
+					betaHologram.BroadcastSetEntityData();
+
+					SkyCoreAPI.Instance.AddPendingTask(() => betaHologram.SpawnEntity());
+				}
+
+				//PendingNpcs.Add(npc);
 
                 Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
             }

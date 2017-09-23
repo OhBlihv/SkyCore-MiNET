@@ -33,7 +33,7 @@ namespace SkyCore.Player
             PlayerGroup = playerGroup;
 
             //Initialize Player UserPermission level for commands
-            PermissionLevel = playerGroup.PermissionLevel;
+            CommadPermission = playerGroup.PermissionLevel;
 
 	        string prefix = PlayerGroup.Prefix;
 	        if (prefix.Length > 2)
@@ -57,6 +57,7 @@ namespace SkyCore.Player
 
         public override void InitializePlayer()
         {
+			SkyUtil.log("a");
             if (_hasJoined)
             {
                 return;
@@ -68,16 +69,24 @@ namespace SkyCore.Player
 
                 if (CertificateData.ExtraData.Xuid == null)
                 {
-                    //Disconnect("§aXBOX §caccount required to login.");
-                    //return;
+                    Disconnect("§aXBOX §caccount required to login.");
+	                SkyUtil.log("no xbox account");
+					return;
                 }
 
+	            SkyUtil.log("adding bar handler");
+
 				BarHandler = new BarHandler(this);
-				
+
+	            SkyUtil.log("set bar handler");
+
 				SetPlayerGroup(PlayerGroup.Player);
+
+	            SkyUtil.log("set player group and bar handler");
 
 				RunnableTask.RunTask(() =>
 				{
+					SkyUtil.log("starting permission sql");
 					new DatabaseAction().Query(
 						"SELECT `group_name` FROM player_groups WHERE `player_xuid`=@id",
 						(command) =>
@@ -98,7 +107,19 @@ namespace SkyCore.Player
 						},
 						new Action(delegate
 						{
-							SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({PermissionLevel})");
+							SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommadPermission})");
+
+							if (PlayerGroup == PlayerGroup.Admin)
+							{
+								//SetGameMode(GameMode.Creative);
+								//UseCreativeInventory = true;
+								SetGameMode(GameMode.Adventure);
+							}
+							else
+							{
+								SetGameMode(GameMode.Adventure);
+								UseCreativeInventory = false;
+							}
 
 							/*if (Username.Equals("OhBlihv"))
 							{
@@ -109,7 +130,7 @@ namespace SkyCore.Player
 					);
 				});
 
-                SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({PermissionLevel})");
+                SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({CommadPermission})");
 
 				//Initialize once we've loaded the group etc.
 	            base.InitializePlayer();
@@ -123,7 +144,7 @@ namespace SkyCore.Player
 	            try
 	            {
 		            //Add this player to any games if available and if this is the only game available
-		            if (SkyCoreAPI.Instance.GameModes.Count == 1)
+		            if (!SkyCoreApi.GameType.Equals("hub") && SkyCoreAPI.Instance.GameModes.Count == 1)
 		            {
 			            //Foreach, but only one value.
 			            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)

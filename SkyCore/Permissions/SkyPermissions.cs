@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MiNET;
+using MiNET.Net;
 using MiNET.Plugins;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
@@ -20,15 +21,15 @@ namespace SkyCore.Permissions
 
 	    public static readonly List<PlayerGroup> Values = new List<PlayerGroup>();
 
-		public static readonly PlayerGroup Player    = new PlayerGroup(0, "Player", "§7", "§7", UserPermission.Any);
-        public static readonly PlayerGroup Vip       = new PlayerGroup(1, "VIP", "§a", "§a[VIP]", UserPermission.Any);
-        public static readonly PlayerGroup Pro       = new PlayerGroup(2, "PRO", "§b", "§b[PRO]", UserPermission.Any);
-        public static readonly PlayerGroup Mvp       = new PlayerGroup(3, "MVP", "§d", "§d[MVP]", UserPermission.Any);
-        public static readonly PlayerGroup Helper    = new PlayerGroup(4, "Helper", "§d", "§d[HELPER]", UserPermission.Gamemasters);
-        public static readonly PlayerGroup Mod       = new PlayerGroup(5, "Mod", "§b", "§b[MOD]", UserPermission.Gamemasters);
-        public static readonly PlayerGroup Developer = new PlayerGroup(6, "Developer", "§e", "§e[DEVELOPER]", UserPermission.Host);
-        public static readonly PlayerGroup Youtuber  = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]", UserPermission.Host);
-        public static readonly PlayerGroup Admin     = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]", UserPermission.Admin);
+		public static readonly PlayerGroup Player    = new PlayerGroup(0, "Player", "§7", "§7", CommandPermission.Normal);
+        public static readonly PlayerGroup Vip       = new PlayerGroup(1, "VIP", "§a", "§a[VIP]", CommandPermission.Normal);
+        public static readonly PlayerGroup Pro       = new PlayerGroup(2, "PRO", "§b", "§b[PRO]", CommandPermission.Normal);
+        public static readonly PlayerGroup Mvp       = new PlayerGroup(3, "MVP", "§d", "§d[MVP]", CommandPermission.Normal);
+        public static readonly PlayerGroup Helper    = new PlayerGroup(4, "Helper", "§d", "§d[HELPER]", CommandPermission.Operator);
+        public static readonly PlayerGroup Mod       = new PlayerGroup(5, "Mod", "§b", "§b[MOD]", CommandPermission.Operator);
+        public static readonly PlayerGroup Developer = new PlayerGroup(6, "Developer", "§e", "§e[DEVELOPER]", CommandPermission.Host);
+        public static readonly PlayerGroup Youtuber  = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]", CommandPermission.Host);
+        public static readonly PlayerGroup Admin     = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]", CommandPermission.Admin);
 
 		//
 
@@ -54,9 +55,9 @@ namespace SkyCore.Permissions
 
         public string Prefix { get; }
 
-        public UserPermission PermissionLevel { get; }
+        public CommandPermission PermissionLevel { get; }
 
-        private PlayerGroup(int enumVal, string groupName, string groupColour, string prefix, UserPermission permissionLevel)
+        private PlayerGroup(int enumVal, string groupName, string groupColour, string prefix, CommandPermission permissionLevel)
         {
             _enumVal = enumVal;
 
@@ -131,7 +132,7 @@ namespace SkyCore.Permissions
         }
 
         [Command(Name = "perm set")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandPermSet(MiNET.Player player, string targetName, string targetGroupName)
         {
             MiNET.Player target;
@@ -193,7 +194,7 @@ namespace SkyCore.Permissions
         }
 
         [Command(Name = "perm get")]
-        [Authorize(Permission = UserPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Admin)]
         public void CommandPermGet(MiNET.Player player, string targetName)
         {
             MiNET.Player target;

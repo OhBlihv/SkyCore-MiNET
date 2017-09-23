@@ -26,7 +26,7 @@ namespace SkyCore.Util
 			
 			level.Initialize();
 
-			//RecalculateLight(level, provider);
+			RecalculateLight(level, provider);
 
 			level.Close();
 
