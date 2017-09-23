@@ -76,6 +76,12 @@ namespace SkyCore.Game
 					return;
 				}
 
+				//TODO: Game Instance Pooling
+				if (GameRegistrations.ContainsKey(messageSplit[0]))
+				{
+					return;
+				}
+
 				SkyUtil.log($"Registering {messageSplit[0]} from {ipAddress}:{connectingPort}");
 
 				RegisterExternalGame(messageSplit[2], connectingPort, messageSplit[0], messageSplit[1]);
@@ -144,8 +150,18 @@ namespace SkyCore.Game
 			new Thread(delegate()
 			{
 
+				int threadTick = -1;
+
 				while (!SkyCoreAPI.IsDisabled)
 				{
+					//Enforce game registration every 15 seconds
+					if (++threadTick % 15 == 0)
+					{
+						//Temp - Sending server is gameName
+						RedisPool.GetSubscriber().PublishAsync("game_register",
+							$"{gameName}:{gameName}:{Config.GetProperty("ip", SkyCoreAPI.Instance.CurrentIp)}:{Config.GetProperty("port", "19132")}");
+					}
+
 					Thread.Sleep(1000); // Update every 1 second
 
 					GameInfo gameInfo = GameRegistrations[gameName];
@@ -154,12 +170,6 @@ namespace SkyCore.Game
 				}
 
 			}).Start();
-
-			ISubscriber subscriber = RedisPool.GetSubscriber();
-
-			//Temp - Sending server is gameName
-			subscriber.PublishAsync("game_register",
-				$"{gameName}:{gameName}:{Config.GetProperty("ip", SkyCoreAPI.Instance.CurrentIp)}:{Config.GetProperty("port", "19132")}");
 
 			GameRegistrations.TryAdd(gameName, new GameInfo("local", gameName));
 
