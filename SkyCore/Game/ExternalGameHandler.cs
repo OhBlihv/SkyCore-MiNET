@@ -44,8 +44,24 @@ namespace SkyCore.Game
 					Thread.Sleep(1000); // Update every 1 second
 
 					int totalPlayers = 0;
+					long expiryTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() - 15000; //15 Seconds
 					foreach (GamePool gamePool in GameRegistrations.Values)
 					{
+						List<InstanceInfo> toRemoveInstances = new List<InstanceInfo>();
+
+						foreach (InstanceInfo instanceInfo in gamePool.GetAllInstances())
+						{
+							if (instanceInfo.LastUpdate < expiryTime)
+							{
+								toRemoveInstances.Add(instanceInfo);
+							}
+						}
+
+						foreach (InstanceInfo instanceInfo in toRemoveInstances)
+						{
+							gamePool.RemoveInstance(instanceInfo);
+						}
+
 						totalPlayers += gamePool.GetCurrentPlayers();
 					}
 
@@ -73,7 +89,7 @@ namespace SkyCore.Game
 				string ipAddress = messageSplit[2];
 				if ((ipAddress + ":" + connectingPort).Equals(SkyCoreAPI.Instance.CurrentIp))
 				{
-					SkyUtil.log($"Avoiding registering self (New Game Registration) ({messageSplit[0]})");
+					//SkyUtil.log($"Avoiding registering self (New Game Registration) ({messageSplit[0]})");
 					return;
 				}
 
@@ -349,7 +365,7 @@ namespace SkyCore.Game
 			}
 		}
 
-		public List<InstanceInfo> GetAllGames()
+		public List<InstanceInfo> GetAllInstances()
 		{
 			List<InstanceInfo> games = new List<InstanceInfo>();
 			games.AddRange(_gameInstances.Values);
@@ -368,6 +384,11 @@ namespace SkyCore.Game
 			{
 				_gameInstances[instanceKey] = instanceInfo; //Update
 			}
+		}
+
+		public void RemoveInstance(InstanceInfo instanceInfo)
+		{
+			_gameInstances.TryRemove(instanceInfo.HostAddress + ":" + instanceInfo.HostPort, out _);
 		}
 
 		public void UpdateInstance(string instanceAddress, ushort instancePort, int currentPlayers, List<GameInfo> availableGames)

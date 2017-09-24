@@ -100,10 +100,10 @@ namespace SkyCore.Game
 			}
 
             //SkyUtil.log("Ticking Core");
-            /*if (QueuedPlayers.IsEmpty)
+            if (QueuedPlayers.IsEmpty && _tick % 20 != 0)
             {
                 return;
-            }*/
+            }
 
             //SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 			lock (GameLevels)
