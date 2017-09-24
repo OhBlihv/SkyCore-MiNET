@@ -174,16 +174,18 @@ namespace SkyCore
 							_initializeCustomGame(new BuildBattleCoreGameController(this));
 							break;
 						}
+						case "none":
+						{
+							SkyUtil.log("Initializing Pure Hub Handling...");
+							_initializeCustomGame(new HubCoreController(this));
+							break;
+						}
 					}
 				}
 				catch (Exception e)
 				{
 					Console.WriteLine(e.StackTrace);
 				}
-
-				//All servers have their own local hub
-	            SkyUtil.log("Initializing Pure Hub Handling...");
-	            _initializeCustomGame(new HubCoreController(this));
 			});
         }
 
