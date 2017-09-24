@@ -32,7 +32,7 @@ namespace SkyCore.Games.Murder.State
 
 				MiNET.Player murderer = ((MurderLevel)gameLevel).Murderer;
 
-	            ((SkyPlayer) murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 2, 4);
+	            ((SkyPlayer) murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 20, 8);
 	            murderer.SendTitle("§e§lYOU LOSE§r");
 
 				gameLevel.DoForPlayersIn(player =>
@@ -42,7 +42,7 @@ namespace SkyCore.Games.Murder.State
 		                return;
 	                }
 
-	                ((SkyPlayer)murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 2, 4);
+	                ((SkyPlayer)murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 20, 8);
                     player.SendTitle("§a§lYOU WIN§r");
                 }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
             }
@@ -53,14 +53,14 @@ namespace SkyCore.Games.Murder.State
 
                 gameLevel.DoForPlayersIn(player =>
                 {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 2);
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 20, 8);
 					player.SendTitle("§a§lYOU WIN§r");
                 }, MurderTeam.Murderer);
 
                 //TODO: DO properly
                 gameLevel.DoForPlayersIn(player =>
                 {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 2);
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 20, 8);
                     player.SendTitle("§c§lYOU LOSE");
                 }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
             }
@@ -71,22 +71,16 @@ namespace SkyCore.Games.Murder.State
 
                 gameLevel.DoForPlayersIn(player =>
                 {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 2);
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 20, 8);
 					player.SendTitle("§a§lYOU WIN");
                 }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
 
                 gameLevel.DoForPlayersIn(player =>
                 {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 2);
+	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 20, 8);
                     player.SendTitle("§c§lYOU LOSE");
                 }, MurderTeam.Murderer);
             }
-        }
-
-        public override GameState GetNextGameState(GameLevel gameLevel)
-        {
-            //TODO: Have a timeout on end game state which moves all players away
-            return new MurderLobbyState();
         }
 
         public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)

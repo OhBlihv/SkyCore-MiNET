@@ -331,7 +331,7 @@ namespace SkyCore.Game
 			//Check current instance first
 			if (_gameInstances.ContainsKey("local"))
 			{
-				InstanceInfo instanceInfo = _gameInstances[ExternalGameHandler.CurrentHostAddress];
+				InstanceInfo instanceInfo = _gameInstances["local"];
 				foreach (GameInfo gameInfo in instanceInfo.AvailableGames)
 				{
 					SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");

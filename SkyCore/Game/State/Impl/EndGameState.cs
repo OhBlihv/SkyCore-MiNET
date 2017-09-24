@@ -17,11 +17,11 @@ namespace SkyCore.Game.State.Impl
     public abstract class EndGameState : GameState
     {
 
-	    private int _timeRemaining = 10; //5 Seconds
+	    protected int TimeRemaining { get; set; }
 
         public override void EnterState(GameLevel gameLevel)
         {
-			
+	        TimeRemaining = 10 * 2;  //10 Seconds
 		}
 
         public override void LeaveState(GameLevel gameLevel)
@@ -58,9 +58,9 @@ namespace SkyCore.Game.State.Impl
         {
             outTick = currentTick;
 
-	        if (_timeRemaining-- >= 0)
+	        if (TimeRemaining-- >= 0)
 	        {
-		        int timeRemaining = _timeRemaining / 2;
+		        int timeRemaining = TimeRemaining / 2;
 		        string message;
 		        if (timeRemaining != 1)
 		        {
@@ -73,8 +73,7 @@ namespace SkyCore.Game.State.Impl
 
 				gameLevel.DoForAllPlayers(player =>
 				{
-					//player.SendTitle(message, TitleType.ActionBar);
-					player.BarHandler.AddMajorLine(message);
+					player.BarHandler.AddMajorLine(message, 4, 3);
 				});
 			}
 	        else
@@ -93,7 +92,7 @@ namespace SkyCore.Game.State.Impl
 				        }
 				        else
 				        {
-					        ((SkyPlayer) player).BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."));
+					        ((SkyPlayer) player).BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."), 20, 7);
 
 							gameLevel.RemovePlayer(player);
 							

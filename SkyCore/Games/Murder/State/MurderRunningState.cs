@@ -189,6 +189,15 @@ namespace SkyCore.Games.Murder.State
 						player.SendUpdateAttributes();
 
 						player.Freeze = false;
+
+						//Ensure this player is at the correct spawn location
+						if (gameLevel.GetBlock(player.KnownPosition).Id != 0)
+						{
+							PlayerLocation newLocation = (PlayerLocation) player.KnownPosition.Clone();
+							newLocation.Y++;
+						
+							player.Teleport(newLocation);
+						}
 					});
 
 		            _isStarted = true;
