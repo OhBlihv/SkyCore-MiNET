@@ -71,9 +71,9 @@ namespace SkyCore.Game
 				}
 
 				string ipAddress = messageSplit[2];
-				if ((ipAddress + connectingPort).Equals(SkyCoreAPI.Instance.CurrentIp))
+				if ((ipAddress + ":" + connectingPort).Equals(SkyCoreAPI.Instance.CurrentIp))
 				{
-					SkyUtil.log("Avoiding registering self (New Game Registration)");
+					SkyUtil.log($"Avoiding registering self (New Game Registration) ({messageSplit[0]})");
 					return;
 				}
 
@@ -93,7 +93,7 @@ namespace SkyCore.Game
 
 		public static void RegisterExternalGame(string connectingAddress, ushort connectingPort, string targetServer, string gameName)
 		{
-			InstanceInfo instanceInfo = new InstanceInfo()
+			InstanceInfo instanceInfo = new InstanceInfo
 			{
 				CurrentPlayers = 0,
 				HostAddress = connectingAddress,
@@ -176,7 +176,7 @@ namespace SkyCore.Game
 					{
 						//Temp - Sending server is gameName
 						RedisPool.GetSubscriber().PublishAsync("game_register",
-							$"{gameName}:{gameName}:{Config.GetProperty("ip", SkyCoreAPI.Instance.CurrentIp)}:{Config.GetProperty("port", "19132")}");
+							$"{gameName}:{gameName}:{CurrentHostAddress}");
 					}
 
 					Thread.Sleep(1000); // Update every 1 second
@@ -203,6 +203,21 @@ namespace SkyCore.Game
 			});
 		}
 
+		public static void RegisterGame(string gameName, InstanceInfo instanceInfo)
+		{
+			GamePool gamePool;
+			if (GameRegistrations.ContainsKey(gameName))
+			{
+				gamePool = GameRegistrations[gameName];
+			}
+			else
+			{
+				GameRegistrations.TryAdd(gameName, gamePool = new GamePool(gameName));
+			}
+
+			gamePool.AddInstance(instanceInfo);
+		}
+
 		public static void AddPlayer(SkyPlayer player, string gameName)
 		{
 			if (!GameRegistrations.ContainsKey(gameName))
@@ -220,21 +235,6 @@ namespace SkyCore.Game
 			//player.SendMessage($"§e§l(!) §r§eJoining {gameName}...");
 
 			RequeuePlayer(player, gameName);
-		}
-
-		public static void RegisterGame(string gameName, InstanceInfo instanceInfo)
-		{
-			GamePool gamePool;
-			if (GameRegistrations.ContainsKey(gameName))
-			{
-				gamePool = GameRegistrations[gameName];
-			}
-			else
-			{
-				GameRegistrations.TryAdd(gameName, gamePool = new GamePool(gameName));
-			}
-
-			gamePool.AddInstance(instanceInfo);
 		}
 
 		public static void RequeuePlayer(SkyPlayer player, string gameName)

@@ -37,8 +37,8 @@ namespace SkyCore.Game
         public string RawName { get; }
 
         public int NextGameId;
-        
-        public CoreGameController(SkyCoreAPI plugin, string gameName, string neatName, List<string> levelNames)
+
+	    protected CoreGameController(SkyCoreAPI plugin, string gameName, string neatName, List<string> levelNames)
         {
             Plugin = plugin;
             
