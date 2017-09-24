@@ -21,6 +21,7 @@ namespace SkyCore.Games.Murder.State
 			gameLevel.DoForAllPlayers(player =>
 			{
 				player.Inventory.Clear();
+				player.AddExperience(-1000, true); //Reset gun cooldowns
 			});
 
             MurderVictoryType victoryType;
