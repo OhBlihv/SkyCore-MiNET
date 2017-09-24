@@ -55,7 +55,13 @@ namespace SkyCore.Games.Murder
 
 	        SpawnPoint = flatFile.GetLocation($"level-names.{levelName}.hub-location", new PlayerLocation(0, 100D, 0));
 
-	        PlayerSpawnLocations.AddRange(flatFile.GetLocationList($"level-names.{levelName}.spawn-locations", new List<PlayerLocation>()));
+	        foreach (PlayerLocation playerSpawnLocation in flatFile.GetLocationList(
+		        $"level-names.{levelName}.spawn-locations", new List<PlayerLocation>()))
+	        {
+		        playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground
+
+		        PlayerSpawnLocations.Add(playerSpawnLocation);
+	        }
 	        GunPartLocations.AddRange(flatFile.GetLocationList($"level-names.{levelName}.gun-part-locations", new List<PlayerLocation>()));
 
 			SkyUtil.log($"Initialized Player Spawns with {PlayerSpawnLocations.Count} unique locations");

@@ -246,7 +246,7 @@ namespace SkyCore.Player
 		    if (Freeze)
 		    {
 				//Allow players to fall
-			    if (Math.Abs(message.x - KnownPosition.X) > 0.1 || Math.Abs(message.x - KnownPosition.Z) > 0.1)
+			    if (Math.Abs(message.x - KnownPosition.X) > 0.1 || Math.Abs(message.z - KnownPosition.Z) > 0.1)
 			    {
 					SendMovePlayer(true);
 				    return;
@@ -258,7 +258,10 @@ namespace SkyCore.Player
 
 	    protected override void OnPlayerLeave(PlayerEventArgs e)
 	    {
-			BarHandler.Clear();
+		    if (BarHandler != null)
+		    {
+				BarHandler.Clear();
+			}
 
 		    base.OnPlayerLeave(e);
 	    }
