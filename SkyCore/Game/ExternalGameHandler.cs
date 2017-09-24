@@ -51,7 +51,7 @@ namespace SkyCore.Game
 
 						foreach (InstanceInfo instanceInfo in gamePool.GetAllInstances())
 						{
-							if (instanceInfo.LastUpdate < expiryTime)
+							if (!instanceInfo.HostAddress.Equals("local") && instanceInfo.LastUpdate < expiryTime)
 							{
 								toRemoveInstances.Add(instanceInfo);
 							}
@@ -60,6 +60,7 @@ namespace SkyCore.Game
 						foreach (InstanceInfo instanceInfo in toRemoveInstances)
 						{
 							gamePool.RemoveInstance(instanceInfo);
+							SkyUtil.log($"Removing {instanceInfo.HostAddress + ":" + instanceInfo.HostPort} from {gamePool.GameName}'s pool due to expiry");
 						}
 
 						totalPlayers += gamePool.GetCurrentPlayers();
@@ -151,30 +152,46 @@ namespace SkyCore.Game
 			/*
 			 * Channel <game>_info
 			 * Format:
-			 * {current-players}:{available-servers}
+			 * {current-players}:{available-servers} //TODO: Update format?
 			 */
 			subscriber.SubscribeAsync($"{gameName}_info", (channel, message) =>
 			{
-				//SkyUtil.log($"Received update for {channel} > {message}");
-				string[] messageSplit = ((string)message).Split(':');
-
-				int.TryParse(messageSplit[0], out var instancePlayers);
-
-				instanceInfo.CurrentPlayers = instancePlayers;
-
-				List<GameInfo> availableGames = new List<GameInfo>();
-				int i = 0;
-				while (++i < messageSplit.Length)
+				try
 				{
-					string[] gameInfoSplit = messageSplit[i].Split(';');
+					string[] messageSplit = ((string)message).Split(':');
 
-					int.TryParse(gameInfoSplit[1], out var currentPlayers);
-					int.TryParse(gameInfoSplit[2], out var maxPlayers);
+					int.TryParse(messageSplit[0], out var instancePlayers);
 
-					availableGames.Add(new GameInfo(gameInfoSplit[0], currentPlayers, maxPlayers));
+					instanceInfo.CurrentPlayers = instancePlayers;
+
+					List<GameInfo> availableGames = new List<GameInfo>();
+					int i = 1;
+					while (i < messageSplit.Length)
+					{
+						string messageSplitContent = messageSplit[i];
+						if (messageSplitContent.Length == 0)
+						{
+							break; //Empty content - End of message
+						}
+
+						string[] gameInfoSplit = messageSplitContent.Split(',');
+
+						int.TryParse(gameInfoSplit[1], out var currentPlayers);
+						int.TryParse(gameInfoSplit[2], out var maxPlayers);
+
+						availableGames.Add(new GameInfo(gameInfoSplit[0], currentPlayers, maxPlayers));
+
+						i++;
+					}
+
+					instanceInfo.AvailableGames = availableGames;
+					instanceInfo.Update();
+					//SkyUtil.log($"Updated {availableGames.Count} available games on {gameName}");
 				}
-
-				instanceInfo.AvailableGames = availableGames;
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
 			});
 		}
 
@@ -198,6 +215,11 @@ namespace SkyCore.Game
 					Thread.Sleep(1000); // Update every 1 second
 
 					InstanceInfo instanceInfo = GameRegistrations[gameName].GetLocalInstance();
+					if (instanceInfo == null)
+					{
+						SkyUtil.log($"Game not registered under 'local'. {GameRegistrations[gameName].GetAllInstances()}");
+						continue; //Game not registered?
+					}
 
 					string availableGameConcat = "";
 					foreach (GameInfo gameInfo in instanceInfo.AvailableGames)
@@ -205,7 +227,7 @@ namespace SkyCore.Game
 						availableGameConcat += gameInfo.GameId + "," + gameInfo.CurrentPlayers + "," + gameInfo.MaxPlayers + ":";
 					}
 
-					//SkyUtil.log($"Sending update on {gameName}_info as " + instanceInfo.CurrentPlayers + ":" + instanceInfo.AvailableGames);
+					//SkyUtil.log($"Sending update on {gameName}_info as {instanceInfo.CurrentPlayers + ":" + availableGameConcat}");
 					RedisPool.GetSubscriber().PublishAsync($"{gameName}_info", instanceInfo.CurrentPlayers + ":" + availableGameConcat);
 				}
 
@@ -295,15 +317,8 @@ namespace SkyCore.Game
 
 		public InstanceInfo GetLocalInstance()
 		{
-			foreach (InstanceInfo instanceInfo in _gameInstances.Values)
-			{
-				if (instanceInfo.HostAddress.Equals("local"))
-				{
-					return instanceInfo;
-				}
-			}
-
-			return null;
+			_gameInstances.TryGetValue("local", out var localInstance);
+			return localInstance;
 		}
 
 		public void AddPlayer(SkyPlayer player)
@@ -311,14 +326,18 @@ namespace SkyCore.Game
 			InstanceInfo bestGameInstance = null;
 			GameInfo bestAvailableGame = null;
 
+			SkyUtil.log($"Checking available games from all instances for {GameName} ({_gameInstances.Count} total instances to search)");
+
 			//Check current instance first
-			if (_gameInstances.ContainsKey(ExternalGameHandler.CurrentHostAddress))
+			if (_gameInstances.ContainsKey("local"))
 			{
 				InstanceInfo instanceInfo = _gameInstances[ExternalGameHandler.CurrentHostAddress];
 				foreach (GameInfo gameInfo in instanceInfo.AvailableGames)
 				{
+					SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");
 					if (bestAvailableGame == null || gameInfo.CurrentPlayers > bestAvailableGame.CurrentPlayers)
 					{
+						SkyUtil.log("Found best game!");
 						bestGameInstance = instanceInfo;
 						bestAvailableGame = gameInfo;
 					}
@@ -329,10 +348,13 @@ namespace SkyCore.Game
 			{
 				foreach (InstanceInfo instanceInfo in _gameInstances.Values)
 				{
+					SkyUtil.log($"Checking instance {instanceInfo.HostAddress} Available Servers: {instanceInfo.AvailableGames.Count}");
 					foreach (GameInfo gameInfo in instanceInfo.AvailableGames)
 					{
+						SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");
 						if (bestAvailableGame == null || gameInfo.CurrentPlayers > bestAvailableGame.CurrentPlayers)
 						{
+							SkyUtil.log("Found best game!");
 							bestGameInstance = instanceInfo;
 							bestAvailableGame = gameInfo;
 						}
@@ -374,15 +396,25 @@ namespace SkyCore.Game
 
 		public void AddInstance(InstanceInfo instanceInfo)
 		{
-			string instanceKey = instanceInfo.HostAddress + ":" + instanceInfo.HostPort;
+			string instanceKey;
+			if (instanceInfo.HostAddress.Equals("local"))
+			{
+				instanceKey = "local";
+			}
+			else
+			{
+				instanceKey = instanceInfo.HostAddress + ":" + instanceInfo.HostPort;
+			}
 
 			if (!_gameInstances.ContainsKey(instanceKey))
 			{
 				_gameInstances.TryAdd(instanceKey, instanceInfo);
+				SkyUtil.log($"Added {instanceKey} to {GameName}'s Instance Pool");
 			}
 			else
 			{
 				_gameInstances[instanceKey] = instanceInfo; //Update
+				SkyUtil.log($"Overwrote {instanceKey} in {GameName}'s Instance Pool");
 			}
 		}
 
@@ -425,6 +457,11 @@ namespace SkyCore.Game
 		public long LastUpdate { get; private set; }
 
 		public List<GameInfo> AvailableGames = new List<GameInfo>();
+
+		public InstanceInfo()
+		{
+			Update();
+		}
 
 		public void Update()
 		{
