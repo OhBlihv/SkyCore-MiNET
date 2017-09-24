@@ -9,6 +9,7 @@ using MiNET.Blocks;
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
+using MiNET.Worlds;
 using SkyCore.Game;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
@@ -44,6 +45,9 @@ namespace SkyCore.Games.BuildBattle.State
 						player.Teleport(gameTeam.SpawnLocation);
 						player.MovementSpeed = 0f;
 						player.SendUpdateAttributes();
+
+						player.UseCreativeInventory = true;
+						player.SetGameMode(GameMode.Creative);
 					}
 				}
 				
@@ -51,9 +55,18 @@ namespace SkyCore.Games.BuildBattle.State
 				for (int i = 0; i < 12; i++)
 				{
 					string category = categoryRotation[i % categoryRotation.Count];
-					foreach (MiNET.Player player in players)
+					foreach (SkyPlayer player in players)
 					{
 						TitleUtil.SendCenteredSubtitle(player, category);
+
+						//Poorly enforce speed
+						if (i == 0 || i == 11)
+						{
+							player.Freeze = true;
+
+							player.MovementSpeed = 0f;
+							player.SendUpdateAttributes();
+						}
 					}
 
 					Thread.Sleep(250);
@@ -62,10 +75,21 @@ namespace SkyCore.Games.BuildBattle.State
 				SelectedCategory = categoryRotation[new Random().Next(categoryRotation.Count)];
 				gameLevel.DoForAllPlayers(player =>
 				{
+					player.Freeze = false;
+
 					player.MovementSpeed = 0.1f;
 					player.SendUpdateAttributes();
 
 					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + SelectedCategory);
+
+					//Ensure this player is at the correct spawn location
+					if (gameLevel.GetBlock(player.KnownPosition).Id != 0)
+					{
+						PlayerLocation newLocation = (PlayerLocation)player.KnownPosition.Clone();
+						newLocation.Y++;
+
+						player.Teleport(newLocation);
+					}
 				});
 			});
 		}

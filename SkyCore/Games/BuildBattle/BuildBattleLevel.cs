@@ -17,7 +17,7 @@ namespace SkyCore.Games.BuildBattle
 
 		public readonly List<BuildBattleTeam> BuildTeams = new List<BuildBattleTeam>();
 
-		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "buildbattle", gameId, levelPath, new PlayerLocation(266, 11, 256))
+		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "build-battle", gameId, levelPath, new PlayerLocation(266, 11, 256))
 		{
 			
 		}
@@ -80,6 +80,51 @@ namespace SkyCore.Games.BuildBattle
 		public override void GameTick(int tick)
 		{
 			
+		}
+
+		public List<PlayerLocation> GetVoteLocations(BuildBattleTeam buildTeam)
+		{
+			List<PlayerLocation> voteLocations = new List<PlayerLocation>();
+			for (int i = 0; i < BuildTeams.Count;i++)
+			{
+				PlayerLocation voteLocation = (PlayerLocation)buildTeam.SpawnLocation.Clone();
+				voteLocation.Y += 10;
+				switch (i)
+				{
+					case 0:
+						voteLocation.X -= 5;
+						break;
+					case 1:
+						voteLocation.X -= 2.5f;
+						voteLocation.Z -= 2.5f;
+						break;
+					case 2:
+						voteLocation.Z -= 5;
+						break;
+					case 3:
+						voteLocation.X += 2.5f;
+						voteLocation.Z -= 2.5f;
+						break;
+					case 4:
+						voteLocation.X += 5;
+						break;
+					case 5:
+						voteLocation.X += 2.5f;
+						voteLocation.Z += 2.5f;
+						break;
+					case 6:
+						voteLocation.Z += 5;
+						break;
+					case 7:
+						voteLocation.X -= 2.5f;
+						voteLocation.Z += 2.5f;
+						break;
+				}
+
+				voteLocations.Add(voteLocation);
+			}
+
+			return voteLocations;
 		}
 
 	}

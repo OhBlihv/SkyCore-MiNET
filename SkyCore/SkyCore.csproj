@@ -92,8 +92,10 @@
     <Compile Include="Games\BuildBattle\BuildBattleCoreGameController.cs" />
     <Compile Include="Games\BuildBattle\BuildBattleLevel.cs" />
     <Compile Include="Games\BuildBattle\BuildBattleTeam.cs" />
+    <Compile Include="Games\BuildBattle\Items\ItemVote.cs" />
     <Compile Include="Games\BuildBattle\State\BuildBattleBuildState.cs" />
     <Compile Include="Games\BuildBattle\State\BuildBattleEndState.cs" />
+    <Compile Include="Games\BuildBattle\State\BuildBattlePodiumState.cs" />
     <Compile Include="Games\BuildBattle\State\BuildBattleLobbyState.cs" />
     <Compile Include="Games\BuildBattle\State\BuildBattleVoteState.cs" />
     <Compile Include="Games\Hub\HubCoreController.cs" />
