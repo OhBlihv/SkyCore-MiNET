@@ -38,27 +38,6 @@ namespace SkyCore.Commands
             this.skyCoreApi = skyCoreApi;
         }
 
-	    [Command(Name = "dtest")]
-	    [Authorize(Permission = CommandPermission.Admin)]
-	    public void CommandDTest(MiNET.Player player)
-	    {
-		    TitleUtil.SendCenteredSubtitle(player, "§9§lDetective §r\n§7Track down the murderer!");
-		}
-
-	    [Command(Name = "itest")]
-	    [Authorize(Permission = CommandPermission.Admin)]
-	    public void CommandITest(MiNET.Player player)
-	    {
-			TitleUtil.SendCenteredSubtitle(player, "§a§lInnocent §r\n§7Track down the murderer!");
-		}
-
-	    [Command(Name = "mtest")]
-	    [Authorize(Permission = CommandPermission.Admin)]
-	    public void CommandMTest(MiNET.Player player)
-	    {
-			TitleUtil.SendCenteredSubtitle(player, "§c§l  Murderer§r\n§7Kill all innocent players!");
-		}
-
 		[Command(Name = "hub")]
 	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandHub(MiNET.Player player)
@@ -77,14 +56,13 @@ namespace SkyCore.Commands
 	    {
 			player.SendMessage("§e§l(!)§r §eMoving to Hub...");
 
-		    /*McpeTransfer transferPacket = new McpeTransfer
+		    McpeTransfer transferPacket = new McpeTransfer
 		    {
 			    serverAddress = "184.171.171.26",
 			    port = 19132
 		    };
 
-		    player.SendPackage(transferPacket);*/
-			ExternalGameHandler.AddPlayer((SkyPlayer) player, "hub");
+		    player.SendPackage(transferPacket);
 		}
 
 	    [Command(Name = "popuptest")]
@@ -95,32 +73,6 @@ namespace SkyCore.Commands
 
 			skyPlayer.BarHandler.AddMajorLine(popup);
 			skyPlayer.BarHandler.AddMinorLine(actionbar);
-	    }
-
-		[Command(Name = "neatjoin")]
-	    [Authorize(Permission = CommandPermission.Admin)]
-	    public void CommandNeatJoin(MiNET.Player player, int lineCount)
-	    {
-		    string lines = "";
-		    for (int i = 0; i < lineCount; i++)
-		    {
-			    string content = $"";
-			    if (i == 1)
-			    {
-				    content = $"§e§lBETA";
-			    }
-				else if (i == 4)
-			    {
-				    content = $"§f§lNETWORK";
-			    }
-
-				lines += content + "\n";
-			    //lines += $"{i}\n";
-		    }
-
-		    player.SendTitle(lines, TitleType.SubTitle);
-		    //player.SendTitle("1\n2\n3\n4\n5", TitleType.SubTitle);
-		    player.SendTitle("§d§lSKYTONIA");
 	    }
 
 		[Command(Name = "subtitletest")]

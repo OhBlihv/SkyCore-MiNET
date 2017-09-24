@@ -108,16 +108,17 @@ namespace SkyCore.Game
             //SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 			lock (GameLevels)
 			{
-				GameInfo gameInfo = ExternalGameHandler.GameRegistrations[RawName];
-				gameInfo.update(0, 0); //Reset
+				InstanceInfo instanceInfo = ExternalGameHandler.GameRegistrations[RawName].GetLocalInstance();
+				instanceInfo.CurrentPlayers = 0;
 
+				List<GameInfo> availableGames = new List<GameInfo>();
 				foreach (GameLevel gameLevel in GameLevels.Values)
 				{
 					//Update player counts
-					gameInfo.CurrentPlayers += gameLevel.GetPlayerCount();
+					instanceInfo.CurrentPlayers += gameLevel.GetPlayerCount();
 					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
 					{
-						gameInfo.AvailableGames++;
+						availableGames.Add(new GameInfo(gameLevel.GameId, gameLevel.GetPlayerCount(), gameLevel.GetMaxPlayers()));
 					}
 
 					while (!QueuedPlayers.IsEmpty)
@@ -141,7 +142,10 @@ namespace SkyCore.Game
 					}
 				}
 
-				//SkyUtil.log($"GameInfo at {gameInfo.CurrentPlayers} with {gameInfo.AvailableGames}");
+				instanceInfo.AvailableGames = availableGames;
+				instanceInfo.Update(); //Set last update time
+
+				//SkyUtil.log($"InstanceInfo at {instanceInfo.CurrentPlayers} with {instanceInfo.AvailableGames}");
 			}
 
             //If we're running out of free slots, create a new game lobby

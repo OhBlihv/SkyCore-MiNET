@@ -43,7 +43,7 @@ namespace SkyCore.Games.Hub
 				return; //Only update player counts every 100 ticks (5 seconds)
 			}
 
-			GameInfo gameInfo;
+			InstanceInfo instanceInfo;
 			try
 			{
 				if (!ExternalGameHandler.GameRegistrations.ContainsKey(RawName))
@@ -51,7 +51,7 @@ namespace SkyCore.Games.Hub
 					SkyUtil.log($"Game Not Registered! '{RawName}'. Contains: {ExternalGameHandler.GameRegistrations.Keys}");
 					return;
 				}
-				gameInfo = ExternalGameHandler.GameRegistrations[RawName];
+				instanceInfo = ExternalGameHandler.GameRegistrations[RawName].GetLocalInstance();
 			}
 			catch (Exception e)
 			{
@@ -59,10 +59,9 @@ namespace SkyCore.Games.Hub
 				return;
 			}
 
-			gameInfo.update(0, 0); //Reset
-
-			gameInfo.CurrentPlayers = _hubLevel.PlayerCount;
-			gameInfo.AvailableGames = 1;
+			instanceInfo.CurrentPlayers = _hubLevel.PlayerCount;
+			//TODO: Improve?
+			instanceInfo.AvailableGames = new List<GameInfo> {new GameInfo("0", SkyCoreAPI.Instance.GetHubLevel().PlayerCount, 100)};
 		}
 
 		public override void QueuePlayer(SkyPlayer player)

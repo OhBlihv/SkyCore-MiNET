@@ -72,6 +72,8 @@ namespace SkyCore
 			CurrentIp = new WebClient().DownloadString("http://icanhazip.com").Replace("\n", "") + ":" + Config.GetProperty("port", "19132");
 			SkyUtil.log($"Registered current IP as {CurrentIp}");
 
+	        ExternalGameHandler.CurrentHostAddress = CurrentIp;
+
 			Context = context;
 
             //

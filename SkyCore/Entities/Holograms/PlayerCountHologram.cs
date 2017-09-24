@@ -27,7 +27,7 @@ namespace SkyCore.Entities.Holograms
 			int playerCount = -1;
 			try
 			{
-				playerCount = ExternalGameHandler.GameRegistrations[_gameName].CurrentPlayers;
+				playerCount = ExternalGameHandler.GameRegistrations[_gameName].GetCurrentPlayers();
 			}
 			catch (Exception e)
 			{
