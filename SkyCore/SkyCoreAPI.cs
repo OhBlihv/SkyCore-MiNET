@@ -309,7 +309,13 @@ namespace SkyCore
             
             text = TextUtils.RemoveFormatting(text);
 
-            string formattedText = $"{GetNameTag(player)}{ChatColors.Gray}: {((SkyPlayer) player).PlayerGroup.GroupColour}{text}";
+	        string chatColor = ChatColors.White;
+	        if (((SkyPlayer) player).PlayerGroup == PlayerGroup.Player)
+	        {
+		        chatColor = ChatColors.Gray;
+	        }
+
+            string formattedText = $"{GetNameTag(player)}{ChatColors.Gray}: {chatColor}{text}";
             SkyUtil.log($"Broadcasting to {player.Level.LevelId}: {formattedText}");
             player.Level.BroadcastMessage(formattedText, MessageType.Raw);
 
