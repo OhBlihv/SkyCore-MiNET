@@ -81,7 +81,7 @@ namespace SkyCore.Game.State.Impl
 				MiNET.Player[] remainingPlayers = gameLevel.GetAllPlayers();
 		        if (remainingPlayers.Length > 0)
 		        {
-			        Level hubLevel = SkyCoreAPI.Instance.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+			        Level hubLevel = SkyCoreAPI.Instance.GetHubLevel();
 
 			        foreach (MiNET.Player player in remainingPlayers)
 			        {

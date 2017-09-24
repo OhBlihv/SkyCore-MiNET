@@ -241,7 +241,7 @@ namespace SkyCore.Game
 
 	        if (removeFromWorld && player.Level == this)
 	        {
-				Level level = LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+		        Level level = SkyCoreAPI.Instance.GetHubLevel();
 		        if (level == null)
 		        {
 			        player.Disconnect("Unable to send you back to the hub!");

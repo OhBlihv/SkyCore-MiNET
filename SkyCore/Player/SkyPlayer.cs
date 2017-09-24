@@ -258,10 +258,7 @@ namespace SkyCore.Player
 
 	    protected override void OnPlayerLeave(PlayerEventArgs e)
 	    {
-		    if (BarHandler != null)
-		    {
-				BarHandler.Clear();
-			}
+		    BarHandler?.Clear();
 
 		    base.OnPlayerLeave(e);
 	    }
