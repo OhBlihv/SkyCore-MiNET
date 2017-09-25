@@ -186,9 +186,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 			gameLevel.DoForAllPlayers(player =>
 			{
-				player.BarHandler.AddMinorLine($"§d§lVoting for {_currentVotingPlayer.Username}§r §e{neatRemaining}", 2);
-
-
+				string voteString = "";
 				if (player != _currentVotingPlayer)
 				{
 					int heldSlot = player.Inventory.InHandSlot;
@@ -223,8 +221,11 @@ namespace SkyCore.Games.BuildBattle.State
 							break;
 					}
 
-					player.BarHandler.AddMajorLine($"§r§d§lVote:§r {voteName}§r");
+					voteString = $" | {voteName} §fSelected...";
 				}
+
+				player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");
+				player.BarHandler.AddMajorLine($"§d§lBUILDER §f{_currentVotingPlayer.Username}§r §7| {neatRemaining} Vote Time{voteString}", 2);
 			});
 		}
 
