@@ -9,7 +9,7 @@ using MiNET.Utils;
 
 namespace SkyCore.Games.Murder.Items
 {
-    class ItemGunParts : ItemGoldNugget
+    class ItemGunParts : ItemGoldenApple
     {
 
         private NbtCompound _extraData;

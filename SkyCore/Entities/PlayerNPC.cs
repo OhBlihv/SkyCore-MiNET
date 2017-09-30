@@ -29,14 +29,14 @@ namespace SkyCore.Entities
 
         public PlayerNPC(string name, Level level, PlayerLocation playerLocation, onInteract action = null) : base(name, level)
         {
-	        /*NameTag = name;
+	        NameTag = name;
             KnownPosition = playerLocation;
 			Skin = new Skin { SkinData = Skin.GetTextureFromFile("Skin.png")};
-	        EntityId = 52;
+	        //EntityId = 52;
 
 			Scale = 1.8D; //Ensure this NPC is visible
 
-            Action = action;*/
+            Action = action;
         }
 
         public void OnInteract(MiNET.Player player)
@@ -141,13 +141,17 @@ namespace SkyCore.Entities
 				}
 
 				//Ensure this NPC can be seen
-				//PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action) {Scale = 1.2};
+				PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action) {Scale = 1.2};
 				//PlayerMob npc = new PlayerMob("Name", level);
 
 				//npc.BroadcastEntityEvent();
                 //npc.BroadcastSetEntityData();
 
-				//SkyCoreAPI.Instance.AddPendingTask(() => npc.SpawnEntity());
+				SkyCoreAPI.Instance.AddPendingTask(() =>
+				{
+					npc.KnownPosition = spawnLocation;
+					npc.SpawnEntity();
+				});
 
 				//Spawn a hologram with player counts //TODO: Split around the colon
 	            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, spawnLocation, gameName);

@@ -23,7 +23,7 @@ namespace SkyCore.Games.Murder.Entities
         //Hold a second location to ensure we have a valid key
         public PlayerLocation SpawnLocation { get; }
 
-        public MurderGunPartEntity(MurderRunningState gameState, MurderLevel level, PlayerLocation spawnLocation) : base(level, new ItemGoldNugget())
+        public MurderGunPartEntity(MurderRunningState gameState, MurderLevel level, PlayerLocation spawnLocation) : base(level, new ItemGoldenApple())
         {
             GameState = gameState;
             KnownPosition = spawnLocation;

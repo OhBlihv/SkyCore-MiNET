@@ -24,7 +24,8 @@ namespace SkyCore.Player
             player.HealthManager = new SkyHealthManager(player);
             player.HungerManager = new SkyFoodManager(player);
             player.MaxViewDistance = 7;
-            player.UseCreativeInventory = false;
+            //player.UseCreativeInventory = false;
+            player.UseCreativeInventory = true;
 			OnPlayerCreated(new PlayerEventArgs(player));
             Console.WriteLine("Returning new SkyPlayer");
             return player;

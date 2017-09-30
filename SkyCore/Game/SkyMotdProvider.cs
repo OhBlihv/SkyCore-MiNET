@@ -23,7 +23,7 @@ namespace SkyCore.Game
 			NumberOfPlayers = serverInfo.NumberOfPlayers;
 			MaxNumberOfPlayers = serverInfo.MaxNumberOfPlayers;
 
-			var protocolVersion = "120";
+			var protocolVersion = "137";
 			var clientVersion = "1.2.0";
 			var edition = "MCPE";
 

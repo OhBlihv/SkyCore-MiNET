@@ -285,7 +285,7 @@ namespace SkyCore.Commands
         }
 
         [Command(Name = "join")]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandJoin(MiNET.Player player, string gameName)
         {
 	        try

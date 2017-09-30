@@ -57,7 +57,7 @@ namespace SkyCore.Player
             PlayerGroup = playerGroup;
 
             //Initialize Player UserPermission level for commands
-            CommadPermission = playerGroup.PermissionLevel;
+            CommandPermission = playerGroup.PermissionLevel;
 
 	        string prefix = PlayerGroup.Prefix;
 	        if (prefix.Length > 2)
@@ -122,7 +122,7 @@ namespace SkyCore.Player
 						new Action(delegate
 						{
 							_isRankLoaded = true;
-							SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommadPermission})");
+							SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommandPermission})");
 
 							if (PlayerGroup == PlayerGroup.Admin)
 							{
@@ -150,7 +150,7 @@ namespace SkyCore.Player
 					);
 				});
 
-                SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({CommadPermission})");
+                SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({CommandPermission})");
 
 				//Initialize once we've loaded the group etc.
 	            base.InitializePlayer();

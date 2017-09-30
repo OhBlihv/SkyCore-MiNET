@@ -225,7 +225,7 @@ namespace SkyCore.Games.BuildBattle.State
 				}
 
 				player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");
-				player.BarHandler.AddMajorLine($"§d§lBUILDER §f{_currentVotingPlayer.Username}§r §7| {neatRemaining} Vote Time{voteString}", 2);
+				player.BarHandler.AddMajorLine($"§d§lBUILDER§r §f{_currentVotingPlayer.Username}§r §7| {neatRemaining} Vote Time{voteString}", 2);
 			});
 		}
 
