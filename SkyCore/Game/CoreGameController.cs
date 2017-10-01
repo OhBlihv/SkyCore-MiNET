@@ -16,7 +16,7 @@ using SkyCore.Util;
 
 namespace SkyCore.Game
 {
-    public abstract class CoreGameController
+    public abstract class CoreGameController : IDisposable
     {
 
         protected readonly Random Random = new Random();
@@ -71,6 +71,11 @@ namespace SkyCore.Game
             });
             GameTickThread.Start();
         }
+
+	    public void Dispose()
+	    {
+		    Close();
+	    }
 
         public void Close()
         {

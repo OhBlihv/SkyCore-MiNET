@@ -14,13 +14,14 @@ using MiNET.Net;
 using MiNET.UI;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SharpAvi;
 using SkyCore.Game.State;
 using SkyCore.Player;
 using SkyCore.Util;
 
 namespace SkyCore.Game
 {
-    public abstract class GameLevel : Level
+    public abstract class GameLevel : Level, IDisposable
     {
 
         public delegate void PlayerAction(SkyPlayer player);
@@ -111,7 +112,12 @@ namespace SkyCore.Game
 
 		protected abstract void InitializeTeamMap();
 
-        public override void Close()
+	    public void Dispose()
+	    {
+		    Close();
+		}
+
+		public override void Close()
         {
             GameLevelTick.Dispose();
             GameLevelTickThread.Abort();
@@ -130,6 +136,11 @@ namespace SkyCore.Game
         {
             return PlayerTeamDict.Count;
         }
+
+	    public new List<SkyPlayer> GetAllPlayers()
+	    {
+		    return GetPlayers();
+	    }
 
         public List<SkyPlayer> GetPlayers()
         {
