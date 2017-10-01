@@ -127,14 +127,16 @@ namespace SkyCore.Player
 
 							if (PlayerGroup == PlayerGroup.Admin)
 							{
-								//SetGameMode(GameMode.Creative);
-								//UseCreativeInventory = true;
 								SetGameMode(GameMode.Adventure);
 							}
 							else
 							{
 								SetGameMode(GameMode.Adventure);
-								UseCreativeInventory = false;
+
+								if (SkyCoreApi.GameType.Equals("hub") && PlayerGroup.isAtLeast(PlayerGroup.Mvp))
+								{
+									SetAllowFly(true);
+								}
 							}
 
 							foreach (Action action in _postLoginActions)

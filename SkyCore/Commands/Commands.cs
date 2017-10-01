@@ -71,6 +71,12 @@ namespace SkyCore.Commands
 
 	    public void MoveToLobby(MiNET.Player player)
 	    {
+		    if (SkyCoreAPI.Instance.GameType.Equals("hub"))
+		    {
+				player.SendMessage("§c§l(!)§r §cYou are already connected to a hub.");
+			    return;
+		    }
+
 			player.SendMessage("§e§l(!)§r §eMoving to Hub...");
 
 		    McpeTransfer transferPacket = new McpeTransfer
