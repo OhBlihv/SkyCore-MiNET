@@ -60,7 +60,7 @@ namespace SkyCore.Game.State.Impl
 
             if (currentPlayers < requiredPlayers)
             {
-                startCountdownTick = -1; //Reset the timer
+                _startCountdownTick = -1; //Reset the timer
 
                 //Only update action bar every second
                 if (currentTick % 2 == 0)
@@ -70,15 +70,15 @@ namespace SkyCore.Game.State.Impl
             }
             else
             {
-                if (startCountdownTick == -1)
+                if (_startCountdownTick == -1)
                 {
-                    startCountdownTick = currentTick;
+                    _startCountdownTick = currentTick;
                 }
 
                 //Only update action bar every second
                 if (currentTick % 2 == 0)
                 {
-                    int secondsRemaining = (GetCountdownTicks() - (currentTick - startCountdownTick)) / 2;
+                    int secondsRemaining = (GetCountdownTicks() - (currentTick - _startCountdownTick)) / 2;
                     if (secondsRemaining <= 0)
                     {
                         if (secondsRemaining == 0)
@@ -117,7 +117,7 @@ namespace SkyCore.Game.State.Impl
          *  Lobby Countdown/Management methods
          */ 
 
-        private int startCountdownTick = -1;
+        private int _startCountdownTick = -1;
 
         protected int GetCountdownTicks()
         {

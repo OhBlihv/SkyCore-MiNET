@@ -10,6 +10,8 @@ using MiNET;
 using MiNET.Effects;
 using MiNET.Entities;
 using MiNET.Items;
+using MiNET.Net;
+using MiNET.UI;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game.State;
@@ -208,7 +210,7 @@ namespace SkyCore.Game
             }
         }
 
-        public void AddPlayer(SkyPlayer player)
+		public void AddPlayer(SkyPlayer player)
         {
             GameTeam defaultTeam = GetDefaultTeam();
 
@@ -224,6 +226,12 @@ namespace SkyCore.Game
         
         public new void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
         {
+			SkyUtil.log("Start Remove");
+	        if (((SkyPlayer) player).GameTeam == null)
+	        {
+				return; //Shouldn't be in the/any game.
+	        }
+
 	        CurrentState.HandleLeave(this, (SkyPlayer)player);
 
 	        PlayerTeamDict.TryGetValue(player.Username, out var gameTeam);
@@ -238,6 +246,9 @@ namespace SkyCore.Game
 	        ((SkyPlayer) player).GameTeam = null;
 
 			player.RemoveAllEffects();
+
+			SkyUtil.log("Removing " + player.Username + " from the level");
+			base.RemovePlayer(player); //Remove player from the 'world'
 
 	        if (removeFromWorld && player.Level == this)
 	        {
@@ -365,6 +376,116 @@ namespace SkyCore.Game
             //Bump the player up into the air to signify death
             player.Knockback(new Vector3(0f, 0.5f, 0f));
         }
+
+		// Forms
+
+	    public void ShowEndGameMenu(SkyPlayer player)
+	    {
+			var simpleForm = new SimpleForm
+		    {
+			    Title = "Game Finished",
+			    Content = "Play Again?",
+			    Buttons = new List<Button>
+			    {
+				    new Button
+				    {
+					    Text = "Play Again",
+					    Image = new Image
+					    {
+						    Type = "url",
+						    //Url = "https://cdn.discordapp.com/attachments/192533470608621570/363942495329189889/1031826.png"
+						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+						},
+					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, GameType); }
+				    }
+			    }
+		    };
+
+		    StateType currentStateType = CurrentState.GetEnumState(this);
+			if (currentStateType != StateType.EndGame && 
+				currentStateType != StateType.Closing)
+		    {
+				simpleForm.Buttons.Add(
+					new Button
+					{
+						Text = "Spectate",
+						//ExecuteAction = delegate { ExternalGameHandler.AddPlayer((SkyPlayer) player, "build-battle"); }
+					}
+				);
+			}
+
+		    simpleForm.Buttons.Add(
+			    new Button
+			    {
+				    Text = "Change Game",
+				    ExecuteAction = delegate { ShowGameList(player); }
+			    }
+			);
+
+		    simpleForm.Buttons.Add(
+			    new Button
+			    {
+				    Text = "Return to Hub",
+				    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "hub"); }
+			    }
+			);
+
+			player.CurrentForm = simpleForm;
+
+		    McpeModalFormRequest message = McpeModalFormRequest.CreateObject();
+		    message.formId = 1234;
+		    message.data = simpleForm.ToJson();
+		    player.SendPackage(message);
+		}
+
+	    public void ShowGameList(SkyPlayer player)
+	    {
+			var simpleForm = new SimpleForm
+		    {
+			    Title = "Game list",
+				Content = "",
+			    Buttons = new List<Button>
+			    {
+				    new Button
+				    {
+					    Text = "Murder",
+					    Image = new Image
+					    {
+						    Type = "url",
+						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+					    },
+					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "murder"); }
+				    },
+				    new Button
+				    {
+					    Text = "Build Battle",
+					    Image = new Image
+					    {
+						    Type = "url",
+						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+					    },
+					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "build-battle"); }
+				    },
+				    new Button
+				    {
+					    Text = "Return to Hub",
+					    Image = new Image
+					    {
+						    Type = "url",
+						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+					    },
+					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "hub"); }
+				    }
+				}
+		    };
+
+		    player.CurrentForm = simpleForm;
+
+		    McpeModalFormRequest message = McpeModalFormRequest.CreateObject();
+		    message.formId = 1234;
+		    message.data = simpleForm.ToJson();
+		    player.SendPackage(message);
+		}
 
     }
     

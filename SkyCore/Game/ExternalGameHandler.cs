@@ -264,9 +264,15 @@ namespace SkyCore.Game
 				return;
 			}
 
+			SkyUtil.log("Is Level: " + (player.Level is GameLevel));
+			if (player.Level is GameLevel)
+			{
+				((GameLevel) player.Level).RemovePlayer(player);
+			}
+
 			if (gameName.Equals("hub"))
 			{
-				SkyCoreAPI.Instance.GameModes[gameName].QueuePlayer(player);
+				SkyCoreAPI.Instance.GameModes["hub"].QueuePlayer(player);
 				return;
 			}
 

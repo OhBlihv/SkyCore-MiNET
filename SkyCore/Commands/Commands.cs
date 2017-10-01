@@ -17,6 +17,7 @@ using MiNET.Entities.World;
 using MiNET.Items;
 using MiNET.Net;
 using MiNET.Plugins.Attributes;
+using MiNET.UI;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Entities;
@@ -25,6 +26,8 @@ using SkyCore.Games.Murder;
 using SkyCore.Permissions;
 using SkyCore.Player;
 using SkyCore.Util;
+using Button = MiNET.UI.Button;
+using Image = System.Drawing.Image;
 
 namespace SkyCore.Commands
 {
@@ -37,6 +40,20 @@ namespace SkyCore.Commands
         {
             this.skyCoreApi = skyCoreApi;
         }
+
+	    [Command(Name = "form")]
+	    [Authorize(Permission = CommandPermission.Admin)]
+	    public void CommandForm(MiNET.Player player)
+	    {
+		    if (player.Level is GameLevel)
+		    {
+			    ((GameLevel) player.Level).ShowEndGameMenu((SkyPlayer) player);
+		    }
+		    else
+		    {
+			    player.SendMessage("Unable to use form on non GameLevel");
+		    }
+		}
 
 		[Command(Name = "hub")]
 	    [Authorize(Permission = CommandPermission.Normal)]

@@ -11,6 +11,7 @@ using MiNET.Worlds;
 using SkyCore.Games.Murder;
 using SkyCore.Games.Murder.State;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Game.State.Impl
 {
@@ -22,6 +23,11 @@ namespace SkyCore.Game.State.Impl
         public override void EnterState(GameLevel gameLevel)
         {
 	        TimeRemaining = 30 * 2;  //30 Seconds
+
+			RunnableTask.RunTaskLater(() =>
+			{
+				gameLevel.DoForAllPlayers(gameLevel.ShowEndGameMenu);
+			}, 5000);
 		}
 
         public override void LeaveState(GameLevel gameLevel)
