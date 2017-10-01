@@ -33,7 +33,13 @@ namespace SkyCore.Games.Murder
 	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandHub(MiNET.Player player, string action = "", string type = "")
 	    {
-		    if (action.Length == 0 || type.Length == 0)
+		    if (player.CommandPermission < CommandPermission.Admin)
+		    {
+			    player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+			    return;
+		    }
+
+			if (action.Length == 0 || type.Length == 0)
 		    {
 			    player.SendMessage("§c/location <add> <spawn/gunpart>");
 			    return;

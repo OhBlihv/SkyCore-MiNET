@@ -42,10 +42,16 @@ namespace SkyCore.Commands
         }
 
 	    [Command(Name = "form")]
-	    [Authorize(Permission = CommandPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandForm(MiNET.Player player)
 	    {
-		    if (player.Level is GameLevel)
+		    if (player.CommandPermission < CommandPermission.Admin)
+		    {
+			    player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+			    return;
+		    }
+
+			if (player.Level is GameLevel)
 		    {
 			    ((GameLevel) player.Level).ShowEndGameMenu((SkyPlayer) player);
 		    }
@@ -92,16 +98,28 @@ namespace SkyCore.Commands
 	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandPopupTest(MiNET.Player player, string popup, string actionbar)
 	    {
-		    SkyPlayer skyPlayer = (SkyPlayer) player;
+		    if (player.CommandPermission < CommandPermission.Admin)
+		    {
+			    player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+			    return;
+		    }
+
+			SkyPlayer skyPlayer = (SkyPlayer) player;
 
 			skyPlayer.BarHandler.AddMajorLine(popup);
 			skyPlayer.BarHandler.AddMinorLine(actionbar);
 	    }
 
 		[Command(Name = "subtitletest")]
-	    [Authorize(Permission = CommandPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandSubtitle(MiNET.Player player, int lineCount)
 		{
+			if (player.CommandPermission < CommandPermission.Admin)
+			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+				return;
+			}
+
 			string lines = "";
 			for (int i = 0; i < lineCount; i++)
 			{
@@ -114,9 +132,15 @@ namespace SkyCore.Commands
 	    }
 
 	    [Command(Name = "actionbartest")]
-	    [Authorize(Permission = CommandPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandActionBar(MiNET.Player player, int lineCount)
 	    {
+		    if (player.CommandPermission < CommandPermission.Admin)
+		    {
+			    player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+			    return;
+		    }
+
 			string lines = "";
 		    for (int i = 0; i < lineCount; i++)
 		    {
@@ -129,9 +153,15 @@ namespace SkyCore.Commands
 	    }
 
 	    [Command(Name = "titletest")]
-	    [Authorize(Permission = CommandPermission.Admin)]
+	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandTitle(MiNET.Player player, int lineCount)
 	    {
+		    if (player.CommandPermission < CommandPermission.Admin)
+		    {
+			    player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+			    return;
+		    }
+
 			//player.SendTitle("1\n2\n3\n4\n5\n6\n7\n8\n9\n10", TitleType.SubTitle);
 			string lines = "";
 		    for (int i = 0; i < lineCount; i++)
@@ -144,9 +174,15 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "speed")]
-		[Authorize(Permission = CommandPermission.Admin)]
-		public void CommandGamemode(MiNET.Player player, float speed = 0.1f)
+		[Authorize(Permission = CommandPermission.Normal)]
+		public void CommandSpeed(MiNET.Player player, float speed = 0.1f)
 		{
+			if (player.CommandPermission < CommandPermission.Admin)
+			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+				return;
+			}
+
 			player.MovementSpeed = speed;
 			player.SendAdventureSettings();
 			
@@ -154,17 +190,23 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandGamemode(MiNET.Player player, int gamemodeId = 0)
         {
             CommandGamemode(player, player.Username, gamemodeId);
         }
 
         [Command(Name = "gamemode", Aliases = new[] {"gm"})]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandGamemode(MiNET.Player player, string targetName = "", int gamemodeId = 0)
         {
-            MiNET.Player target;
+	        if (player.CommandPermission < CommandPermission.Admin)
+	        {
+		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+		        return;
+	        }
+
+			MiNET.Player target;
             if (String.IsNullOrEmpty(targetName))
             {
                 player.SendMessage($"{ChatColors.Red}Enter a valid player name.");
@@ -218,7 +260,13 @@ namespace SkyCore.Commands
         [Authorize(Permission = CommandPermission.Admin)]
         public void CommandFly(MiNET.Player player, string targetName = "")
         {
-            MiNET.Player targetPlayer;
+	        if (player.CommandPermission < PlayerGroup.Mvp.PermissionLevel)
+	        {
+		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+		        return;
+	        }
+
+			MiNET.Player targetPlayer;
             if (String.IsNullOrEmpty(targetName))
             {
                 targetPlayer = player;
@@ -261,7 +309,7 @@ namespace SkyCore.Commands
             }
         }
 
-        [Command(Name = "hologram")]
+        /*[Command(Name = "hologram")]
         [Authorize(Permission = CommandPermission.Admin)]
         public void CommandHologram(MiNET.Player player, string hologramText)
         {
@@ -305,7 +353,7 @@ namespace SkyCore.Commands
                 Console.WriteLine(e);
                 throw;
             }
-        }
+        }*/
 
         [Command(Name = "join")]
         [Authorize(Permission = CommandPermission.Normal)]
@@ -341,7 +389,7 @@ namespace SkyCore.Commands
 	        }
         }
 
-        [Command(Name = "npc")]
+        /*[Command(Name = "npc")]
         [Authorize(Permission = CommandPermission.Admin)]
         public void CommandNPC(MiNET.Player executingPlayer, string npcName, string command = "")
         {
@@ -401,13 +449,19 @@ namespace SkyCore.Commands
                 Console.WriteLine(e);
                 throw;
             }
-        }
+        }*/
 
         [Command(Name = "scale")]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandScale(MiNET.Player player, string scaleString, string targetName = "")
         {
-            MiNET.Player targetPlayer;
+	        if (player.CommandPermission < CommandPermission.Admin)
+	        {
+		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+		        return;
+	        }
+
+			MiNET.Player targetPlayer;
             if (String.IsNullOrEmpty(targetName))
             {
                 targetPlayer = player;
@@ -436,7 +490,7 @@ namespace SkyCore.Commands
 
         }
 
-        [Command(Name = "spawnmob")]
+        /*[Command(Name = "spawnmob")]
         [Authorize(Permission = CommandPermission.Admin)]
         public void CommandSpawnMob(MiNET.Player player, string entityName, string mobName = "", string mobScale = "")
         {
@@ -607,9 +661,9 @@ namespace SkyCore.Commands
             mob.SpawnEntity();
 
             player.SendMessage($"§e§l(!) §r§eSpawned new {entityType}");
-        }
+        }*/
 
-        [Command(Name = "world")]
+        /*[Command(Name = "world")]
         [Authorize(Permission = CommandPermission.Admin)]
         public void CommandWorld(MiNET.Player player, string worldName)
         {
@@ -635,18 +689,24 @@ namespace SkyCore.Commands
             
             player.SendMessage($"§e§l(!) §r§eTeleporting to {worldName}");
             player.SpawnLevel(level, player.KnownPosition);
-        }
+        }*/
 
         [Command(Name = "getpos")]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandGetPos(MiNET.Player player)
         {
+	        if (player.CommandPermission < CommandPermission.Admin)
+	        {
+		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+		        return;
+	        }
+
             PlayerLocation knownLocation = player.KnownPosition;
 
             player.SendMessage($"Pos: {player.Level.LevelId}:{knownLocation.X},{knownLocation.Y},{knownLocation.Z}:{knownLocation.HeadYaw}:{knownLocation.Pitch}");
         }
 
-		[Command(Name = "transfer")]
+		/*[Command(Name = "transfer")]
         [Authorize(Permission = CommandPermission.Admin)]
         public void CommandTransfer(MiNET.Player player, string address, ushort serverPort = 19132)
 		{
@@ -661,218 +721,7 @@ namespace SkyCore.Commands
             player.SendMessage($"§e§l(!) §r§eSending you to {address}:{port}...");
 			SkyUtil.log($"Sending {player.Username} to {address}:{port}");
             player.SendPackage(transferPacket);
-        }
-
-		[Command(Name = "maptest")]
-        [Authorize(Permission = CommandPermission.Admin)]
-        public void CommandTestMap(MiNET.Player player)
-        {
-            player.SendMessage("_o_");
-            PlayerLocation playerLocation = player.KnownPosition;
-            
-            //Stone
-            /*player.Level.SetBlock((int) playerLocation.X, (int) playerLocation.Y, (int)playerLocation.Z, 1);
-            player.Level.SetBlock((int) playerLocation.X, (int) playerLocation.Y, (int)playerLocation.Z + 1, 1);
-            player.Level.SetBlock((int) playerLocation.X, (int) playerLocation.Y + 1, (int)playerLocation.Z, 1);
-            player.Level.SetBlock((int) playerLocation.X, (int) playerLocation.Y + 1, (int)playerLocation.Z + 1, 1);*/
-
-            /*VideoImageProvider videoProvider = new VideoImageProvider(new FrameTicker(100));
-            videoProvider.Frames = new List<McpeWrapper>();
-            videoProvider.Frames.Add(new McpeWrapper());*/
-            
-            player.Level.SetBlock((int) playerLocation.X, (int)playerLocation.Y, (int)playerLocation.Z, 199);
-            
-            /*ItemFrame itemFrameBlock = new ItemFrame();
-            itemFrameBlock.PlaceBlock(player.Level, player, new BlockCoordinates(player.KnownPosition), BlockFace.West, Vector3.One);*/
-            
-            MapEntity mapEntity = new MapEntity(player.Level);
-            //mapEntity.ImageProvider = new RandomColorMapImageProvider();
-            mapEntity.KnownPosition = (PlayerLocation) playerLocation.Clone();
-            mapEntity.ImageProvider = new TextMapImageProvider("Test");
-
-            //((ItemFrameBlockEntity) player.Level.GetBlockEntity(new BlockCoordinates(playerLocation))).SetItem(mapEntity);
-            //player.Level.SetBlockEntity(mapEntity, true);
-
-            //mapEntity.AddToMapListeners(player, mapEntity.MapInfo.MapId);
-
-            mapEntity.SpawnEntity();
-            //player.Level.AddEntity(mapEntity);
-
-            player.SendMessage("\\o/");
-        }
-
-        [Command]
-        //[Authorize(Permission = UserPermission.Op)]
-        public void VideoX(MiNET.Player player, int numberOfFrames, bool color)
-        {
-            Task.Run(delegate
-            {
-                try
-                {
-                    Dictionary<Tuple<int, int>, MapEntity> entities = new Dictionary<Tuple<int, int>, MapEntity>();
-
-                    int width = 2;
-                    int height = 2;
-                    int frameCount = numberOfFrames;
-                    //int frameOffset = 0;
-                    int frameOffset = 120;
-
-                    var frameTicker = new FrameTicker(frameCount);
-
-
-                    // 768x384
-                    for (int frame = frameOffset; frame < frameCount + frameOffset; frame++)
-                    {
-                        Console.WriteLine($"Generating frame {frame}");
-
-                        string file = Path.Combine(@"D:\Development\Other\Smash Heroes 3x6 (128)\Smash Heroes 3x6 (128)", $"Smash Heroes Trailer{frame:D4}.bmp");
-                        //string file = Path.Combine(@"D:\Development\Other\2 by 1 PE test app ad for Gurun-2\exported frames 2", $"pe app ad{frame:D2}.bmp");
-                        if (!File.Exists(file)) continue;
-
-                        Bitmap image = new Bitmap((Bitmap)Image.FromFile(file), width * 128, height * 128);
-
-                        for (int x = 0; x < width; x++)
-                        {
-                            for (int y = 0; y < height; y++)
-                            {
-                                var key = new Tuple<int, int>(x, y);
-                                if (!entities.ContainsKey(key))
-                                {
-                                    entities.Add(key, new MapEntity(player.Level) { ImageProvider = new VideoImageProvider(frameTicker) });
-                                }
-
-                                var croppedImage = CropImage(image, new Rectangle(new Point(x * 128, y * 128), new Size(128, 128)));
-                                byte[] bitmapToBytes = BitmapToBytes(croppedImage, color);
-
-                                if (bitmapToBytes.Length != 128 * 128 * 4) return;
-
-                                ((VideoImageProvider)entities[key].ImageProvider).Frames.Add(CreateCachedPacket(entities[key].EntityId, bitmapToBytes));
-                            }
-                        }
-                    }
-
-                    int i = 0;
-
-                    player.Inventory.Slots[i++] = new ItemBlock(new Planks(), 0) { Count = 64 };
-                    player.Inventory.Slots[i++] = new ItemItemFrame { Count = 64 };
-
-                    foreach (MapEntity entity in entities.Values)
-                    {
-                        entity.SpawnEntity();
-                        player.Inventory.Slots[i++] = new ItemMap(entity.EntityId);
-                    }
-
-                    player.SendPlayerInventory();
-                    player.SendMessage("Done generating video.", MessageType.Raw);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Aborted video generation", e);
-                }
-            });
-
-            player.SendMessage("Generating video...", MessageType.Raw);
-        }
-
-        private McpeWrapper CreateCachedPacket(long mapId, byte[] bitmapToBytes)
-        {
-            MapInfo mapInfo = new MapInfo
-            {
-                MapId = mapId,
-                UpdateType = 2,
-                Scale = 0,
-                X = 0,
-                Z = 0,
-                Col = 128,
-                Row = 128,
-                XOffset = 0,
-                ZOffset = 0,
-                Data = bitmapToBytes,
-            };
-
-            McpeClientboundMapItemData packet = McpeClientboundMapItemData.CreateObject();
-            packet.mapinfo = mapInfo;
-            var batch = CreateMcpeBatch(packet.Encode());
-
-            return batch;
-        }
-
-        internal static McpeWrapper CreateMcpeBatch(byte[] bytes)
-        {
-            McpeWrapper batch = BatchUtils.CreateBatchPacket(bytes, 0, (int)bytes.Length, CompressionLevel.Optimal, true);
-            batch.MarkPermanent();
-            batch.Encode();
-            return batch;
-        }
-
-
-        private static Bitmap CropImage(Bitmap img, Rectangle cropArea)
-        {
-            return img.Clone(cropArea, img.PixelFormat);
-        }
-
-        private static byte[] ReadFrame(string filename)
-        {
-            Bitmap bitmap;
-            try
-            {
-                bitmap = new Bitmap(filename);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Failed reading file " + filename);
-                bitmap = new Bitmap(128, 128);
-            }
-
-            byte[] bytes = BitmapToBytes(bitmap);
-
-            return bytes;
-        }
-
-        public Bitmap GrayScale(Bitmap bmp)
-        {
-            for (int y = 0; y < bmp.Height; y++)
-            {
-                for (int x = 0; x < bmp.Width; x++)
-                {
-                    var c = bmp.GetPixel(x, y);
-                    var rgb = (int)((c.R + c.G + c.B) / 3);
-                    bmp.SetPixel(x, y, Color.FromArgb(rgb, rgb, rgb));
-                }
-            }
-            return bmp;
-        }
-
-        private static byte[] BitmapToBytes(Bitmap bitmap, bool useColor = false)
-        {
-            byte[] bytes;
-            bytes = new byte[bitmap.Height * bitmap.Width * 4];
-
-            int i = 0;
-            for (int y = 0; y < bitmap.Height; y++)
-            {
-                for (int x = 0; x < bitmap.Width; x++)
-                {
-                    Color color = bitmap.GetPixel(x, y);
-                    if (!useColor)
-                    {
-                        byte rgb = (byte)((color.R + color.G + color.B) / 3);
-                        bytes[i++] = rgb;
-                        bytes[i++] = rgb;
-                        bytes[i++] = rgb;
-                        bytes[i++] = 0xff;
-                    }
-                    else
-                    {
-                        bytes[i++] = color.R;
-                        bytes[i++] = color.G;
-                        bytes[i++] = color.B;
-                        bytes[i++] = 0xff;
-                    }
-                }
-            }
-            return bytes;
-        }
+        }*/
 
     }
 
