@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using MiNET.Utils;
 using log4net;
+using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Worlds;
 using SkyCore.Database;
@@ -209,20 +210,35 @@ namespace SkyCore.Player
             base.HandleMcpeAnimate(message);
         }
 
-        public override void HandleMcpeInteract(McpeInteract message)
+	    protected override void HandleTransactionItemUseOnEntity(Transaction transaction)
+	    {
+		    switch ((McpeInventoryTransaction.ItemUseOnEntityAction)transaction.ActionType)
+		    {
+			    case McpeInventoryTransaction.ItemUseOnEntityAction.Interact: // Right click
+				case McpeInventoryTransaction.ItemUseOnEntityAction.Attack:
+				    Entity target = Level.GetEntity(transaction.EntityId);
+				    
+					HandleInteract((byte) transaction.ActionType, target);
+					break;
+		    }
+
+		    base.HandleTransactionItemUseOnEntity(transaction);
+	    }
+
+		public virtual void HandleInteract(byte actionId, Entity target)
         {
-            if (message.actionId == 4)
+            if (actionId == 4)
             {
-                base.HandleMcpeInteract(message);
+                //base.HandleMcpeInteract(message);
                 return;
             }
 
-            //SkyUtil.log($"Interact Id:{message.actionId} ({Username})");
-            MiNET.Entities.Entity target = Level.GetEntity(message.targetRuntimeEntityId);
+            SkyUtil.log($"Interact Id:{actionId} ({Username})");
+            //Entity target = Level.GetEntity(message.targetRuntimeEntityId);
 
             if (target is PlayerNPC)
             {
-                if (message.actionId == 1 || message.actionId == 2)
+                if (actionId == 1 || actionId == 2)
                 {
                     //SkyUtil.log($"Processing NPC Interact as {Username}");
                     (target as PlayerNPC).OnInteract(this);
@@ -230,13 +246,13 @@ namespace SkyCore.Player
             }
             else
             {
-                if (Level is GameLevel && ((GameLevel) Level).DoInteract(message.actionId, this, (SkyPlayer) target))
+                if (Level is GameLevel && ((GameLevel) Level).DoInteract(actionId, this, (SkyPlayer) target))
                 {
                     //return; //Avoid default handling
                 }
             }
 
-            base.HandleMcpeInteract(message);
+            //base.HandleMcpeInteract(message);
         }
 
 		public bool Freeze { get; set; }
