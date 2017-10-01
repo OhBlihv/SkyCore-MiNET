@@ -89,7 +89,7 @@ namespace SkyCore.Game.State.Impl
 		        {
 			        Level hubLevel = SkyCoreAPI.Instance.GetHubLevel();
 
-			        foreach (MiNET.Player player in remainingPlayers)
+			        foreach (SkyPlayer player in remainingPlayers)
 			        {
 				        if (hubLevel == null)
 				        {
@@ -98,11 +98,11 @@ namespace SkyCore.Game.State.Impl
 				        }
 				        else
 				        {
-					        ((SkyPlayer) player).BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."), 20, 7);
+					        player.BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."), 20, 7);
 
 							gameLevel.RemovePlayer(player);
 							
-							ExternalGameHandler.RequeuePlayer((SkyPlayer) player, gameLevel.GameType);
+							ExternalGameHandler.RequeuePlayer(player, gameLevel.GameType);
 				        }
 			        }
 		        }

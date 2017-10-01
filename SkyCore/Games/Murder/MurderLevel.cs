@@ -1,23 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Mime;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using MiNET;
 using MiNET.Effects;
-using MiNET.Entities;
-using MiNET.Entities.Projectiles;
-using MiNET.Items;
 using MiNET.Utils;
 using SkyCore.Game;
 using SkyCore.Game.State;
-using SkyCore.Games.Murder.Items;
 using SkyCore.Games.Murder.State;
 using SkyCore.Player;
-using SkyCore.Util;
 using SkyCore.Util.File;
 
 namespace SkyCore.Games.Murder
@@ -25,7 +15,7 @@ namespace SkyCore.Games.Murder
     class MurderLevel : GameLevel
     {
 
-	    public string LevelName { get; }
+	    public new string LevelName { get; }
 
         public List<PlayerLocation> PlayerSpawnLocations = new List<PlayerLocation>();
         public List<PlayerLocation> GunPartLocations = new List<PlayerLocation>();
@@ -66,31 +56,6 @@ namespace SkyCore.Games.Murder
 
 			SkyUtil.log($"Initialized Player Spawns with {PlayerSpawnLocations.Count} unique locations");
 			SkyUtil.log($"Initialized Gun Part Locations with {GunPartLocations.Count} unique locations");
-
-	        /*switch (levelName)
-	        {
-	            case "murder-library":
-	            {
-	                SpawnPoint = new PlayerLocation(255D, 54D, 255D);
-
-	                PlayerSpawnLocations.Add(new PlayerLocation(255D, 54D, 280D));
-	                PlayerSpawnLocations.Add(new PlayerLocation(265D, 54D, 275D));
-	                GunPartLocations.Add(new PlayerLocation(255D, 54D, 280D));
-	                GunPartLocations.Add(new PlayerLocation(265D, 54D, 275D));
-	                break;
-	            }
-		        case "murder-library-alternative":
-		        {
-			        SpawnPoint = new PlayerLocation(255D, 54D, 255D);
-
-					PlayerSpawnLocations.Add(new PlayerLocation(255D, 54D, 280D));
-			        PlayerSpawnLocations.Add(new PlayerLocation(265D, 54D, 275D));
-			        GunPartLocations.Add(new PlayerLocation(255D, 54D, 280D));
-			        GunPartLocations.Add(new PlayerLocation(265D, 54D, 275D));
-			        break;
-		        }
-			}*/
-
         }
 
         protected override void InitializeTeamMap()

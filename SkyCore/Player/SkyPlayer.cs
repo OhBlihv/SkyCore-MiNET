@@ -204,7 +204,7 @@ namespace SkyCore.Player
 
             //SkyUtil.log($"Animate Id:{message.actionId} ({Username})");
 
-            if (Level is GameLevel && ((GameLevel) Level).DoInteract(message.actionId, this, null))
+            if (Level is GameLevel level && level.DoInteract(message.actionId, this, null))
             {
                 //return; //Avoid default handling
             }
@@ -231,24 +231,22 @@ namespace SkyCore.Player
         {
             if (actionId == 4)
             {
-                //base.HandleMcpeInteract(message);
                 return;
             }
 
             SkyUtil.log($"Interact Id:{actionId} ({Username})");
-            //Entity target = Level.GetEntity(message.targetRuntimeEntityId);
 
             if (target is PlayerNPC)
             {
                 if (actionId == 1 || actionId == 2)
                 {
                     //SkyUtil.log($"Processing NPC Interact as {Username}");
-                    (target as PlayerNPC).OnInteract(this);
+                    ((PlayerNPC) target).OnInteract(this);
                 }
             }
             else
             {
-                if (Level is GameLevel && ((GameLevel) Level).DoInteract(actionId, this, (SkyPlayer) target))
+                if (Level is GameLevel level && level.DoInteract(actionId, this, (SkyPlayer) target))
                 {
                     //return; //Avoid default handling
                 }

@@ -90,17 +90,8 @@ namespace SkyCore.Game
 				string ipAddress = messageSplit[2];
 				if ((ipAddress + ":" + connectingPort).Equals(SkyCoreAPI.Instance.CurrentIp))
 				{
-					//SkyUtil.log($"Avoiding registering self (New Game Registration) ({messageSplit[0]})");
 					return;
 				}
-
-				//TODO: Game Instance Pooling
-				if (GameRegistrations.ContainsKey(messageSplit[0]))
-				{
-					return;
-				}
-
-				SkyUtil.log($"Registering {messageSplit[0]} from {ipAddress}:{connectingPort}");
 
 				RegisterExternalGame(messageSplit[2], connectingPort, messageSplit[0], messageSplit[1]);
 			});
@@ -116,9 +107,12 @@ namespace SkyCore.Game
 				HostAddress = connectingAddress,
 				HostPort = connectingPort
 			};
-			RegisterGame(gameName, instanceInfo);
 
-			if (!gameName.Equals("hub"))
+			bool newRegistration = !GameRegistrations.ContainsKey(gameName);
+
+			RegisterGame(gameName, instanceInfo);
+			
+			if (newRegistration && !gameName.Equals("hub"))
 			{
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
@@ -265,9 +259,9 @@ namespace SkyCore.Game
 			}
 
 			SkyUtil.log("Is Level: " + (player.Level is GameLevel));
-			if (player.Level is GameLevel)
+			if (player.Level is GameLevel level)
 			{
-				((GameLevel) player.Level).RemovePlayer(player);
+				level.RemovePlayer(player);
 			}
 
 			if (gameName.Equals("hub"))

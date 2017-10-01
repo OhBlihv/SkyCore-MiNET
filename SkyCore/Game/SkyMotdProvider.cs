@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 using MiNET;
 using MiNET.Utils;
 
 namespace SkyCore.Game
 {
-	public class SkyMotdProvider : MiNET.MotdProvider
+	public class SkyMotdProvider : MotdProvider
 	{
 
 		public SkyMotdProvider()
