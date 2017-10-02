@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 
 namespace SkyCore.Games.BuildBattle
 {
@@ -19,5 +20,11 @@ namespace SkyCore.Games.BuildBattle
 		{
 			return new BuildBattleLevel(Plugin, GetNextGameId(), GetRandomLevelName());
 		}
+
+		public override Type GetGameLevelInfoType()
+		{
+			return typeof(GameLevelInfo); //Nothing Custom
+		}
+
 	}
 }

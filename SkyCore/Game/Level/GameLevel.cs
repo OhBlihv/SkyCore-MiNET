@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using MiNET;
 using MiNET.Effects;
 using MiNET.Entities;
@@ -14,17 +10,19 @@ using MiNET.Net;
 using MiNET.UI;
 using MiNET.Utils;
 using MiNET.Worlds;
-using SharpAvi;
+using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Player;
 using SkyCore.Util;
 
 namespace SkyCore.Game
 {
-    public abstract class GameLevel : Level, IDisposable
+    public abstract class GameLevel : MiNET.Worlds.Level, IDisposable
     {
 
-        public delegate void PlayerAction(SkyPlayer player);
+	    public new string LevelName { get; }
+
+		public delegate void PlayerAction(SkyPlayer player);
 
         //Player -> Team
         protected readonly Dictionary<string, GameTeam> PlayerTeamDict = new Dictionary<string, GameTeam>();
@@ -32,7 +30,7 @@ namespace SkyCore.Game
         //Team -> Player(s) //TODO: Possibly remove due to complexity?
         protected readonly Dictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
 
-		protected readonly List<PlayerLocation> LobbySpawnLocations = new List<PlayerLocation>();
+	    protected GameLevelInfo gameLevelInfo;
 
         //
 
@@ -51,31 +49,37 @@ namespace SkyCore.Game
 
         //
 
-        public GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, PlayerLocation lobbySpawnLocation)
+	    protected GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, bool modifiable = false)
                 //: base(plugin.Context.LevelManager, gameId, AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath),
                 : base(plugin.Context.LevelManager, gameId, 
-					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath),
+					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath, modifiable),
 					//new AnvilWorldProvider(levelPath), 
                       plugin.Context.LevelManager.EntityManager, GameMode.Creative)
         {
-            Plugin = plugin;
+	        string levelName;
+	        {
+		        string[] split = levelPath.Split('\\');
+		        levelName = split[split.Length - 1];
+	        }
+
+	        LevelName = levelName;
+
+			Plugin = plugin;
             GameId = gameId;
 	        GameType = gameType;
 
-			LobbySpawnLocations.Add(lobbySpawnLocation);
+	        //TODO: Read from file
+	        gameLevelInfo = new GameLevelInfo(gameType, LevelName, new PlayerLocation(0, 100D, 0));
 
-			//Handled in GameState
-            //AllowBreak = false;
-            //AllowBuild = false;
-
-            EnableBlockTicking = false;
+			EnableBlockTicking = false;
             EnableChunkTicking = false;
 
             SkyUtil.log($"Initializing world {gameId}");
             Initialize();
 
-            ((AnvilWorldProvider)WorldProvider).PruneAir();
-            ((AnvilWorldProvider)WorldProvider).MakeAirChunksAroundWorldToCompensateForBadRendering();
+			//TODO: Aren't required?
+            //((AnvilWorldProvider)WorldProvider).PruneAir();
+            //((AnvilWorldProvider)WorldProvider).MakeAirChunksAroundWorldToCompensateForBadRendering();
 
             if (!plugin.Context.LevelManager.Levels.Contains(this))
             {
@@ -237,7 +241,6 @@ namespace SkyCore.Game
         
         public new void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
         {
-			SkyUtil.log("Start Remove");
 	        if (((SkyPlayer) player).GameTeam == null)
 	        {
 				return; //Shouldn't be in the/any game.
@@ -258,12 +261,12 @@ namespace SkyCore.Game
 
 			player.RemoveAllEffects();
 
-			SkyUtil.log("Removing " + player.Username + " from the level");
+		
 			base.RemovePlayer(player); //Remove player from the 'world'
 
 	        if (removeFromWorld && player.Level == this)
 	        {
-		        Level level = SkyCoreAPI.Instance.GetHubLevel();
+		        MiNET.Worlds.Level level = SkyCoreAPI.Instance.GetHubLevel();
 		        if (level == null)
 		        {
 			        player.Disconnect("Unable to send you back to the hub!");

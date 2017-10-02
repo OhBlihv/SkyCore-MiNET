@@ -34,8 +34,8 @@
     <Reference Include="AStarNavigator, Version=1.0.63.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AStarNavigator.1.0.63\lib\net35\AStarNavigator.dll</HintPath>
     </Reference>
-    <Reference Include="fNbt, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MiNET.fnbt.0.6.9\lib\net35-client\fNbt.dll</HintPath>
+    <Reference Include="fNbt, Version=1.0.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiNET.fnbt.1.0.12\lib\net461\fNbt.dll</HintPath>
     </Reference>
     <Reference Include="jose-jwt, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\jose-jwt.2.3.0\lib\net461\jose-jwt.dll</HintPath>
@@ -77,9 +77,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="YamlDotNet, Version=4.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.4.2.1\lib\net35\YamlDotNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\Commands.cs" />
@@ -104,21 +101,23 @@
     <Compile Include="Games\Murder\Items\ItemGunParts.cs" />
     <Compile Include="Games\Murder\Items\ItemInnocentGun.cs" />
     <Compile Include="Games\Murder\Items\ItemMurderKnife.cs" />
+    <Compile Include="Games\Murder\Level\MurderLevelInfo.cs" />
     <Compile Include="Games\Murder\MurderCoreGameController.cs" />
-    <Compile Include="Games\Murder\MurderLevel.cs" />
+    <Compile Include="Games\Murder\Level\MurderLevel.cs" />
     <Compile Include="Games\Murder\MurderTeam.cs" />
     <Compile Include="Games\Murder\MurderVictoryType.cs" />
     <Compile Include="Games\Murder\State\MurderEndState.cs" />
     <Compile Include="Games\Murder\State\MurderLobbyState.cs" />
     <Compile Include="Games\Murder\State\MurderRunningState.cs" />
     <Compile Include="Game\ExternalGameHandler.cs" />
+    <Compile Include="Game\Level\GameLevelInfo.cs" />
     <Compile Include="Game\SkyMotdProvider.cs" />
     <Compile Include="Game\State\GameTeam.cs" />
     <Compile Include="Game\State\Impl\VoidGameState.cs" />
     <Compile Include="Game\State\Impl\EndGameState.cs" />
     <Compile Include="Game\State\Impl\LobbyState.cs" />
     <Compile Include="Game\CoreGameController.cs" />
-    <Compile Include="Game\GameLevel.cs" />
+    <Compile Include="Game\Level\GameLevel.cs" />
     <Compile Include="Game\State\GameState.cs" />
     <Compile Include="Game\State\Impl\RunningState.cs" />
     <Compile Include="Game\State\StateType.cs" />

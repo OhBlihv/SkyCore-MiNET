@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using MiNET;
 using MiNET.Net;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
-using MiNET.Worlds;
-using SkyCore.Entities;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SkyCore.Game;
-using SkyCore.Game.State;
-using SkyCore.Util.File;
+using SkyCore.Game.Level;
+using SkyCore.Games.Murder.Level;
 
 namespace SkyCore.Games.Murder
 {
@@ -28,6 +26,11 @@ namespace SkyCore.Games.Murder
         {
             return new MurderLevel(Plugin, GetNextGameId(), GetRandomLevelName());
         }
+
+	    public override Type GetGameLevelInfoType()
+	    {
+		    return typeof(MurderLevelInfo);
+	    }
 
 	    [Command(Name = "location")]
 	    [Authorize(Permission = CommandPermission.Normal)]
@@ -52,19 +55,19 @@ namespace SkyCore.Games.Murder
 		    }
 
 		    List<PlayerLocation> locationList = null;
-		    string typePath = null;
+		    //string typePath = null;
 		    if (type.Equals("spawn"))
 		    {
-			    typePath = $"level-names.{murderLevel.LevelName}.spawn-locations";
+			    //typePath = $"level-names.{murderLevel.LevelName}.spawn-locations";
 			    locationList = murderLevel.PlayerSpawnLocations;
 		    }
 		    else if(type.Equals("gunpart"))
 		    {
-			    typePath = $"level-names.{murderLevel.LevelName}.gun-part-locations";
+			    //typePath = $"level-names.{murderLevel.LevelName}.gun-part-locations";
 			    locationList = murderLevel.GunPartLocations;
 		    }
 
-		    if (typePath == null)
+		    if (locationList == null)
 		    {
 			    player.SendMessage($"§cAction invalid. Must be 'spawn' or 'gunpart', but was '{action}'");
 			    return;
@@ -79,10 +82,13 @@ namespace SkyCore.Games.Murder
 
 			locationList.Add(player.KnownPosition);
 
-		    FlatFile flatFile = FlatFile.ForFile(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\config\\murder.yml");
+			//FlatFile flatFile = FlatFile.ForFile(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\config\\murder.yml");
 
-			flatFile.Set(typePath, locationList);
-			
+			//flatFile.Set(typePath, locationList);
+
+			File.WriteAllText($"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\murder-{type.ToLower()}-{murderLevel.LevelName}.json",
+								JsonConvert.SerializeObject(locationList));
+
 			player.SendMessage($"§cUpdated {action} location list with current location.");
 	    }
 

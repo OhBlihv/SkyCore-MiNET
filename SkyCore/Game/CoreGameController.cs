@@ -9,7 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using MiNET.Utils;
 using MiNET.Worlds;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SkyCore.Entities;
+using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Player;
 using SkyCore.Util;
@@ -289,6 +292,10 @@ namespace SkyCore.Game
                 QueuedPlayers.Enqueue(player);
             }
         }
+
+		// JSON
+
+	    public abstract Type GetGameLevelInfoType();
 
     }
 }

@@ -4,18 +4,18 @@ using System.IO;
 using System.Reflection;
 using MiNET.Effects;
 using MiNET.Utils;
+using Newtonsoft.Json;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Game.State;
+using SkyCore.Games.Murder.Level;
 using SkyCore.Games.Murder.State;
 using SkyCore.Player;
-using SkyCore.Util.File;
 
 namespace SkyCore.Games.Murder
 {
     class MurderLevel : GameLevel
     {
-
-	    public new string LevelName { get; }
 
         public List<PlayerLocation> PlayerSpawnLocations = new List<PlayerLocation>();
         public List<PlayerLocation> GunPartLocations = new List<PlayerLocation>();
@@ -23,37 +23,26 @@ namespace SkyCore.Games.Murder
         public SkyPlayer Murderer { get; set; }
         public SkyPlayer Detective { get; set; }
 
-        public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "murder", gameId, levelPath, new PlayerLocation(266, 11, 256))
+        public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "murder", gameId, levelPath)
         {
-            string levelName;
-            {
-                string[] split = levelPath.Split('\\');
-                levelName = split[split.Length - 1];
-            }
+	        //gameLevelInfo = new MurderLevelInfo(LevelName, new PlayerLocation(266, 11, 256)),;
+	        gameLevelInfo.LobbyLocation = new PlayerLocation(266, 11, 256);
 
-	        LevelName = levelName;
-
-			//TODO: Move loading this to the CoreGameController of this games type?
-	        FlatFile flatFile = FlatFile.ForFile(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\config\\murder.yml");
-            
-            //Hardcoded spawn for initial map
-            SkyUtil.log($"Initializing level '{levelName}'");
-	        if (!flatFile.Contains($"level-names.{levelName}.name"))
+			//Hardcoded spawn for initial map
+			SkyUtil.log($"Initializing level '{LevelName}'");
+			if(!File.Exists($"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\murder-spawn-{LevelName}.json"))
 	        {
-		        throw new ArgumentException($"Level {levelName} not found in {GameType}.yml!");
+		        throw new ArgumentException($"Level {LevelName} not found in config folder!");
 	        }
 
-	        SpawnPoint = flatFile.GetLocation($"level-names.{levelName}.hub-location", new PlayerLocation(0, 100D, 0));
+	        //SpawnPoint = flatFile.GetLocation($"level-names.{levelName}.hub-location", new PlayerLocation(0, 100D, 0));
+	        SpawnPoint = new PlayerLocation(0, 100D, 0); //TODO: JSON?
 
-	        foreach (PlayerLocation playerSpawnLocation in flatFile.GetLocationList(
-		        $"level-names.{levelName}.spawn-locations", new List<PlayerLocation>()))
+	        foreach (PlayerLocation playerSpawnLocation in ((MurderLevelInfo) gameLevelInfo).PlayerSpawnLocations)
 	        {
-		        playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground
-
-		        PlayerSpawnLocations.Add(playerSpawnLocation);
-	        }
-	        GunPartLocations.AddRange(flatFile.GetLocationList($"level-names.{levelName}.gun-part-locations", new List<PlayerLocation>()));
-
+				playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground
+			}
+			
 			SkyUtil.log($"Initialized Player Spawns with {PlayerSpawnLocations.Count} unique locations");
 			SkyUtil.log($"Initialized Gun Part Locations with {GunPartLocations.Count} unique locations");
         }

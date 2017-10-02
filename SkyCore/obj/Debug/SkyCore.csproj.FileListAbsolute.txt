@@ -74,7 +74,6 @@ E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MySql.Data.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\Newtonsoft.Json.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SharpAvi.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\StackExchange.Redis.dll
-E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\YamlDotNet.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\fNbt.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\LibNoise.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\log4net.xml
@@ -83,7 +82,6 @@ E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.pdb
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\Newtonsoft.Json.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SharpAvi.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\StackExchange.Redis.xml
-E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\YamlDotNet.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.csprojResolveAssemblyReference.cache
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.csproj.CoreCompileInputs.cache
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.dll

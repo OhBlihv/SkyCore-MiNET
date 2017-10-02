@@ -11,8 +11,7 @@ namespace SkyCore.Util
 
 		public static AnvilWorldProvider GetLevelProvider(LevelManager levelManager, string levelDir, bool readOnly = true, bool insulate = true, bool cache = true)
 		{
-			AnvilWorldProvider provider;
-			ProviderCache.TryGetValue(levelDir, out provider);
+			ProviderCache.TryGetValue(levelDir, out var provider);
 
 			if (provider != null) return readOnly ? provider : (AnvilWorldProvider)provider.Clone();
 
