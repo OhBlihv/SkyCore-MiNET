@@ -293,8 +293,6 @@ namespace SkyCore.Game
             }
         }
 
-		// JSON
-
 	    public abstract Type GetGameLevelInfoType();
 
     }

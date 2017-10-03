@@ -32,9 +32,9 @@ namespace SkyCore.Games.Murder
 		    return typeof(MurderLevelInfo);
 	    }
 
-	    [Command(Name = "location")]
+		[Command(Name = "location")]
 	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandHub(MiNET.Player player, string action = "", string type = "")
+	    public void CommandLocation(MiNET.Player player, string action = "", string type = "")
 	    {
 		    if (player.CommandPermission < CommandPermission.Admin)
 		    {
@@ -48,23 +48,26 @@ namespace SkyCore.Games.Murder
 			    return;
 		    }
 
-		    if (!(player.Level is MurderLevel murderLevel))
+		    if (!(player.Level is MurderLevel))
 		    {
 			    player.SendMessage("§cYou must be in a murder game to use this command!");
 			    return;
 		    }
 
-		    List<PlayerLocation> locationList = null;
-		    //string typePath = null;
+		    MurderLevel murderLevel = (MurderLevel) player.Level;
+
+			//TODO: Don't clone until we know we have a correct arg?
+			//MurderLevelInfo murderLevelInfo = (MurderLevelInfo) ((MurderLevel) player.Level).GameLevelInfo.Clone();
+			MurderLevelInfo murderLevelInfo = (MurderLevelInfo) murderLevel.LoadThisLevelInfo();
+
+			List<PlayerLocation> locationList = null;
 		    if (type.Equals("spawn"))
 		    {
-			    //typePath = $"level-names.{murderLevel.LevelName}.spawn-locations";
-			    locationList = murderLevel.PlayerSpawnLocations;
+			    locationList = murderLevelInfo.PlayerSpawnLocations;
 		    }
 		    else if(type.Equals("gunpart"))
 		    {
-			    //typePath = $"level-names.{murderLevel.LevelName}.gun-part-locations";
-			    locationList = murderLevel.GunPartLocations;
+			    locationList = murderLevelInfo.GunPartLocations;
 		    }
 
 		    if (locationList == null)
@@ -73,23 +76,17 @@ namespace SkyCore.Games.Murder
 			    return;
 		    }
 
-		    {
-			    List<PlayerLocation> intermediateList = new List<PlayerLocation>();
-			    intermediateList.AddRange(locationList);
-
-			    locationList = intermediateList;
-		    }
-
 			locationList.Add(player.KnownPosition);
 
-			//FlatFile flatFile = FlatFile.ForFile(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\config\\murder.yml");
+		    string fileName =
+			    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{murderLevel.GameType}-{murderLevel.LevelName}.json";
 
-			//flatFile.Set(typePath, locationList);
+			SkyUtil.log($"Saving as '{fileName}' -> {murderLevel.GameType} AND {murderLevel.LevelName}");
 
-			File.WriteAllText($"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\murder-{type.ToLower()}-{murderLevel.LevelName}.json",
-								JsonConvert.SerializeObject(locationList));
+			File.WriteAllText(fileName,
+				JsonConvert.SerializeObject(murderLevelInfo));
 
-			player.SendMessage($"§cUpdated {action} location list with current location.");
+			player.SendMessage($"§cUpdated {action} location list ({locationList.Count}) with current location.");
 	    }
 
 	}

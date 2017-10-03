@@ -17,7 +17,7 @@ namespace SkyCore.Games.Murder.Entities
 	public class GunProjectile : Arrow
 	{
 
-		public GunProjectile(MiNET.Player shooter, Level level, int damage = 2, bool isCritical = false) : base(shooter, level, damage, isCritical)
+		public GunProjectile(MiNET.Player shooter, MiNET.Worlds.Level level, int damage = 2, bool isCritical = false) : base(shooter, level, damage, isCritical)
 		{
 	
 		}

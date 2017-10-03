@@ -22,6 +22,7 @@ using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
 using SkyCore.Games.Murder.Entities;
 using SkyCore.Games.Murder.Items;
+using SkyCore.Games.Murder.Level;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -53,12 +54,12 @@ namespace SkyCore.Games.Murder.State
             GunPartLocations.Clear();
             PlayerSpawnLocations.Clear();
 
-            GunPartLocations.AddRange(((MurderLevel) gameLevel).GunPartLocations);
-            PlayerSpawnLocations.AddRange(((MurderLevel) gameLevel).PlayerSpawnLocations);
+            GunPartLocations.AddRange(((MurderLevelInfo) ((MurderLevel) gameLevel).GameLevelInfo).GunPartLocations);
+            PlayerSpawnLocations.AddRange(((MurderLevelInfo)((MurderLevel)gameLevel).GameLevelInfo).PlayerSpawnLocations);
 
             while (PlayerSpawnLocations.Count < gameLevel.GetMaxPlayers())
             {
-                PlayerSpawnLocations.Add(((MurderLevel)gameLevel).PlayerSpawnLocations[0]);
+                PlayerSpawnLocations.Add(((MurderLevelInfo)((MurderLevel)gameLevel).GameLevelInfo).PlayerSpawnLocations[0]);
             }
 
 	        _endTick = gameLevel.Tick + MaxGameTime + PreStartTime;

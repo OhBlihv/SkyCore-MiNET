@@ -46,7 +46,7 @@ namespace SkyCore.Games.Murder.Items
             return _extraData;
         }
 
-        public override void Release(Level world, MiNET.Player player, BlockCoordinates blockCoordinates, long timeUsed)
+        public override void Release(MiNET.Worlds.Level world, MiNET.Player player, BlockCoordinates blockCoordinates, long timeUsed)
         {
 	        if (player.Experience > 0.1f)
 	        {

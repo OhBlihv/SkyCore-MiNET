@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MiNET.Worlds;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Player;
 
 namespace SkyCore.Games.Hub
@@ -82,6 +83,11 @@ namespace SkyCore.Games.Hub
 		public override void CheckCapacity()
 		{
 
+		}
+
+		public override Type GetGameLevelInfoType()
+		{
+			return typeof(GameLevelInfo); //Nothing Custom
 		}
 
 	}

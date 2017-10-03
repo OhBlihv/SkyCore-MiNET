@@ -14,12 +14,25 @@ namespace SkyCore.Games.Murder.Level
 		public List<PlayerLocation> PlayerSpawnLocations { get; set; }
 		public List<PlayerLocation> GunPartLocations { get; set; }
 
+		//JSON Loading
+		public MurderLevelInfo()
+		{
+			
+		}
+
 		public MurderLevelInfo(string levelName, PlayerLocation lobbyLocation,
 								List<PlayerLocation> playerSpawnLocations, List<PlayerLocation> gunPartLocations
 								) : base("murder", levelName, lobbyLocation)
 		{
 			PlayerSpawnLocations = playerSpawnLocations;
 			GunPartLocations = gunPartLocations;
+		}
+
+		public override object Clone()
+		{
+			//Shallow Clone
+			return new MurderLevelInfo(LevelName, (PlayerLocation)LobbyLocation.Clone(),
+				PlayerSpawnLocations.ToList(), GunPartLocations.ToList());
 		}
 
 	}

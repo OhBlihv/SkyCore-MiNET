@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace SkyCore.Game.Level
 {
-	public class GameLevelInfo
+	public class GameLevelInfo : ICloneable
 	{
 
 		public string GameType { get; }
@@ -18,11 +18,22 @@ namespace SkyCore.Game.Level
 
 		public PlayerLocation LobbyLocation { get; set; }
 
+		//JSON Loading
+		public GameLevelInfo()
+		{
+			
+		}
+
 		public GameLevelInfo(string gameType, string levelName, PlayerLocation lobbyLocation)
 		{
 			GameType = gameType;
 			LevelName = levelName;
 			LobbyLocation = lobbyLocation;
+		}
+
+		public virtual object Clone()
+		{
+			return new GameLevelInfo(GameType, LevelName, (PlayerLocation) LobbyLocation.Clone());
 		}
 
 	}
@@ -44,6 +55,7 @@ namespace SkyCore.Game.Level
 			{
 				if (SkyCoreAPI.Instance.GameModes.ContainsKey(serialisedGameType.Value<string>()))
 				{
+					SkyUtil.log($"Attempting to load GameInfo of type {serialisedGameType.Value<string>()}");
 					newObjectType = SkyCoreAPI.Instance.GameModes[serialisedGameType.Value<string>()].GetGameLevelInfoType();
 				}
 				else
@@ -59,16 +71,21 @@ namespace SkyCore.Game.Level
 				return null;
 			}
 
-			//existingValue = Convert.ChangeType(existingValue, objectType);
-			existingValue = Activator.CreateInstance(objectType);
+			//existingValue = Convert.ChangeType(existingValue, newObjectType);
+			existingValue = Activator.CreateInstance(newObjectType);
 
 			serializer.Populate(item.CreateReader(), existingValue);
+
+			SkyUtil.log($"Loaded as {newObjectType} ({existingValue.GetType()}");
 
 			return existingValue;
 		}
 
+		public override bool CanRead => true;
+
 		public override bool CanConvert(Type objectType)
 		{
+			SkyUtil.log($"Is {typeof(GameLevelInfo)} assignable from {objectType} == {typeof(GameLevelInfo).IsAssignableFrom(objectType)}");
 			return typeof(GameLevelInfo).IsAssignableFrom(objectType);
 		}
 

@@ -17,34 +17,29 @@ namespace SkyCore.Games.Murder
     class MurderLevel : GameLevel
     {
 
-        public List<PlayerLocation> PlayerSpawnLocations = new List<PlayerLocation>();
-        public List<PlayerLocation> GunPartLocations = new List<PlayerLocation>();
-
         public SkyPlayer Murderer { get; set; }
         public SkyPlayer Detective { get; set; }
 
         public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "murder", gameId, levelPath)
         {
-	        //gameLevelInfo = new MurderLevelInfo(LevelName, new PlayerLocation(266, 11, 256)),;
-	        gameLevelInfo.LobbyLocation = new PlayerLocation(266, 11, 256);
+	        GameLevelInfo = new MurderLevelInfo(LevelName, new PlayerLocation(266, 11, 256), new List<PlayerLocation>(),
+		        new List<PlayerLocation>());
+	        SpawnPoint = GameLevelInfo.LobbyLocation;
 
 			//Hardcoded spawn for initial map
 			SkyUtil.log($"Initializing level '{LevelName}'");
-			if(!File.Exists($"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\murder-spawn-{LevelName}.json"))
+			/*if(!File.Exists($"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\murder-{LevelName}.json"))
 	        {
 		        throw new ArgumentException($"Level {LevelName} not found in config folder!");
-	        }
+	        }*/
 
-	        //SpawnPoint = flatFile.GetLocation($"level-names.{levelName}.hub-location", new PlayerLocation(0, 100D, 0));
-	        SpawnPoint = new PlayerLocation(0, 100D, 0); //TODO: JSON?
-
-	        foreach (PlayerLocation playerSpawnLocation in ((MurderLevelInfo) gameLevelInfo).PlayerSpawnLocations)
+	        foreach (PlayerLocation playerSpawnLocation in ((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations)
 	        {
 				playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground
 			}
 			
-			SkyUtil.log($"Initialized Player Spawns with {PlayerSpawnLocations.Count} unique locations");
-			SkyUtil.log($"Initialized Gun Part Locations with {GunPartLocations.Count} unique locations");
+			SkyUtil.log($"Initialized Player Spawns with {((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations.Count} unique locations");
+			SkyUtil.log($"Initialized Gun Part Locations with {((MurderLevelInfo)GameLevelInfo).GunPartLocations.Count} unique locations");
         }
 
         protected override void InitializeTeamMap()
@@ -124,5 +119,10 @@ namespace SkyCore.Games.Murder
             //Console.WriteLine("Tick: " + tick);
         }
 
-    }
+	    public override Type GetGameLevelInfoType()
+	    {
+		    return typeof(MurderLevelInfo);
+	    }
+
+	}
 }

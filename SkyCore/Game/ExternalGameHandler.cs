@@ -116,7 +116,7 @@ namespace SkyCore.Game
 			{
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
-					Level level = SkyCoreAPI.Instance.GetHubLevel();
+					MiNET.Worlds.Level level = SkyCoreAPI.Instance.GetHubLevel();
 
 					string neatName = gameName;
 					PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);

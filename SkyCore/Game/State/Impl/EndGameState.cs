@@ -87,7 +87,7 @@ namespace SkyCore.Game.State.Impl
 				List<SkyPlayer> remainingPlayers = gameLevel.GetAllPlayers();
 		        if (remainingPlayers.Count > 0)
 		        {
-			        Level hubLevel = SkyCoreAPI.Instance.GetHubLevel();
+			        MiNET.Worlds.Level hubLevel = SkyCoreAPI.Instance.GetHubLevel();
 
 			        foreach (SkyPlayer player in remainingPlayers)
 			        {

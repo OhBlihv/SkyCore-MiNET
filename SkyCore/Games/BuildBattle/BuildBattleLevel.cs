@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Games.BuildBattle.State;
 using SkyCore.Player;
@@ -17,7 +18,7 @@ namespace SkyCore.Games.BuildBattle
 
 		public readonly List<BuildBattleTeam> BuildTeams = new List<BuildBattleTeam>();
 
-		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "build-battle", gameId, levelPath, new PlayerLocation(266, 11, 256), true)
+		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "build-battle", gameId, levelPath, true)
 		{
 			
 		}
@@ -125,6 +126,11 @@ namespace SkyCore.Games.BuildBattle
 			}
 
 			return voteLocations;
+		}
+
+		public override Type GetGameLevelInfoType()
+		{
+			return typeof(GameLevelInfo); //Nothing Custom
 		}
 
 	}

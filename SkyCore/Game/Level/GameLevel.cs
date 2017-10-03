@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
+using System.Reflection;
 using System.Threading;
 using MiNET;
 using MiNET.Effects;
@@ -10,6 +12,7 @@ using MiNET.Net;
 using MiNET.UI;
 using MiNET.Utils;
 using MiNET.Worlds;
+using Newtonsoft.Json;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Player;
@@ -30,7 +33,7 @@ namespace SkyCore.Game
         //Team -> Player(s) //TODO: Possibly remove due to complexity?
         protected readonly Dictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
 
-	    protected GameLevelInfo gameLevelInfo;
+	    public GameLevelInfo GameLevelInfo { get; protected set; }
 
         //
 
@@ -68,10 +71,16 @@ namespace SkyCore.Game
             GameId = gameId;
 	        GameType = gameType;
 
-	        //TODO: Read from file
-	        gameLevelInfo = new GameLevelInfo(gameType, LevelName, new PlayerLocation(0, 100D, 0));
+	        GameLevelInfo = new GameLevelInfo(gameType, LevelName, new PlayerLocation(0, 100D, 0));
+	        {
+		        GameLevelInfo gameLevelInfo = LoadThisLevelInfo();
+		        if (gameLevelInfo != null)
+		        {
+			        GameLevelInfo = gameLevelInfo;
+		        }
+	        }
 
-			EnableBlockTicking = false;
+	        EnableBlockTicking = false;
             EnableChunkTicking = false;
 
             SkyUtil.log($"Initializing world {gameId}");
@@ -234,7 +243,7 @@ namespace SkyCore.Game
 
             //player.SpawnLevel(this, new PlayerLocation(7.5, 181, -20.5));
             //player.SpawnLevel(this, new PlayerLocation(255, 70, 255));
-            player.SpawnLevel(this, LobbySpawnLocations[0]);
+            player.SpawnLevel(this, GameLevelInfo.LobbyLocation);
 
 			CurrentState.InitializePlayer(this, player);
         }
@@ -378,7 +387,7 @@ namespace SkyCore.Game
                 Particles = false
             });
 
-			player.SetEffect(new Blindness()
+			player.SetEffect(new Blindness
 			{
 				Duration = 100,
 				Particles = false
@@ -390,6 +399,42 @@ namespace SkyCore.Game
             //Bump the player up into the air to signify death
             player.Knockback(new Vector3(0f, 0.5f, 0f));
         }
+
+	    // JSON
+
+	    public abstract Type GetGameLevelInfoType();
+
+		public GameLevelInfo LoadThisLevelInfo()
+	    {
+		    try
+		    {
+			    string levelInfoFilename =
+				    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{GameType}-{LevelName}.json";
+
+			    if (File.Exists(levelInfoFilename))
+			    {
+				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
+
+				    //return JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), new GameLevelInfoConverter());
+				    GameLevelInfo gameLevelInfo = (GameLevelInfo)JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), GetGameLevelInfoType());
+
+				    SkyUtil.log("Returning of type " + gameLevelInfo.GetType());
+
+				    return gameLevelInfo;
+			    }
+			    else
+			    {
+				    SkyUtil.log($"Could not find '{levelInfoFilename} for level. Not loading.");
+			    }
+
+			    return null;
+			}
+		    catch (Exception e)
+		    {
+			    Console.WriteLine(e);
+			    return null;
+		    }
+	    }
 
 		// Forms
 
