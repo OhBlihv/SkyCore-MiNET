@@ -351,7 +351,8 @@ namespace SkyCore.Games.Murder.State
              */
 
             //Every 5 Seconds -- Can't spawn any gun parts if the spawned amount == the total locations
-            if (currentTick % 10 == 0 && GunParts.Count != GunPartLocations.Count)
+			// V Avoid spawning gun parts on the first possible spawn tick
+            if (secondsLeft < (MaxGameTime / 2) - 10 && currentTick % 10 == 0 && GunParts.Count != GunPartLocations.Count)
             {
                 PlayerLocation spawnLocation = null;
 
