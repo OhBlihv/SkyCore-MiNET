@@ -129,7 +129,7 @@ namespace SkyCore.Punishments
 					"`punish_type`       varchar(16),\n" +
 					"`executing_player`  varchar(16),\n" +
 					"`reason`			 varchar(128),\n" +
-					"`expiry_time`       DATETIME2(1),\n" + //Lowest precision type for lowest storage usage
+					"`expiry_time`       DATETIME(1),\n" +
 					" PRIMARY KEY(`player_xuid`, `punish_type`, `expiry_time`)\n" +
 					");",
 					null, null, null);
