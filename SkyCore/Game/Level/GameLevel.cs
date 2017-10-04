@@ -489,12 +489,7 @@ namespace SkyCore.Game
 			    }
 			);
 
-			player.CurrentForm = simpleForm;
-
-		    McpeModalFormRequest message = McpeModalFormRequest.CreateObject();
-		    message.formId = 1234;
-		    message.data = simpleForm.ToJson();
-		    player.SendPackage(message);
+			player.SendForm(simpleForm);
 		}
 
 	    public void ShowGameList(SkyPlayer player)
@@ -538,12 +533,7 @@ namespace SkyCore.Game
 				}
 		    };
 
-		    player.CurrentForm = simpleForm;
-
-		    McpeModalFormRequest message = McpeModalFormRequest.CreateObject();
-		    message.formId = 1234;
-		    message.data = simpleForm.ToJson();
-		    player.SendPackage(message);
+		    player.SendForm(simpleForm);
 		}
 
     }

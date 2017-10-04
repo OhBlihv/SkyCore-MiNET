@@ -62,7 +62,7 @@ namespace SkyCore.Games.BuildBattle.State
 						//Poorly enforce speed
 						if (i == 0 || i == 11)
 						{
-							player.Freeze = true;
+							player.SetNoAi(true);
 
 							player.MovementSpeed = 0f;
 							player.SendUpdateAttributes();
@@ -75,7 +75,7 @@ namespace SkyCore.Games.BuildBattle.State
 				SelectedCategory = categoryRotation[new Random().Next(categoryRotation.Count)];
 				gameLevel.DoForAllPlayers(player =>
 				{
-					player.Freeze = false;
+					player.SetNoAi(false);
 
 					player.MovementSpeed = 0.1f;
 					player.SendUpdateAttributes();

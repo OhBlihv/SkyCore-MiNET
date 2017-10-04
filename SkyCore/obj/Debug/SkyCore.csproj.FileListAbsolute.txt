@@ -78,7 +78,6 @@ E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\fNbt.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\LibNoise.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\log4net.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\Microsoft.IO.RecyclableMemoryStream.pdb
-E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.pdb
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\Newtonsoft.Json.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SharpAvi.xml
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\StackExchange.Redis.xml

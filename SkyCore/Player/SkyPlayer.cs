@@ -104,43 +104,54 @@ namespace SkyCore.Player
 	            PlayerPunishments playerPunishments = PunishCore.GetPunishmentsFor(CertificateData.ExtraData.Xuid);
 	            if (playerPunishments.HasActive(PunishmentType.Ban))
 	            {
-		            TimeSpan expiryTime = playerPunishments.GetActive(PunishmentType.Ban).Expiry.Subtract(DateTime.Now);
+		            Punishment activePunishment = playerPunishments.GetActive(PunishmentType.Ban);
 
-		            string expiryString = "";
-		            if (expiryTime.Days > 0)
+					string expiryString = "";
+		            if (activePunishment.Expiry.HasValue)
 		            {
-			            expiryString += expiryTime.Days + " Days";
-		            }
-		            if (expiryTime.Hours > 0)
-		            {
-			            if (expiryString.Length > 0)
+						TimeSpan expiryTime = activePunishment.Expiry.Value.Subtract(DateTime.Now);
+
+			            if (expiryTime.Days > 0)
 			            {
-				            expiryString += " ";
+				            expiryString += expiryTime.Days + " Days";
+			            }
+			            if (expiryTime.Hours > 0)
+			            {
+				            if (expiryString.Length > 0)
+				            {
+					            expiryString += " ";
+				            }
+
+				            expiryString += expiryTime.Hours + " Hours";
+			            }
+			            if (expiryTime.Minutes > 0)
+			            {
+				            if (expiryString.Length > 0)
+				            {
+					            expiryString += " ";
+				            }
+
+				            expiryString += expiryTime.Minutes + " Minutes";
+			            }
+			            if (expiryTime.Seconds > 0)
+			            {
+				            if (expiryString.Length > 0)
+				            {
+					            expiryString += " ";
+				            }
+
+				            expiryString += expiryTime.Seconds + " Seconds";
 			            }
 
-			            expiryString += expiryTime.Hours + " Hours";
+			            expiryString += $" Remaining";
 		            }
-		            if (expiryTime.Minutes > 0)
+		            else
 		            {
-			            if (expiryString.Length > 0)
-			            {
-				            expiryString += " ";
-			            }
-
-			            expiryString += expiryTime.Minutes + " Minutes";
-		            }
-		            if (expiryTime.Seconds > 0)
-		            {
-			            if (expiryString.Length > 0)
-			            {
-				            expiryString += " ";
-			            }
-
-			            expiryString += expiryTime.Seconds + " Seconds";
+			            expiryString = "Permanent";
 		            }
 
 					Disconnect("§cYou are currently banned from the §dSkytonia §eNetwork\n" +
-							   $"§c({expiryString} Remaining)");
+							   $"§c({expiryString})");
 		            return;
 				}
 
@@ -302,23 +313,6 @@ namespace SkyCore.Player
 
             //base.HandleMcpeInteract(message);
         }
-
-		public bool Freeze { get; set; }
-
-	    public override void HandleMcpeMovePlayer(McpeMovePlayer message)
-	    {
-		    if (Freeze)
-		    {
-				//Allow players to fall
-			    if (Math.Abs(message.x - KnownPosition.X) > 0.1 || Math.Abs(message.z - KnownPosition.Z) > 0.1)
-			    {
-					SendMovePlayer(true);
-				    return;
-				}
-		    }
-
-		    base.HandleMcpeMovePlayer(message);
-	    }
 
 	    protected override void OnPlayerLeave(PlayerEventArgs e)
 	    {

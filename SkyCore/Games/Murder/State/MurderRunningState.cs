@@ -97,9 +97,9 @@ namespace SkyCore.Games.Murder.State
 
 			            player.SetHideNameTag(true);
 
-			            //SkyUtil.log($"Moving speed from {player.MovementSpeed} to 0 during freeze phase");
+						//SkyUtil.log($"Moving speed from {player.MovementSpeed} to 0 during freeze phase");
 
-			            player.Freeze = true;
+			            player.SetNoAi(true);
 
 						player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
 						player.MovementSpeed = 0f;
@@ -118,7 +118,7 @@ namespace SkyCore.Games.Murder.State
 							//Poorly enforce speed
 							if (i == 0 || i == 11)
 							{
-								player.Freeze = true;
+								player.SetNoAi(true);
 
 								player.MovementSpeed = 0f;
 								player.SendUpdateAttributes();
@@ -189,7 +189,7 @@ namespace SkyCore.Games.Murder.State
 						player.MovementSpeed = 0.1f;
 						player.SendUpdateAttributes();
 
-						player.Freeze = false;
+						player.SetNoAi(false);
 
 						//Ensure this player is at the correct spawn location
 						if (gameLevel.GetBlock(player.KnownPosition).Id != 0)

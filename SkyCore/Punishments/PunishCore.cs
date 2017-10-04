@@ -26,7 +26,7 @@ namespace SkyCore.Punishments
 
 		public string PunishingPlayer { get; }
 
-		public DateTime Expiry { get; }
+		public DateTime? Expiry { get; }
 
 		public Punishment(string punishReason, string punishingPlayer, DateTime? expiry)
 		{
@@ -37,7 +37,7 @@ namespace SkyCore.Punishments
 
 		public bool IsActive()
 		{
-			return Expiry.CompareTo(DateTime.Now) >= 0;
+			return Expiry?.CompareTo(DateTime.Now) >= 0;
 		}
 
 		public int CompareTo(object obj)
@@ -47,7 +47,12 @@ namespace SkyCore.Punishments
 				return 0;
 			}
 
-			return Expiry.CompareTo(pObj.Expiry);
+			if (Expiry == null)
+			{
+				return -1; //Order First
+			}
+
+			return Expiry.Value.CompareTo(pObj.Expiry);
 		}
 	}
 
