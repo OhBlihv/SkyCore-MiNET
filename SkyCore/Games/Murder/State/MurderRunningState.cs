@@ -499,8 +499,8 @@ namespace SkyCore.Games.Murder.State
 		        particle.Spawn();
 			}
 
-	        if (player == murderLevel.Murderer ||
-				murderLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0)
+	        if (player == murderLevel.Murderer) //||
+				/*murderLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0*///) //TODO: Uncomment for better presentation
 			{
 				//Message appears once game ends
 			}
@@ -514,7 +514,7 @@ namespace SkyCore.Games.Murder.State
 
 				player.SendAdventureSettings();
 
-				player.Knockback(new Vector3(0, 3, 0));
+				player.Knockback(new Vector3(0, 1.5f, 0));
 			}
         }
 
