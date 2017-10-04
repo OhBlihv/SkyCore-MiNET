@@ -17,6 +17,8 @@ using SkyCore.Entities;
 using SkyCore.Game;
 using SkyCore.Game.State;
 using SkyCore.Games.Hub;
+using SkyCore.Punishments;
+using SkyCore.Statistics;
 using SkyCore.Util;
 
 namespace SkyCore.Player
@@ -95,6 +97,52 @@ namespace SkyCore.Player
                     Disconnect("§cAn §2§lXBOX§r §caccount required to login to §dSkytonia §eNetwork");
 					return;
                 }
+
+				StatisticsCore.AddPlayer(CertificateData.ExtraData.Xuid, Username);
+
+				//Sync retrieve any active punishments
+	            PlayerPunishments playerPunishments = PunishCore.GetPunishmentsFor(CertificateData.ExtraData.Xuid);
+	            if (playerPunishments.HasActive(PunishmentType.Ban))
+	            {
+		            TimeSpan expiryTime = playerPunishments.GetActive(PunishmentType.Ban).Expiry.Subtract(DateTime.Now);
+
+		            string expiryString = "";
+		            if (expiryTime.Days > 0)
+		            {
+			            expiryString += expiryTime.Days + " Days";
+		            }
+		            if (expiryTime.Hours > 0)
+		            {
+			            if (expiryString.Length > 0)
+			            {
+				            expiryString += " ";
+			            }
+
+			            expiryString += expiryTime.Hours + " Hours";
+		            }
+		            if (expiryTime.Minutes > 0)
+		            {
+			            if (expiryString.Length > 0)
+			            {
+				            expiryString += " ";
+			            }
+
+			            expiryString += expiryTime.Minutes + " Minutes";
+		            }
+		            if (expiryTime.Seconds > 0)
+		            {
+			            if (expiryString.Length > 0)
+			            {
+				            expiryString += " ";
+			            }
+
+			            expiryString += expiryTime.Seconds + " Seconds";
+		            }
+
+					Disconnect("§cYou are currently banned from the §dSkytonia §eNetwork\n" +
+							   $"§c({expiryString} Remaining)");
+		            return;
+				}
 
 				BarHandler = new BarHandler(this);
 
