@@ -24,6 +24,9 @@ namespace SkyCore.Game.State.Impl
         {
 	        TimeRemaining = 30 * 2;  //30 Seconds
 
+			//Re-enable the player nametags
+			gameLevel.DoForAllPlayers(player => player.HideNameTag = true);
+
 			RunnableTask.RunTaskLater(() =>
 			{
 				gameLevel.DoForAllPlayers(gameLevel.ShowEndGameMenu);

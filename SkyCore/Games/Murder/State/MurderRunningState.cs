@@ -73,6 +73,8 @@ namespace SkyCore.Games.Murder.State
 		            foreach (SkyPlayer player in players)
 		            {
 			            player.SetEffect(new Blindness{Duration = 80,Particles = false}); //Should be 3 seconds?
+
+			            player.HideNameTag = true;
 		            }
 
 		            List<PlayerLocation> usedSpawnLocations = new List<PlayerLocation>();
