@@ -22,9 +22,8 @@ namespace SkyCore.Games.Murder
 
         public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "murder", gameId, levelPath)
         {
-	        GameLevelInfo = new MurderLevelInfo(LevelName, new PlayerLocation(266, 11, 256), new List<PlayerLocation>(),
-		        new List<PlayerLocation>());
-	        SpawnPoint = GameLevelInfo.LobbyLocation;
+	        //GameLevelInfo = new MurderLevelInfo(LevelName, new PlayerLocation(266, 11, 256), new List<PlayerLocation>(), new List<PlayerLocation>());
+	        //SpawnPoint = GameLevelInfo.LobbyLocation;
 
 			//Hardcoded spawn for initial map
 			SkyUtil.log($"Initializing level '{LevelName}'");
@@ -37,6 +36,15 @@ namespace SkyCore.Games.Murder
 	        {
 				playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground
 			}
+
+	        if (((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations.Count == 0 ||
+	            ((MurderLevelInfo) GameLevelInfo).GunPartLocations.Count == 0)
+	        {
+		        SkyUtil.log($"Player Spawns -> {((MurderLevelInfo)GameLevelInfo).PlayerSpawnLocations.Count}");
+		        SkyUtil.log($"Gun Part Locations -> {((MurderLevelInfo)GameLevelInfo).GunPartLocations.Count}");
+
+				throw new Exception("Defined spawns below range!");
+	        }
 			
 			SkyUtil.log($"Initialized Player Spawns with {((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations.Count} unique locations");
 			SkyUtil.log($"Initialized Gun Part Locations with {((MurderLevelInfo)GameLevelInfo).GunPartLocations.Count} unique locations");
