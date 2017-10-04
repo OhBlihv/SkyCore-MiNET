@@ -227,6 +227,7 @@ namespace SkyCore.Games.Murder.State
 		    TitleUtil.SendCenteredSubtitle(player, "§c§l  Murderer§r\n§7Kill all innocent players!");
 
 		    player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
+			player.Inventory.SetHeldItemSlot(1); //Avoid holding the knife on spawn/select
 
 		    player.HungerManager.Hunger = 20; //Set food to 'able to run' level.
 
