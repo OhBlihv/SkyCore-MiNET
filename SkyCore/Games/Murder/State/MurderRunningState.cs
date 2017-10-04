@@ -69,8 +69,8 @@ namespace SkyCore.Games.Murder.State
 				RunnableTask.RunTask(() =>
 	            {
 					//Create new collection due to iterating over a live list
-					ICollection<MiNET.Player> players = new List<MiNET.Player>(gameLevel.Players.Values);
-		            foreach (MiNET.Player player in players)
+		            ICollection<SkyPlayer> players = gameLevel.GetAllPlayers();
+		            foreach (SkyPlayer player in players)
 		            {
 			            player.SetEffect(new Blindness{Duration = 80,Particles = false}); //Should be 3 seconds?
 		            }
@@ -119,9 +119,6 @@ namespace SkyCore.Games.Murder.State
 							if (i == 0 || i == 11)
 							{
 								player.SetNoAi(true);
-
-								player.MovementSpeed = 0f;
-								player.SendUpdateAttributes();
 							}
 						}
 
@@ -169,21 +166,15 @@ namespace SkyCore.Games.Murder.State
 						TitleUtil.SendCenteredSubtitle(player, "§9§lDetective §r\n§7Track down the murderer!");
 
 						player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
-						SkyUtil.log($"In Slot 0 = {player.Inventory.GetSlots()[0].GetType().FullName}");
+						//SkyUtil.log($"In Slot 0 = {player.Inventory.GetSlots()[0].GetType().FullName}");
 
 						PlayerAmmoCounts[player.Username] = int.MaxValue;
 					}, MurderTeam.Detective);
 
-		            gameLevel.DoForPlayersIn(player =>
-		            {
-						InitializeMurderer(player);
-		            }, MurderTeam.Murderer);
+		            gameLevel.DoForPlayersIn(InitializeMurderer, MurderTeam.Murderer);
 
 					gameLevel.DoForAllPlayers(player =>
 					{
-						player.SetAllowFly(false);
-						player.IsFlying = false;
-
 						player.SendAdventureSettings();
 
 						player.MovementSpeed = 0.1f;
