@@ -448,9 +448,9 @@ namespace SkyCore.Games.Murder.State
                 return;
             }
 
-            if (source is Arrow && ((Arrow)source).Shooter is SkyPlayer)
+            if (source is Arrow arrow && arrow.Shooter is SkyPlayer)
             {
-                SkyPlayer shooter = (SkyPlayer) ((Arrow) source).Shooter;
+                SkyPlayer shooter = (SkyPlayer) arrow.Shooter;
                 
                 //Ensure this player is alive
                 if (!gameLevel.GetPlayerTeam(shooter).IsSpectator)
@@ -492,7 +492,7 @@ namespace SkyCore.Games.Murder.State
 				ItemBreakParticle particle = new ItemBreakParticle(murderLevel, new ItemRedstone())
 				{
 					Position = new Vector3(player.KnownPosition.X - 1 + ((float)random.NextDouble() * 1),
-						(float)(player.KnownPosition.Y + 0.5f + ((float) random.NextDouble() * 1)),
+						player.KnownPosition.Y + 0.5f + ((float) random.NextDouble() * 1),
 						player.KnownPosition.Z - 1 + ((float)random.NextDouble() * 1))
 				};
 
@@ -506,7 +506,15 @@ namespace SkyCore.Games.Murder.State
 			}
 			else
 			{
+				SkyUtil.log("Player has died.");
 				player.SendTitle("§c§lYOU DIED§r");
+
+				player.SetAllowFly(true);
+				player.IsFlying = true;
+
+				player.SendAdventureSettings();
+
+				player.Knockback(new Vector3(0, 3, 0));
 			}
         }
 
