@@ -8,7 +8,10 @@ using MiNET.Entities.Projectiles;
 using MiNET.Items;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.Game;
 using SkyCore.Games.Murder.Entities;
+using SkyCore.Games.Murder.State;
+using SkyCore.Player;
 using SkyCore.Util;
 
 namespace SkyCore.Games.Murder.Items
@@ -48,7 +51,8 @@ namespace SkyCore.Games.Murder.Items
 
         public override void Release(MiNET.Worlds.Level world, MiNET.Player player, BlockCoordinates blockCoordinates, long timeUsed)
         {
-	        if (player.Experience > 0.1f)
+	        ((MurderRunningState) ((MurderLevel) world).CurrentState).DoInteract((GameLevel) world, 1, (SkyPlayer) player, null);
+	        /*if (player.Experience > 0.1f)
 	        {
 		        return;
 	        }
@@ -67,6 +71,8 @@ namespace SkyCore.Games.Murder.Items
             arrow.BroadcastMovement = true;
             arrow.DespawnOnImpact = true;
             arrow.SpawnEntity();
+
+	        player.Inventory.Slots[0].Durability = 0;*/
         }
     }
 }

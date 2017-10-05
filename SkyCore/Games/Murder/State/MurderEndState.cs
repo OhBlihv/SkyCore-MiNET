@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using MiNET;
-using SkyCore.Game;
-using SkyCore.Game.State;
+﻿using SkyCore.Game;
 using SkyCore.Game.State.Impl;
 using SkyCore.Player;
 

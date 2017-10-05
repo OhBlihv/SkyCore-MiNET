@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using MiNET;
-using MiNET.Blocks;
 using MiNET.Effects;
 using MiNET.Entities;
 using MiNET.Entities.Projectiles;
-using MiNET.Entities.World;
 using MiNET.Items;
 using MiNET.Net;
 using MiNET.Particles;
-using MiNET.Sounds;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
@@ -99,8 +93,6 @@ namespace SkyCore.Games.Murder.State
 
 			            player.SetHideNameTag(true);
 
-						//SkyUtil.log($"Moving speed from {player.MovementSpeed} to 0 during freeze phase");
-
 			            player.SetNoAi(true);
 
 						player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
@@ -124,7 +116,7 @@ namespace SkyCore.Games.Murder.State
 							}
 						}
 
-						SkyUtil.log($"Printed scroll {i}/12, with {team.TeamPrefix + "§l" + team.TeamName}");
+						//SkyUtil.log($"Printed scroll {i}/12, with {team.TeamPrefix + "§l" + team.TeamName}");
 			            Thread.Sleep(250);
 		            }
 
@@ -169,6 +161,7 @@ namespace SkyCore.Games.Murder.State
 
 						player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
 						//SkyUtil.log($"In Slot 0 = {player.Inventory.GetSlots()[0].GetType().FullName}");
+						player.Inventory.SetInventorySlot(9, new ItemArrow());
 
 						PlayerAmmoCounts[player.Username] = int.MaxValue;
 					}, MurderTeam.Detective);
@@ -356,9 +349,10 @@ namespace SkyCore.Games.Murder.State
 			// V Avoid spawning gun parts on the first possible spawn tick
             if (secondsLeft < (MaxGameTime / 2) - 10 && currentTick % 10 == 0 && GunParts.Count != GunPartLocations.Count)
             {
+				SkyUtil.log("Attempting to spawn gun parts at tick " + currentTick);
                 PlayerLocation spawnLocation = null;
 
-	            int maxSpawnAmount = gameLevel.GetMaxPlayers();
+	            int maxSpawnAmount = gameLevel.GetPlayerCount();
 	            int spawnCount = 0;
 	            while (++spawnCount < maxSpawnAmount)
 	            {
@@ -368,7 +362,7 @@ namespace SkyCore.Games.Murder.State
 			            //
 		            }
 
-		            if (rollCount == 10)
+		            if (rollCount == 5)
 		            {
 			            break; //No more spawn points available.
 		            }
@@ -426,14 +420,21 @@ namespace SkyCore.Games.Murder.State
 				const float levelOneFullBarXp = 6.65f;
 
 	            player.Experience = 0;
-	            player.AddExperience(levelOneFullBarXp, true);
+	            player.AddExperience(levelOneFullBarXp);
+
+	            player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
 
 				const int updateTicks = 60;
 	            const int timerMillis = 50;
 	            RunnableTask.RunTaskTimer(() =>
 	            {
 
-		            player.AddExperience(-(levelOneFullBarXp / updateTicks), true);
+		            player.AddExperience(-(levelOneFullBarXp / updateTicks));
+
+		            if (player.Experience <= 0.1)
+		            {
+			            player.Inventory.SetInventorySlot(9, new ItemArrow());
+		            }
 
 	            }, timerMillis, updateTicks + 2);
             }
