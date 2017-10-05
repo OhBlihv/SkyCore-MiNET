@@ -71,7 +71,7 @@ namespace SkyCore.Game
             GameId = gameId;
 	        GameType = gameType;
 
-	        GameLevelInfo = new GameLevelInfo(gameType, LevelName, new PlayerLocation(0, 100D, 0));
+	        GameLevelInfo = new GameLevelInfo(gameType, LevelName, new PlayerLocation(266, 11, 256));
 	        {
 		        GameLevelInfo gameLevelInfo = LoadThisLevelInfo();
 		        if (gameLevelInfo != null)

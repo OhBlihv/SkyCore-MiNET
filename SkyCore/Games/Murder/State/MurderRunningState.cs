@@ -515,6 +515,8 @@ namespace SkyCore.Games.Murder.State
 				player.SendAdventureSettings();
 
 				player.Knockback(new Vector3(0, 1.5f, 0));
+
+				RunnableTask.RunTaskLater(() => murderLevel.ShowEndGameMenu(player), 5000);
 			}
         }
 

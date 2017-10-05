@@ -42,8 +42,7 @@ namespace SkyCore.Games.BuildBattle.State
 				topPlayers.Add(new KeyValuePair<SkyPlayer, int>(player, _voteTally[player]));
 			}
 
-			topPlayers.Sort((x, y) => x.Value.CompareTo(y.Value));
-			//topPlayers = topPlayers.OrderBy(o => o.Value).ToList();
+			topPlayers.Sort((x, y) => 0 - x.Value.CompareTo(y.Value));
 
 			SkyPlayer winningPlayer = null;
 
