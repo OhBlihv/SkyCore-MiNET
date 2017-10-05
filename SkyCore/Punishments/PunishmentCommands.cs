@@ -38,5 +38,19 @@ namespace SkyCore.Punishments
 			});
 		}
 
+		[Command(Name = "unban")]
+		[Authorize(Permission = CommandPermission.Operator)]
+		public void CommandUnban(MiNET.Player player, string playerName)
+		{
+			string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
+			if (targetXuid == null)
+			{
+				player.SendMessage($"§c{playerName} has never played before.");
+				return;
+			}
+
+
+		}
+
 	}
 }

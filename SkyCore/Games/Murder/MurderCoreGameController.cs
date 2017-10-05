@@ -76,15 +76,19 @@ namespace SkyCore.Games.Murder
 			    return;
 		    }
 
-			locationList.Add(player.KnownPosition);
+		    PlayerLocation addedLocation = (PlayerLocation) player.KnownPosition.Clone();
+		    addedLocation.X = (float) (Math.Floor(addedLocation.X) + 0.5f);
+		    addedLocation.X = (float) (Math.Floor(addedLocation.X) + 0.5f);
+		    addedLocation.Z = (float) (Math.Floor(addedLocation.Z) + 0.5f);
+
+			locationList.Add(addedLocation);
 
 		    string fileName =
 			    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{murderLevel.GameType}-{murderLevel.LevelName}.json";
 
 			SkyUtil.log($"Saving as '{fileName}' -> {murderLevel.GameType} AND {murderLevel.LevelName}");
 
-			File.WriteAllText(fileName,
-				JsonConvert.SerializeObject(murderLevelInfo));
+			File.WriteAllText(fileName, JsonConvert.SerializeObject(murderLevelInfo));
 
 			player.SendMessage($"§cUpdated {action} location list ({locationList.Count}) with current location.");
 	    }

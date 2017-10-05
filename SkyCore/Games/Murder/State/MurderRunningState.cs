@@ -113,6 +113,7 @@ namespace SkyCore.Games.Murder.State
 							if (i == 0 || i == 11)
 							{
 								player.SetNoAi(true);
+								player.SetHideNameTag(true);
 							}
 						}
 
@@ -205,7 +206,9 @@ namespace SkyCore.Games.Murder.State
                 item.DespawnEntity();
             }
 
-            GunParts.Clear();
+			gameLevel.DoForAllPlayers(player => player.SetHideNameTag(false));
+
+			GunParts.Clear();
         }
 
 	    public void InitializeMurderer(SkyPlayer player)
@@ -345,9 +348,9 @@ namespace SkyCore.Games.Murder.State
              * Gun Parts
              */
 
-            //Every 5 Seconds -- Can't spawn any gun parts if the spawned amount == the total locations
+            //Every 15 Seconds -- Can't spawn any gun parts if the spawned amount == the total locations
 			// V Avoid spawning gun parts on the first possible spawn tick
-            if (secondsLeft < (MaxGameTime / 2) - 10 && currentTick % 10 == 0 && GunParts.Count != GunPartLocations.Count)
+            if (secondsLeft < (MaxGameTime / 2) - 10 && currentTick % 30 == 0 && GunParts.Count != GunPartLocations.Count)
             {
 				SkyUtil.log("Attempting to spawn gun parts at tick " + currentTick);
                 PlayerLocation spawnLocation = null;
@@ -389,12 +392,17 @@ namespace SkyCore.Games.Murder.State
             MurderLevel murderLevel = (MurderLevel) gameLevel;
             Item itemInHand = player.Inventory.GetItemInHand();
 
+	        SkyUtil.log($"Is Gun: {itemInHand is ItemInnocentGun}({itemInHand.GetType()}) Ammo: {PlayerAmmoCounts[player.Username]}");
+			SkyUtil.log($"Displayname: {itemInHand.ExtraData["display"]["Name"].StringValue}");
+
             if (player == murderLevel.Murderer && itemInHand is ItemMurderKnife && target != null)
             {
                 KillPlayer((MurderLevel) gameLevel, target);
             }
-            else if (itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
+			//Left click only (Right click charges up)
+            else if (/*interactId == 1 && */itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
             {
+				SkyUtil.log($"Interact ID: {interactId}");
 				SkyUtil.log($"Experience: {player.Experience}");
 	            if (player.Experience > 0.05f)
 	            {
@@ -422,7 +430,9 @@ namespace SkyCore.Games.Murder.State
 	            player.Experience = 0;
 	            player.AddExperience(levelOneFullBarXp);
 
-	            player.Inventory.SetInventorySlot(0, new ItemInnocentGun());
+				//Ensure the gun is updated to a 'ItemInnocentGun' rather than an ItemBow
+	            RunnableTask.RunTaskLater(() => player.Inventory.SetInventorySlot(0, new ItemInnocentGun()), 50);
+	            player.Inventory.SetInventorySlot(9, null);
 
 				const int updateTicks = 60;
 	            const int timerMillis = 50;
@@ -464,7 +474,7 @@ namespace SkyCore.Games.Murder.State
                 //Ensure this player is alive
                 if (!gameLevel.GetPlayerTeam((SkyPlayer) source).IsSpectator)
                 {
-                    KillPlayer((MurderLevel)gameLevel, (SkyPlayer)target);
+                    KillPlayer((MurderLevel) gameLevel, (SkyPlayer)target);
                 }
             }
         }
@@ -483,13 +493,6 @@ namespace SkyCore.Games.Murder.State
 			Random random = new Random();
 	        for (int i = 0; i < 30; i++)
 	        {
-		        /*DestroyBlockParticle particle = new DestroyBlockParticle(murderLevel, new RedstoneBlock())
-		        {
-			        Position = new Vector3(player.KnownPosition.X,
-					(float) (player.KnownPosition.Y + 0.1 + i),
-					player.KnownPosition.Z)
-		        };*/
-
 				ItemBreakParticle particle = new ItemBreakParticle(murderLevel, new ItemRedstone())
 				{
 					Position = new Vector3(player.KnownPosition.X - 1 + ((float)random.NextDouble() * 1),

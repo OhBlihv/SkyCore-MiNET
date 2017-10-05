@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MiNET;
 using MiNET.Entities;
 using MiNET.Items;
+using MiNET.Net;
 using MiNET.Worlds;
 using SkyCore.Games.Murder;
 using SkyCore.Games.Murder.State;
@@ -31,6 +32,17 @@ namespace SkyCore.Game.State.Impl
 			{
 				gameLevel.DoForAllPlayers(gameLevel.ShowEndGameMenu);
 			}, 5000);
+
+	        RunnableTask.RunTaskLater(() =>
+	        {
+		        gameLevel.DoForAllPlayers((player) =>
+		        {
+			        McpeModalFormRequest modalFormRequest = Package<McpeModalFormRequest>.CreateObject(1L);
+			        modalFormRequest.formId = 1234U;
+			        modalFormRequest.data = ""; //Empty response to close modal
+			        player.SendPackage((Package)modalFormRequest);
+				});
+	        }, 15000);
 		}
 
         public override void LeaveState(GameLevel gameLevel)

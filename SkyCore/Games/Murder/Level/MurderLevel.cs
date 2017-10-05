@@ -35,7 +35,11 @@ namespace SkyCore.Games.Murder
 	        foreach (PlayerLocation playerSpawnLocation in ((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations)
 	        {
 				playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground
-			}
+
+				//Round to the centre of the block.
+		        playerSpawnLocation.X = (float) (Math.Floor(playerSpawnLocation.X) + 0.5f);
+		        playerSpawnLocation.Z = (float) (Math.Floor(playerSpawnLocation.Z) + 0.5f);
+	        }
 
 	        if (((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations.Count == 0 ||
 	            ((MurderLevelInfo) GameLevelInfo).GunPartLocations.Count == 0)

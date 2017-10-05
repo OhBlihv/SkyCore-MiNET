@@ -121,6 +121,8 @@ namespace SkyCore.Punishments
 
 		static PunishCore()
 		{
+			SkyCoreAPI.Instance.Context.PluginManager.LoadCommands(new PunishmentCommands());  //Initialize Punishment Commands
+
 			RunnableTask.RunTask(() =>
 			{
 				new DatabaseAction().Query(
