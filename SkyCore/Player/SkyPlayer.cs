@@ -102,14 +102,13 @@ namespace SkyCore.Player
 
 				//Sync retrieve any active punishments
 	            PlayerPunishments playerPunishments = PunishCore.GetPunishmentsFor(CertificateData.ExtraData.Xuid);
-	            if (playerPunishments.HasActive(PunishmentType.Ban))
+	            Punishment activePunishment = playerPunishments.GetActive(PunishmentType.Ban);
+				if (activePunishment != null)
 	            {
-		            Punishment activePunishment = playerPunishments.GetActive(PunishmentType.Ban);
-
 					string expiryString = "";
-		            if (activePunishment.Expiry.HasValue)
+		            if (activePunishment.DurationUnit != DurationUnit.Permanent)
 		            {
-						TimeSpan expiryTime = activePunishment.Expiry.Value.Subtract(DateTime.Now);
+						TimeSpan expiryTime = activePunishment.Expiry.Subtract(DateTime.Now);
 
 			            if (expiryTime.Days > 0)
 			            {
@@ -151,9 +150,21 @@ namespace SkyCore.Player
 		            }
 
 					Disconnect("§cYou are currently banned from the §dSkytonia §eNetwork\n" +
-							   $"§c({expiryString})");
+							   $"§c({expiryString})\n" + 
+							   $"§cReason: {activePunishment.PunishReason}");
 		            return;
 				}
+	            else
+	            {
+		            SkyUtil.log($"{Username} has no current bans, and is allowed to connect.");
+		            foreach (PunishmentType punishmentType in playerPunishments.Punishments.Keys)
+		            {
+			            foreach (Punishment punishment in playerPunishments.Punishments[punishmentType])
+			            {
+				            SkyUtil.log(punishment.ToString());
+			            }
+		            }
+	            }
 
 				BarHandler = new BarHandler(this);
 
