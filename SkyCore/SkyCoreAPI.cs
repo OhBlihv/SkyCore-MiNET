@@ -23,6 +23,8 @@ using SkyCore.Games.Hub;
 using SkyCore.Games.Murder;
 using SkyCore.Permissions;
 using SkyCore.Player;
+using SkyCore.Punishments;
+using SkyCore.Statistics;
 using SkyCore.Util;
 
 namespace SkyCore
@@ -46,7 +48,7 @@ namespace SkyCore
 
         public readonly ConcurrentDictionary<string, CoreGameController> GameModes = new ConcurrentDictionary<string, CoreGameController>();
 
-		private List<PendingTask> PendingTasks = new List<PendingTask>();
+		private readonly List<PendingTask> PendingTasks = new List<PendingTask>();
 		public delegate void PendingTask();
 		private bool _shouldSchedule = true;
 		public void AddPendingTask(PendingTask pendingTask)
@@ -216,9 +218,12 @@ namespace SkyCore
                 foreach (MiNET.Player player in level.Players.Values)
                 {
                     //TODO: Improve?
-                    player.Disconnect("Server Shutting Down");
+                    player.Disconnect("§eThis instance is currently rebooting. Rejoin to continue playing!");
                 }
             }
+
+			PunishCore.Close();
+			StatisticsCore.Close();
         }
 
         private void LevelOnBlockBreak(object sender, BlockBreakEventArgs e)
@@ -255,36 +260,19 @@ namespace SkyCore
 
             ThreadPool.QueueUserWorkItem(state =>
             {
-                Thread.Sleep(2000);
+	            player.SendTitle("§f", TitleType.Clear);
+	            player.SendTitle("§f", TitleType.AnimationTimes, 6, 6, 20 * 10);
+	            player.SendTitle("§f", TitleType.ActionBar, 6, 6, 20 * 10);
+	            player.SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
+	            player.SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
+
+				Thread.Sleep(2000);
 
                 //Group isn't initialized yet - wait.
                 SkyUtil.log($"{++i} Group for {player.Username} == {player.PlayerGroup} vs {PlayerGroup.Youtuber} == {player.PlayerGroup.CompareTo(PlayerGroup.Youtuber)}");
 
-                player.SendTitle("§f", TitleType.Clear);
-                player.SendTitle("§f", TitleType.AnimationTimes, 6, 6, 20 * 10);
-                player.SendTitle("§f", TitleType.ActionBar, 6, 6, 20 * 10);
-                player.SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
-                player.SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
-
                 //player.SendTitle($"{ChatColors.Gold}Welcome {player.Username}\n{ChatColors.LightPurple}~ To the Skytonia Network ~", TitleType.ActionBar);
                 Console.WriteLine(" (Joined!)");
-                
-                /*try
-                {
-                    SkyUtil.log($"Coming from {player.Level.LevelId}");
-                    /*Task.Delay(5000).ContinueWith(t =>
-                    {
-                        Level gameLevel = new MurderCoreGameController(this).GetGameController().Level;
-                        SkyUtil.log($"Travelling to {gameLevel.LevelName} ({gameLevel.LevelId})");
-                        
-                        player.SpawnLevel(gameLevel, new PlayerLocation(0D, 100D, 0D));
-                    });#1#
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }*/
             });
         
         }
@@ -296,9 +284,9 @@ namespace SkyCore
 		        return;
 	        }
 
-            if (eventArgs.Level is GameLevel)
+            if (eventArgs.Level is GameLevel level)
             {
-                ((GameLevel) eventArgs.Level).RemovePlayer((SkyPlayer) eventArgs.Player);
+                level.RemovePlayer((SkyPlayer) eventArgs.Player);
             }
         }
 
@@ -331,23 +319,9 @@ namespace SkyCore
             string username = player.Username;
 
             string rank;
-            //if (username.StartsWith("gurun") || username.StartsWith("Oliver"))
-            //{
-            //	rank = $"{ChatColors.Red}[ADMIN]";
-            //}
-            //else 
-            /*if (player.CertificateData.ExtraData.Xuid != null)
+            if (player is SkyPlayer skyPlayer)
             {
-                rank = $"{ChatColors.Green}[XBOX]";
-            }
-            else
-            {
-                rank = $"{ChatColors.White}";
-            }*/
-
-            if (player.GetType() == typeof(SkyPlayer))
-            {
-                rank = ((SkyPlayer) player).PlayerGroup.Prefix;
+                rank = skyPlayer.PlayerGroup.Prefix;
             }
             else
             {
@@ -368,7 +342,7 @@ namespace SkyCore
 
 		    if (level == null)
 		    {
-			    Console.WriteLine($"§c§l(!) §r§cUnable to find level Overworld/world. Returning 0th level.");
+			    Console.WriteLine("§c§l(!) §r§cUnable to find level Overworld/world. Returning 0th level.");
 			    return Context.LevelManager.Levels[0];
 		    }
 
@@ -394,14 +368,14 @@ namespace SkyCore
             return (SkyPlayer) foundPlayer;
         }
 
-	    public List<SkyPlayer> GetAllOnlinePlayers()
+	    public ISet<SkyPlayer> GetAllOnlinePlayers()
 	    {
-			List<SkyPlayer> players = new List<SkyPlayer>();
+			ISet<SkyPlayer> players = new HashSet<SkyPlayer>();
 			foreach (Level level in Context.LevelManager.Levels)
 			{
 				foreach (MiNET.Player player in level.Players.Values)
 				{
-					players.Add(player as SkyPlayer);
+					players.Add((SkyPlayer) player);
 				}
 			}
 
