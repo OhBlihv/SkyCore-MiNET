@@ -68,8 +68,10 @@ namespace SkyCore.Games.Murder.State
 		            {
 			            player.SetEffect(new Blindness{Duration = 80,Particles = false}); //Should be 3 seconds?
 
-			            player.HideNameTag = true;
-		            }
+						player.SetHideNameTag(true);
+						player.IsAlwaysShowName = false;
+			            player.SetNameTagVisibility(false);
+					}
 
 		            List<PlayerLocation> usedSpawnLocations = new List<PlayerLocation>();
 		            gameLevel.DoForAllPlayers(player =>
@@ -91,13 +93,14 @@ namespace SkyCore.Games.Murder.State
 
 			            player.Teleport(spawnLocation);
 
-			            player.SetHideNameTag(true);
+						player.SetHideNameTag(true);
+			            player.IsAlwaysShowName = false;
+			            player.SetNameTagVisibility(false);
 
-			            player.SetNoAi(true);
+						player.SetNoAi(true);
 
 						player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
-						player.MovementSpeed = 0f;
-						player.SendUpdateAttributes();
+						player.SendUpdateAttributes(); //TODO: Not required? Or is this required for Hunger
 					});
 
 					List<MurderTeam> teamRotation = new List<MurderTeam> { MurderTeam.Murderer, MurderTeam.Detective, MurderTeam.Innocent };
@@ -114,6 +117,8 @@ namespace SkyCore.Games.Murder.State
 							{
 								player.SetNoAi(true);
 								player.SetHideNameTag(true);
+								player.IsAlwaysShowName = false;
+								player.SetNameTagVisibility(false);
 							}
 						}
 
@@ -173,9 +178,6 @@ namespace SkyCore.Games.Murder.State
 					{
 						player.SendAdventureSettings();
 
-						player.MovementSpeed = 0.1f;
-						player.SendUpdateAttributes();
-
 						player.SetNoAi(false);
 
 						//Ensure this player is at the correct spawn location
@@ -206,7 +208,12 @@ namespace SkyCore.Games.Murder.State
                 item.DespawnEntity();
             }
 
-			gameLevel.DoForAllPlayers(player => player.SetHideNameTag(false));
+			gameLevel.DoForAllPlayers(player =>
+			{
+				player.SetHideNameTag(false);
+				player.IsAlwaysShowName = true;
+				player.SetNameTagVisibility(true);
+			});
 
 			GunParts.Clear();
         }
@@ -392,9 +399,6 @@ namespace SkyCore.Games.Murder.State
             MurderLevel murderLevel = (MurderLevel) gameLevel;
             Item itemInHand = player.Inventory.GetItemInHand();
 
-	        SkyUtil.log($"Is Gun: {itemInHand is ItemInnocentGun}({itemInHand.GetType()}) Ammo: {PlayerAmmoCounts[player.Username]}");
-			SkyUtil.log($"Displayname: {itemInHand.ExtraData["display"]["Name"].StringValue}");
-
             if (player == murderLevel.Murderer && itemInHand is ItemMurderKnife && target != null)
             {
                 KillPlayer((MurderLevel) gameLevel, target);
@@ -402,8 +406,6 @@ namespace SkyCore.Games.Murder.State
 			//Left click only (Right click charges up)
             else if (/*interactId == 1 && */itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
             {
-				SkyUtil.log($"Interact ID: {interactId}");
-				SkyUtil.log($"Experience: {player.Experience}");
 	            if (player.Experience > 0.05f)
 	            {
 		            return true;

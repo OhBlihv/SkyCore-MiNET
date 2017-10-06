@@ -62,18 +62,42 @@ namespace SkyCore.Player
             //Initialize Player UserPermission level for commands
             CommandPermission = playerGroup.PermissionLevel;
 
-	        string prefix = PlayerGroup.Prefix;
-	        if (prefix.Length > 2)
-	        {
-		        prefix += " ";
-	        }
-
-	        SetDisplayName(prefix + Username);
-	        SetNameTag(prefix + Username);
 	        this.SetHideNameTag(false);
+			UpdatePlayerName();
 
 	        SkyUtil.log($"Set {Username}'s name to {DisplayName}");
 		}
+
+	    public void UpdatePlayerName()
+	    {
+			string prefix = PlayerGroup.Prefix;
+		    if (prefix.Length > 2)
+		    {
+			    prefix += " ";
+		    }
+
+		    SetDisplayName(prefix + Username);
+		    SetNameTag(prefix + Username);
+		}
+
+	    public void SetNameTagVisibility(bool visible)
+	    {
+		    if (visible)
+		    {
+			    if (string.IsNullOrEmpty(NameTag))
+			    {
+				    UpdatePlayerName();
+				}
+		    }
+		    else
+		    {
+			    if (!string.IsNullOrEmpty(NameTag))
+			    {
+					SetDisplayName("");
+				    SetNameTag("");
+				}
+			}
+	    }
 
         public SkyPlayer(MiNetServer server, IPEndPoint endpoint, SkyCoreAPI skyCoreApi) : base(server, endpoint)
         {

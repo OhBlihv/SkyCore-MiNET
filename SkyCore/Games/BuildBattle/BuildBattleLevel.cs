@@ -133,5 +133,14 @@ namespace SkyCore.Games.BuildBattle
 			return typeof(GameLevelInfo); //Nothing Custom
 		}
 
+		public override string GetGameModalTitle()
+		{
+			return "§5§lBUILD BATTLE";
+		}
+
+		public override string GetEndOfGameContent(SkyPlayer player)
+		{
+			return "TODO";
+		}
 	}
 }

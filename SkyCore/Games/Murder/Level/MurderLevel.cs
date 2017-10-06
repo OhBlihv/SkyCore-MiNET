@@ -136,5 +136,51 @@ namespace SkyCore.Games.Murder
 		    return typeof(MurderLevelInfo);
 	    }
 
-	}
+	    public override string GetGameModalTitle()
+	    {
+		    return "§d§lMURDER MYSTERY";
+	    }
+
+		public override string GetEndOfGameContent(SkyPlayer player)
+	    {
+		    GameTeam winningTeam = null;
+
+		    int innocentPlayers = GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count;
+
+		    if (innocentPlayers > 0)
+		    {
+			    if (GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
+			    {
+					winningTeam = MurderTeam.Innocent;
+				}
+				//Else, null
+		    }
+		    else
+		    {
+				winningTeam = MurderTeam.Murderer;
+			}
+
+		    if (winningTeam == null)
+		    {
+			    return
+				    "\n" +
+				    TextUtils.Center("", 205) + "\n" +
+				    TextUtils.Center("§cYou are dead!", 205) + "\n";
+		    }
+
+		    return
+			    "\n" +
+			    TextUtils.Center("§f§lWinner:§r " + ((MurderTeam) winningTeam).TeamPrefix + winningTeam.DisplayName.ToUpper(),
+				    205) + "\n" +
+			    " " + "\n" +
+				"§8§o---------------------------------§r" + "\n" +
+			    " " + "\n" +
+			    TextUtils.Center("§9§lDetective:§r §f" + Detective.Username + (Detective.GameTeam == null || Detective.GameTeam.IsSpectator ? "§7[DEAD]" : ""),
+				    205) +
+			    "\n" +
+			    TextUtils.Center("§c§lMurderer:§r §f" + Murderer.Username + (Murderer.GameTeam == null || Murderer.GameTeam.IsSpectator ? "§7[DEAD]" : ""), 205) +
+			    "\n";
+	    }
+
+    }
 }

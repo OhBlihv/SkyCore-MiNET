@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Mime;
 using System.Numerics;
 using System.Reflection;
 using System.Threading;
@@ -341,6 +342,10 @@ namespace SkyCore.Game
                 {
                     AddSpectator(player);
                 }
+                else
+                {
+	                player.IsGameSpectator = false;
+                }
             }
         }
 
@@ -396,6 +401,8 @@ namespace SkyCore.Game
 			player.SetAllowFly(true);
             player.IsFlying = true;
 
+	        player.IsGameSpectator = true;
+
             //Bump the player up into the air to signify death
             player.Knockback(new Vector3(0f, 0.5f, 0f));
         }
@@ -438,21 +445,25 @@ namespace SkyCore.Game
 
 		// Forms
 
+	    public abstract string GetEndOfGameContent(SkyPlayer player);
+
+	    public abstract string GetGameModalTitle();
+
 	    public void ShowEndGameMenu(SkyPlayer player)
 	    {
 			var simpleForm = new SimpleForm
 		    {
-			    Title = "Game Finished",
-			    Content = "Play Again?",
+			    Title = GetGameModalTitle(),
+			    Content = GetEndOfGameContent(player),
 			    Buttons = new List<Button>
 			    {
 				    new Button
 				    {
-					    Text = "Play Again",
+					    Text = "§2§lPlay Again\n" +
+							   "§r§8(Jump into a new game)",
 					    Image = new Image
 					    {
 						    Type = "url",
-						    //Url = "https://cdn.discordapp.com/attachments/192533470608621570/363942495329189889/1031826.png"
 						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
 						},
 					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, GameType); }
@@ -467,8 +478,15 @@ namespace SkyCore.Game
 				simpleForm.Buttons.Add(
 					new Button
 					{
-						Text = "Spectate",
-						//ExecuteAction = delegate { ExternalGameHandler.AddPlayer((SkyPlayer) player, "build-battle"); }
+						Text = "§6§lSpectate Game\n" +
+							   "§r§8(Continue watching this game)",
+						Image = new Image
+						{
+							Type = "url",
+							Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+						},
+						//TODO: Close the GUI, or simply ensure the player is spectating?
+						ExecuteAction = delegate {  }
 					}
 				);
 			}
@@ -476,16 +494,14 @@ namespace SkyCore.Game
 		    simpleForm.Buttons.Add(
 			    new Button
 			    {
-				    Text = "Change Game",
-				    ExecuteAction = delegate { ShowGameList(player); }
-			    }
-			);
-
-		    simpleForm.Buttons.Add(
-			    new Button
-			    {
-				    Text = "Return to Hub",
-				    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "hub"); }
+					Text = "§c§lChange Game\n" +
+						   "§r§8(Choose a different game)",
+				    Image = new Image
+				    {
+					    Type = "url",
+					    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+				    },
+					ExecuteAction = delegate { ShowGameList(player); }
 			    }
 			);
 
