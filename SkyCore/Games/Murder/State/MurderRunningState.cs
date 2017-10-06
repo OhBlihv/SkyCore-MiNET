@@ -25,7 +25,8 @@ namespace SkyCore.Games.Murder.State
     class MurderRunningState : RunningState
     {
 
-	    private const int MaxGameTime = 120;
+	    //private const int MaxGameTime = 120;
+	    private const int MaxGameTime = 300 * 2;
 	    private const int PreStartTime = 10;
 
         private const int MaxGunParts = 5;
@@ -104,7 +105,7 @@ namespace SkyCore.Games.Murder.State
 					});
 
 					List<MurderTeam> teamRotation = new List<MurderTeam> { MurderTeam.Murderer, MurderTeam.Detective, MurderTeam.Innocent };
-					int offset = new Random().Next(teamRotation.Count);
+					int offset = Random.Next(teamRotation.Count);
 		            for (int i = 0; i < 12; i++)
 		            {
 			            MurderTeam team = teamRotation[(offset + i) % 3];
@@ -226,8 +227,9 @@ namespace SkyCore.Games.Murder.State
 			player.Inventory.SetHeldItemSlot(1); //Avoid holding the knife on spawn/select
 
 		    player.HungerManager.Hunger = 20; //Set food to 'able to run' level.
+		    player.SendUpdateAttributes();
 
-		    //PlayerAmmoCounts[player.Username] = 3; //Throwing Knives
+			//PlayerAmmoCounts[player.Username] = 3; //Throwing Knives
 		}
 
 	    public override void HandleLeave(GameLevel gameLevel, SkyPlayer player)
@@ -411,7 +413,8 @@ namespace SkyCore.Games.Murder.State
 		            return true;
 	            }
 
-				var arrow = new Arrow(player, gameLevel)
+				//var arrow = new Arrow(player, gameLevel)
+				var arrow = new GunProjectile(player, gameLevel)
 	            {
 		            Damage = 0,
 		            KnownPosition = (PlayerLocation) player.KnownPosition.Clone()
@@ -461,7 +464,7 @@ namespace SkyCore.Games.Murder.State
                 return;
             }
 
-            if (source is Arrow arrow && arrow.Shooter is SkyPlayer)
+            if (source is GunProjectile arrow && arrow.Shooter is SkyPlayer)
             {
                 SkyPlayer shooter = (SkyPlayer) arrow.Shooter;
                 
@@ -474,7 +477,7 @@ namespace SkyCore.Games.Murder.State
             else if (item is ItemMurderKnife && source == ((MurderLevel) gameLevel).Murderer)
             {
                 //Ensure this player is alive
-                if (((SkyPlayer) source).IsGameSpectator)
+                if (!((SkyPlayer) source).IsGameSpectator)
                 {
                     KillPlayer((MurderLevel) gameLevel, (SkyPlayer)target);
                 }
@@ -485,6 +488,7 @@ namespace SkyCore.Games.Murder.State
 
         public void KillPlayer(MurderLevel murderLevel, SkyPlayer player)
         {
+
             murderLevel.SetPlayerTeam(player, MurderTeam.Spectator);
 
 			player.Inventory.Clear();
@@ -523,6 +527,9 @@ namespace SkyCore.Games.Murder.State
 				player.Knockback(new Vector3(0, 1.5f, 0));
 
 				RunnableTask.RunTaskLater(() => murderLevel.ShowEndGameMenu(player), 5000);
+
+				//TODO: - Remove
+				murderLevel.AddSpectator(player);
 			}
         }
 

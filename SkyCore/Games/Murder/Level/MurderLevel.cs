@@ -23,15 +23,7 @@ namespace SkyCore.Games.Murder
 
         public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "murder", gameId, levelPath)
         {
-	        //GameLevelInfo = new MurderLevelInfo(LevelName, new PlayerLocation(266, 11, 256), new List<PlayerLocation>(), new List<PlayerLocation>());
-	        //SpawnPoint = GameLevelInfo.LobbyLocation;
-
-			//Hardcoded spawn for initial map
 			SkyUtil.log($"Initializing level '{LevelName}'");
-			/*if(!File.Exists($"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\murder-{LevelName}.json"))
-	        {
-		        throw new ArgumentException($"Level {LevelName} not found in config folder!");
-	        }*/
 
 	        foreach (PlayerLocation playerSpawnLocation in ((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations)
 	        {

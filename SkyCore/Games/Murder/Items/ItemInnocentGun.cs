@@ -52,27 +52,6 @@ namespace SkyCore.Games.Murder.Items
         public override void Release(MiNET.Worlds.Level world, MiNET.Player player, BlockCoordinates blockCoordinates, long timeUsed)
         {
 	        ((MurderRunningState) ((MurderLevel) world).CurrentState).DoInteract((GameLevel) world, 1, (SkyPlayer) player, null);
-	        /*if (player.Experience > 0.1f)
-	        {
-		        return;
-	        }
-
-            float force = 2.0f;
-
-	        GunProjectile arrow = new GunProjectile(player, world, 2, force >= 1.0)
-	        {
-		        PowerLevel = 1,
-		        KnownPosition = (PlayerLocation) player.KnownPosition.Clone()
-	        };
-	        arrow.KnownPosition.Y += 1.62f;
-            arrow.Velocity = arrow.KnownPosition.GetHeadDirection() * (float)(force * 2.0 * 1.5);
-            arrow.KnownPosition.Yaw = (float) arrow.Velocity.GetYaw();
-            arrow.KnownPosition.Pitch = (float) arrow.Velocity.GetPitch();
-            arrow.BroadcastMovement = true;
-            arrow.DespawnOnImpact = true;
-            arrow.SpawnEntity();
-
-	        player.Inventory.Slots[0].Durability = 0;*/
         }
     }
 }

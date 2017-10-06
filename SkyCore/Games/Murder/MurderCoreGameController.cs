@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Games.Murder.Level;
+using SkyCore.Player;
 
 namespace SkyCore.Games.Murder
 {
@@ -30,9 +31,28 @@ namespace SkyCore.Games.Murder
 	    public override Type GetGameLevelInfoType()
 	    {
 		    return typeof(MurderLevelInfo);
-	    }
 
-		[Command(Name = "location")]
+		    
+		}
+
+	    /*[Command(Name = "nospec")]
+	    [Authorize(Permission = CommandPermission.Host)]
+	    public void CommandLocation(MiNET.Player player)
+	    {
+		    if (!(player.Level is MurderLevel))
+		    {
+				player.SendMessage("Not murder level");
+			    return;
+		    }
+
+		    SkyPlayer altPlayer = SkyCoreAPI.Instance.GetPlayer("OhBlihv2");
+
+			//Set back as detective 
+			player.SendMessage("Alt should be detective");
+		    ((MurderLevel) altPlayer.Level).SetPlayerTeam(altPlayer, MurderTeam.Detective);
+		}*/
+
+	    [Command(Name = "location")]
 	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandLocation(MiNET.Player player, string action = "", string type = "")
 	    {

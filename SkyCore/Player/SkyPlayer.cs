@@ -34,7 +34,7 @@ namespace SkyCore.Player
 
 		public BarHandler BarHandler { get; private set; }
 
-		private List<Action> _postLoginActions = new List<Action>();
+		private readonly List<Action> _postLoginActions = new List<Action>();
 
 		//Game Settings
 			
@@ -373,6 +373,11 @@ namespace SkyCore.Player
 
             base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc);
         }
+
+	    public override string ToString()
+	    {
+		    return $"SkyPlayer: {Username}";
+	    }
 
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Mime;
 using System.Numerics;
 using System.Reflection;
@@ -334,20 +335,20 @@ namespace SkyCore.Game
                 TeamPlayerDict[oldTeam].Remove(player);
             }
 
-            if (team != null)
+			if (team != null)
             {
                 TeamPlayerDict[team].Add(player);
 
                 if (team.IsSpectator)
                 {
-                    AddSpectator(player);
+					AddSpectator(player);
                 }
                 else
                 {
 					//Respawn if this player is missing
 	                if (player.IsGameSpectator)
 	                {
-						List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
+		                List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
 		                DoForAllPlayers(gamePlayer =>
 		                {
 			                if (!gamePlayer.IsGameSpectator)
@@ -356,9 +357,10 @@ namespace SkyCore.Game
 			                }
 		                });
 
-		                SkyUtil.log($"Spawning {player.Username} to {gamePlayers.ToArray()}");
-						player.SpawnToPlayers(gamePlayers.ToArray());
-					}
+		                SkyUtil.log(
+			                $"Spawning {player.Username} to {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
+		                player.SpawnToPlayers(gamePlayers.ToArray());
+	                }
 
 	                player.IsGameSpectator = false;
                 }
@@ -413,7 +415,7 @@ namespace SkyCore.Game
 				}
 			});
 
-			SkyUtil.log($"Despawning {player.Username} from {gamePlayers.ToArray()}");
+			SkyUtil.log($"Despawning {player.Username} from {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
 			player.DespawnFromPlayers(gamePlayers.ToArray());
 
             player.SetEffect(new Invisibility

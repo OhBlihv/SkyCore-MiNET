@@ -67,9 +67,7 @@ namespace SkyCore.Games.Murder.Entities
 
 				collided = true;
 
-				SkyPlayer player = entityCollided as SkyPlayer;
-
-				if (player != null)
+				if (entityCollided is SkyPlayer player)
 				{
 					if (player.IsGameSpectator)
 					{
@@ -153,6 +151,7 @@ namespace SkyCore.Games.Murder.Entities
 			{
 				if (entity == Shooter) continue;
 				if (entity.GameMode == GameMode.Spectator) continue;
+				if (entity is SkyPlayer player && player.IsGameSpectator) continue;
 
 				if (Intersect(entity.GetBoundingBox() + HitBoxPrecision, ray))
 				{
@@ -169,7 +168,7 @@ namespace SkyCore.Games.Murder.Entities
 			{
 				if (entity == Shooter) continue;
 				if (entity == this) continue;
-				if (entity is Projectile) continue;
+				if (entity is Projectile || entity is SkyPlayer) continue; //We handle players above.
 
 				if (Intersect(entity.GetBoundingBox() + HitBoxPrecision, ray))
 				{
@@ -184,68 +183,6 @@ namespace SkyCore.Games.Murder.Entities
 			return null;
 		}
 
-		private bool CheckBlockCollide(PlayerLocation location)
-		{
-			var bbox = GetBoundingBox();
-			var pos = location.ToVector3();
-
-			var coords = new BlockCoordinates(
-				(int)Math.Floor(KnownPosition.X),
-				(int)Math.Floor((bbox.Max.Y + bbox.Min.Y) / 2.0),
-				(int)Math.Floor(KnownPosition.Z));
-
-			Dictionary<double, Block> blocks = new Dictionary<double, Block>();
-
-			for (int x = -1; x < 2; x++)
-			{
-				for (int z = -1; z < 2; z++)
-				{
-					for (int y = -1; y < 2; y++)
-					{
-						Block block = Level.GetBlock(coords.X + x, coords.Y + y, coords.Z + z);
-						if (block is Air) continue;
-
-						BoundingBox blockbox = block.GetBoundingBox() + 0.3f;
-						if (blockbox.Intersects(GetBoundingBox()))
-						{
-							//if (!blockbox.Contains(KnownPosition.ToVector3())) continue;
-
-							if (block is FlowingLava || block is StationaryLava)
-							{
-								HealthManager.Ignite(1200);
-								continue;
-							}
-
-							if (!block.IsSolid) continue;
-
-							blockbox = block.GetBoundingBox();
-
-							var midPoint = blockbox.Min + new Vector3(0.5f);
-							blocks.Add(Vector3.Distance((pos - Velocity), midPoint), block);
-						}
-					}
-				}
-			}
-
-			if (blocks.Count == 0) return false;
-
-			var firstBlock = blocks.OrderBy(pair => pair.Key).First().Value;
-
-			BoundingBox boundingBox = firstBlock.GetBoundingBox();
-			if (!SetIntersectLocation(boundingBox, KnownPosition.ToVector3()))
-			{
-				// No real hit
-				return false;
-			}
-
-			// Use to debug hits, makes visual impressions (can be used for paintball too)
-			var substBlock = new Stone { Coordinates = firstBlock.Coordinates };
-			Level.SetBlock(substBlock);
-			// End debug block
-
-			Velocity = Vector3.Zero;
-			return true;
-		}
 
 		public new bool SetIntersectLocation(BoundingBox bbox, Vector3 location)
 		{
