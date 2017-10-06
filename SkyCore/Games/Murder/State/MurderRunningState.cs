@@ -456,7 +456,7 @@ namespace SkyCore.Games.Murder.State
 
         public override void HandleDamage(GameLevel gameLevel, Entity source, Entity target, Item item, int damage, DamageCause damageCause)
         {
-            if (!(target is SkyPlayer))
+            if (!(target is SkyPlayer) || ((SkyPlayer) target).IsGameSpectator)
             {
                 return;
             }
@@ -466,7 +466,7 @@ namespace SkyCore.Games.Murder.State
                 SkyPlayer shooter = (SkyPlayer) arrow.Shooter;
                 
                 //Ensure this player is alive
-                if (!gameLevel.GetPlayerTeam(shooter).IsSpectator)
+                if (!shooter.IsGameSpectator)
                 {
                     KillPlayer((MurderLevel) gameLevel, (SkyPlayer) target);
                 }
@@ -474,7 +474,7 @@ namespace SkyCore.Games.Murder.State
             else if (item is ItemMurderKnife && source == ((MurderLevel) gameLevel).Murderer)
             {
                 //Ensure this player is alive
-                if (!gameLevel.GetPlayerTeam((SkyPlayer) source).IsSpectator)
+                if (((SkyPlayer) source).IsGameSpectator)
                 {
                     KillPlayer((MurderLevel) gameLevel, (SkyPlayer)target);
                 }

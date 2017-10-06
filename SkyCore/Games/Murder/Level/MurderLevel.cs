@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using MiNET.Effects;
+using MiNET.Items;
 using MiNET.Utils;
 using Newtonsoft.Json;
 using SkyCore.Game;
@@ -175,10 +176,10 @@ namespace SkyCore.Games.Murder
 			    " " + "\n" +
 				"§8§o---------------------------------§r" + "\n" +
 			    " " + "\n" +
-			    TextUtils.Center("§9§lDetective:§r §f" + Detective.Username + (Detective.GameTeam == null || Detective.GameTeam.IsSpectator ? "§7[DEAD]" : ""),
+			    TextUtils.Center("§9§lDetective:§r §f" + Detective.Username + (Detective.GameTeam == null || Detective.GameTeam.IsSpectator ? " §7[DEAD]" : ""),
 				    205) +
 			    "\n" +
-			    TextUtils.Center("§c§lMurderer:§r §f" + Murderer.Username + (Murderer.GameTeam == null || Murderer.GameTeam.IsSpectator ? "§7[DEAD]" : ""), 205) +
+			    TextUtils.Center("§c§lMurderer:§r §f" + Murderer.Username + (Murderer.GameTeam == null || Murderer.GameTeam.IsSpectator ? " §7[DEAD]" : ""), 205) +
 			    "\n";
 	    }
 

@@ -344,6 +344,22 @@ namespace SkyCore.Game
                 }
                 else
                 {
+					//Respawn if this player is missing
+	                if (player.IsGameSpectator)
+	                {
+						List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
+		                DoForAllPlayers(gamePlayer =>
+		                {
+			                if (!gamePlayer.IsGameSpectator)
+			                {
+				                gamePlayers.Add(gamePlayer);
+			                }
+		                });
+
+		                SkyUtil.log($"Spawning {player.Username} to {gamePlayers.ToArray()}");
+						player.SpawnToPlayers(gamePlayers.ToArray());
+					}
+
 	                player.IsGameSpectator = false;
                 }
             }
@@ -386,6 +402,20 @@ namespace SkyCore.Game
 
         public void AddSpectator(SkyPlayer player)
         {
+	        player.IsGameSpectator = true;
+
+			List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
+			DoForAllPlayers(gamePlayer =>
+			{
+				if (!gamePlayer.IsGameSpectator)
+				{
+					gamePlayers.Add(gamePlayer);
+				}
+			});
+
+			SkyUtil.log($"Despawning {player.Username} from {gamePlayers.ToArray()}");
+			player.DespawnFromPlayers(gamePlayers.ToArray());
+
             player.SetEffect(new Invisibility
             {
                 Duration = int.MaxValue,
@@ -400,8 +430,6 @@ namespace SkyCore.Game
 
 			player.SetAllowFly(true);
             player.IsFlying = true;
-
-	        player.IsGameSpectator = true;
 
             //Bump the player up into the air to signify death
             player.Knockback(new Vector3(0f, 0.5f, 0f));
