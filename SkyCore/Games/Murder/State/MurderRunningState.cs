@@ -30,6 +30,7 @@ namespace SkyCore.Games.Murder.State
 	    private const int PreStartTime = 10;
 
         private const int MaxGunParts = 5;
+	    private const int MaxGunAmmo = 5;
 
         private int _endTick = -1; //Default value
 	    private bool _isStarted = false;
@@ -326,7 +327,15 @@ namespace SkyCore.Games.Murder.State
 
             gameLevel.DoForPlayersIn(player =>
             {
-				player.BarHandler.AddMajorLine($"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerAmmo(gameLevel as MurderLevel, player)}/10 §fBullets...", 2);
+	            int gunAmmo = GetPlayerAmmo((MurderLevel) gameLevel, player);
+	            if (gunAmmo > 0)
+	            {
+					player.BarHandler.AddMajorLine($"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerAmmo((MurderLevel) gameLevel, player)}/{MaxGunAmmo} §fBullets...", 2);
+				}
+	            else
+	            {
+					player.BarHandler.AddMajorLine($"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerGunParts((MurderLevel) gameLevel, player)}/{MaxGunParts} §fGun Parts...", 2);
+				}
             }, MurderTeam.Innocent);
 
             gameLevel.DoForPlayersIn(player =>
@@ -339,6 +348,11 @@ namespace SkyCore.Games.Murder.State
 				player.BarHandler.AddMajorLine($"§c§lMURDERER§r §7| {neatRemaining} §fRemaining...", 2);
 				//$"              §7{PlayerAmmoCounts[player.Username]}/3 Throwing Knives", TitleType.ActionBar);
 			}, MurderTeam.Murderer);
+
+			gameLevel.DoForPlayersIn(player =>
+			{
+				player.BarHandler.AddMajorLine($"§7§lSPECTATOR §7 | {neatRemaining} §fRemaining...", 2);
+			}, MurderTeam.Spectator);
 
 			/*
 			 * Dodgy Anti-Cheat
@@ -428,15 +442,22 @@ namespace SkyCore.Games.Murder.State
                 arrow.DespawnOnImpact = true;
                 arrow.SpawnEntity();
 
-				PlayerAmmoCounts[player.Username]--;
+				int currentAmmo = --PlayerAmmoCounts[player.Username];
+	            if (currentAmmo <= 0)
+	            {
+					player.Inventory.SetInventorySlot(0, null); //Remove Gun
+	            }
+	            else
+	            {
+					//Ensure the gun is updated to a 'ItemInnocentGun' rather than an ItemBow
+		            RunnableTask.RunTaskLater(() => player.Inventory.SetInventorySlot(0, new ItemInnocentGun()), 50);
+				}
 
 				const float levelOneFullBarXp = 6.65f;
 
 	            player.Experience = 0;
 	            player.AddExperience(levelOneFullBarXp);
 
-				//Ensure the gun is updated to a 'ItemInnocentGun' rather than an ItemBow
-	            RunnableTask.RunTaskLater(() => player.Inventory.SetInventorySlot(0, new ItemInnocentGun()), 50);
 	            player.Inventory.SetInventorySlot(9, null);
 
 				const int updateTicks = 60;
@@ -446,7 +467,7 @@ namespace SkyCore.Games.Murder.State
 
 		            player.AddExperience(-(levelOneFullBarXp / updateTicks));
 
-		            if (player.Experience <= 0.1)
+		            if (currentAmmo > 0 && player.Experience <= 0.1)
 		            {
 			            player.Inventory.SetInventorySlot(9, new ItemArrow());
 		            }
@@ -488,7 +509,6 @@ namespace SkyCore.Games.Murder.State
 
         public void KillPlayer(MurderLevel murderLevel, SkyPlayer player)
         {
-
             murderLevel.SetPlayerTeam(player, MurderTeam.Spectator);
 
 			player.Inventory.Clear();
@@ -527,9 +547,6 @@ namespace SkyCore.Games.Murder.State
 				player.Knockback(new Vector3(0, 1.5f, 0));
 
 				RunnableTask.RunTaskLater(() => murderLevel.ShowEndGameMenu(player), 5000);
-
-				//TODO: - Remove
-				murderLevel.AddSpectator(player);
 			}
         }
 
@@ -570,6 +587,13 @@ namespace SkyCore.Games.Murder.State
 
 	        player.SendPackage(levelEvent);
 
+	        if (GetPlayerAmmo(gameLevel, player) > 0)
+	        {
+		        return 0; //Ignore gun parts while a player still has ammo
+	        }
+
+			player.BarHandler.AddMinorLine("§6(+1 Gun Parts)");
+
 			int count = GetPlayerGunParts(gameLevel, player) + 1;
 
             if (count == MaxGunParts)
@@ -579,10 +603,11 @@ namespace SkyCore.Games.Murder.State
                 PlayerInventory inventory = player.Inventory;
 
                 int currentSlot = inventory.InHandSlot;
-                inventory.SetInventorySlot(8, new ItemAir());
+                inventory.SetInventorySlot(8, null);
                 inventory.SetInventorySlot(0, new ItemInnocentGun());
+	            inventory.SetInventorySlot(9, new ItemArrow());
 
-				PlayerAmmoCounts[player.Username] = 10; //TODO: Avoid hardcode?
+				PlayerAmmoCounts[player.Username] = MaxGunAmmo;
 
                 inventory.SetHeldItemSlot(currentSlot);
             }

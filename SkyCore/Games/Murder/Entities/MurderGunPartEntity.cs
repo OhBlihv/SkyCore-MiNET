@@ -44,35 +44,15 @@ namespace SkyCore.Games.Murder.Entities
             if (PickupDelay > 0) return;
 
             var players = Level.GetSpawnedPlayers();
-            foreach (var player in players)
+            foreach (SkyPlayer player in players)
             {
-                if (player.GameMode != GameMode.Spectator && KnownPosition.DistanceTo(player.KnownPosition) <= 2)
+                if (!player.IsGameSpectator && KnownPosition.DistanceTo(player.KnownPosition) <= 2)
                 {
-                    {
-                        //Others
+					GameState.AddPlayerGunParts((MurderLevel) Level, player);
 
-                        /*var takeItemEntity = McpeTakeItemEntity.CreateObject();
-                        takeItemEntity.runtimeEntityId = EntityId;
-                        takeItemEntity.target = player.EntityId;
-                        Level.RelayBroadcast(player, takeItemEntity);*/
-                    }
-                    {
-                        //Self
-                        /*int amount = */GameState.AddPlayerGunParts((MurderLevel) Level, (SkyPlayer) player);
-                        /*if (amount >= 0)
-                        {
-                            player.SendMessage($"Picked up gun part {amount}/{5}!");
-                        }*/
+	                GameState.GunParts.Remove(SpawnLocation);
 
-                        GameState.GunParts.Remove(SpawnLocation);
-
-                        /*var takeItemEntity = McpeTakeItemEntity.CreateObject();
-                        takeItemEntity.runtimeEntityId = EntityId;
-                        takeItemEntity.target = EntityManager.EntityIdSelf;
-                        player.SendPackage(takeItemEntity);*/
-                    }
-
-                    DespawnEntity();
+					DespawnEntity();
                     break;
                 }
             }

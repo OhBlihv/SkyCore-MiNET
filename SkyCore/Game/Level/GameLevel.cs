@@ -494,7 +494,7 @@ namespace SkyCore.Game
 					    Image = new Image
 					    {
 						    Type = "url",
-						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
 						},
 					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, GameType); }
 				    }
@@ -513,7 +513,7 @@ namespace SkyCore.Game
 						Image = new Image
 						{
 							Type = "url",
-							Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+							Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
 						},
 						//TODO: Close the GUI, or simply ensure the player is spectating?
 						ExecuteAction = delegate {  }
@@ -529,8 +529,8 @@ namespace SkyCore.Game
 				    Image = new Image
 				    {
 					    Type = "url",
-					    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
-				    },
+					    Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
+					},
 					ExecuteAction = delegate { ShowGameList(player); }
 			    }
 			);

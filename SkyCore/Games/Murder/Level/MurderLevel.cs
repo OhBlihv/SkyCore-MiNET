@@ -165,13 +165,11 @@ namespace SkyCore.Games.Murder
 			    "\n" +
 			    TextUtils.Center("§f§lWinner:§r " + ((MurderTeam) winningTeam).TeamPrefix + winningTeam.DisplayName.ToUpper(),
 				    205) + "\n" +
-			    " " + "\n" +
-				"§8§o---------------------------------§r" + "\n" +
-			    " " + "\n" +
-			    TextUtils.Center("§9§lDetective:§r §f" + Detective.Username + (Detective.GameTeam == null || Detective.GameTeam.IsSpectator ? " §7[DEAD]" : ""),
-				    205) +
+			    TextUtils.Center("§8§m--------------------§r", 205) + "\n" +
+			    TextUtils.Center("§9§lDetective:§r §f" + Detective.Username, 205) +
 			    "\n" +
-			    TextUtils.Center("§c§lMurderer:§r §f" + Murderer.Username + (Murderer.GameTeam == null || Murderer.GameTeam.IsSpectator ? " §7[DEAD]" : ""), 205) +
+			    TextUtils.Center("§c§lMurderer:§r §f" + Murderer.Username, 205) +
+			    "\n" +
 			    "\n";
 	    }
 
