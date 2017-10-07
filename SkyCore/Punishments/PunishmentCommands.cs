@@ -17,7 +17,7 @@ namespace SkyCore.Punishments
 
 		[Command(Name = "ban")]
 		[Authorize(Permission = CommandPermission.Operator)]
-		public void CommandBan(MiNET.Player player, string playerName, string expiryString = "", params string[] reason) //TODO: Change to string if this doesn't work
+		public void CommandBan(MiNET.Player player, string playerName, params string[] args)
 		{
 			if (!((SkyPlayer) player).PlayerGroup.isAtLeast(PlayerGroup.Mod))
 			{
@@ -34,59 +34,13 @@ namespace SkyCore.Punishments
 					return;
 				}
 
-				int durationAmount = -1;
-				DurationUnit durationUnit = DurationUnit.Permanent;
-				if (expiryString.Length > 0)
+				args = ParseExpiryTime(player, args, out DurationUnit durationUnit, out int durationAmount);
+				if (args == null)
 				{
-					switch (expiryString.ToUpper())
-					{
-						case "FOREVER":
-						case "PERM":
-						case "PERMANENT":
-						{
-							durationAmount = 0;
-							//DurationUnit is already correct.	
-							break;
-						}
-						default:
-						{
-							string amountString = "";
-							for (int idx = 0; idx < expiryString.Length; idx++)
-							{
-								char charAt = expiryString[idx];
-								if (durationAmount == -1 && Char.IsDigit(charAt))
-								{
-									amountString += charAt;
-									continue;
-								}
-
-								if (Enum.TryParse(expiryString.Substring(idx, expiryString.Length), out durationUnit))
-								{
-									break;
-								}
-								else
-								{
-									player.SendMessage($"§cUnable to parse expiryString unit '{expiryString.Substring(idx, expiryString.Length)}'.");
-									return;
-								}
-							}
-
-							if (!int.TryParse(amountString, out durationAmount))
-							{
-								player.SendMessage($"§cUnable to parse expiryString amount '{amountString}'.");
-								return;
-							}
-							break;
-						}
-					}
+					return; //Message printed to player
 				}
-
-				if (durationAmount == -1)
-				{
-					durationAmount = 0;
-				}
-
-				string punishReason = GetReasonFromArgs(reason);
+	
+				string punishReason = GetReasonFromArgs(args);
 
 				DateTime expiry = DateTime.Now;
 				switch (durationUnit)
@@ -132,12 +86,16 @@ namespace SkyCore.Punishments
 				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
 				if (durationUnit == DurationUnit.Permanent)
 				{
+					player.SendMessage($"§c{playerName} has been banned permanently: {punishReason}");
+
 					target?.Disconnect($"§cYou have been banned permanently.\n" +
 					                   $"§6Reason: {punishReason}");
 				}
 				else
 				{
-					target?.Disconnect($"§cYou have been banned for {durationAmount} {durationUnit}\n" +
+					player.SendMessage($"§c{playerName} has been banned for {GetNeatDuration(durationAmount, durationUnit)}: {punishReason}");
+
+					target?.Disconnect($"§cYou have been banned for {GetNeatDuration(durationAmount, durationUnit)}\n" +
 					                   $"§6Reason: {punishReason}");
 				}
 			});
@@ -199,32 +157,163 @@ namespace SkyCore.Punishments
 				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
 				target?.Disconnect($"§cYou have been kicked from the server.\n" +
 				                   $"§6Reason: {punishReason}");
+				
+				player.SendMessage($"§c{playerName} has been kicked: {punishReason}");
 			});
 		}
 
-		private string GetReasonFromArgs(string[] reasonArgs)
+		private static string GetNeatDuration(int durationAmount, DurationUnit durationUnit)
 		{
-			string punishReason;
-			if (reasonArgs.Length > 1)
+			if (durationAmount != 1)
 			{
-				punishReason = "";
-				int length = reasonArgs.Length;
-				for (int idx = 0; idx < length; idx++)
-				{
-					string word = reasonArgs[idx];
-
-					punishReason += word;
-					if (idx < (length - 1))
-					{
-						punishReason += " ";
-					}
-				}
-			}
-			else if (reasonArgs.Length == 1)
-			{
-				punishReason = reasonArgs[0];
+				return $"{durationAmount} {durationUnit}";
 			}
 			else
+			{
+				string unitString = durationUnit.ToString();
+				if (unitString.EndsWith("s"))
+				{
+					unitString = unitString.Substring(0, unitString.Length - 1);
+				}
+
+				return $"{durationAmount} {unitString}";
+			}
+		}
+
+		private static string[] ParseExpiryTime(MiNET.Player player, string[] args, out DurationUnit durationUnit, out int durationAmount)
+		{
+			durationAmount = -1;
+			durationUnit = DurationUnit.Permanent;
+			if (args.Length > 0)
+			{
+				string expiryString = args[0];
+				if (expiryString.Length > 0)
+				{
+					switch (expiryString.ToUpper())
+					{
+						case "FOREVER":
+						case "PERM":
+						case "PERMANENT":
+						{
+							durationAmount = 0;
+							//DurationUnit is already correct.	
+							break;
+						}
+						default:
+						{
+							if (args[0].Any(char.IsDigit))
+							{
+								string amountString = "";
+								for (int idx = 0; idx < expiryString.Length; idx++)
+								{
+									char charAt = expiryString[idx];
+									if (durationAmount == -1 && Char.IsDigit(charAt))
+									{
+										amountString += charAt;
+										continue;
+									}
+
+									string remainingUnitString = expiryString.Substring(idx, expiryString.Length - idx);
+									if (Enum.TryParse(remainingUnitString, out durationUnit))
+									{
+										break;
+									}
+									switch (remainingUnitString.ToLower())
+									{
+										case "m":
+											durationUnit = DurationUnit.Minutes;
+											break;
+										case "h":
+											durationUnit = DurationUnit.Hours;
+											break;
+										case "d":
+											durationUnit = DurationUnit.Days;
+											break;
+										case "w":
+											durationUnit = DurationUnit.Weeks;
+											break;
+										case "mon":
+											durationUnit = DurationUnit.Months;
+											break;
+										case "y":
+											durationUnit = DurationUnit.Years;
+											break;
+									}
+
+									if (durationUnit == DurationUnit.Permanent)
+									{
+										player.SendMessage($"§cUnable to parse expiryString unit '{expiryString.Substring(idx, expiryString.Length)}' from '{expiryString}'.");
+										return null;
+									}
+								}
+
+								if (!int.TryParse(amountString, out durationAmount))
+								{
+									player.SendMessage($"§cUnable to parse expiryString amount '{amountString}' from '{expiryString}'.");
+									return null;
+								}
+
+								if (durationAmount <= 0)
+								{
+									player.SendMessage($"§cInvalid duration: '{durationAmount} {durationUnit}'.");
+									return null;
+								}
+							}
+							break;
+						}
+					}
+
+					if (durationAmount > 0)
+					{
+						//Update args to remove the first entry
+						if (args.Length > 1)
+						{
+							args = args.Skip(1).ToArray(); //Skip the first entry
+						}
+						else
+						{
+							args = new string[0]; //No more args
+						}
+					}
+				}
+
+				//Handles Perm ban amount
+				if (durationAmount == -1)
+				{
+					durationAmount = 0;
+				}
+			}
+			
+			return args;
+		}
+
+		private static string GetReasonFromArgs(string[] reasonArgs)
+		{
+			string punishReason = null;
+			if (reasonArgs != null)
+			{
+				if (reasonArgs.Length > 1)
+				{
+					punishReason = "";
+					int length = reasonArgs.Length;
+					for (int idx = 0; idx < length; idx++)
+					{
+						string word = reasonArgs[idx];
+
+						punishReason += word;
+						if (idx < (length - 1))
+						{
+							punishReason += " ";
+						}
+					}
+				}
+				else if (reasonArgs.Length == 1)
+				{
+					punishReason = reasonArgs[0];
+				}
+			}
+
+			if (punishReason == null)
 			{
 				punishReason = "No Reason Provided.";
 			}

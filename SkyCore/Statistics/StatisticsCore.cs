@@ -64,7 +64,7 @@ namespace SkyCore.Statistics
 						(dataRow, batchItem) =>
 						{
 							dataRow["player_xuid"] = batchItem.Key;
-							dataRow["punish_type"] = batchItem.Value;
+							dataRow["current_name"] = batchItem.Value;
 							return true;
 						},
 						null,

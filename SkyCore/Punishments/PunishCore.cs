@@ -133,9 +133,19 @@ namespace SkyCore.Punishments
 				return 0;
 			}
 
+			if (!Active && pObj.Active)
+			{
+				return -1; //Order after
+			}
+			
 			if (DurationUnit == DurationUnit.Permanent)
 			{
-				return 1; //Order First;
+				if (pObj.DurationUnit == DurationUnit.Permanent)
+				{
+					//Order by issue date
+					return Expiry.CompareTo(pObj.Expiry);
+				}
+				return -1; //Order First;
 			}
 
 			return Expiry.CompareTo(pObj.Expiry);
@@ -165,6 +175,9 @@ namespace SkyCore.Punishments
 
 		public void AddPunishment(PunishmentType punishmentType, Punishment punishment)
 		{
+			//Deactivate existing punishment if exists
+			RemoveActive(punishmentType);
+			
 			SortedSet<Punishment> punishments;
 			if (Punishments.ContainsKey(punishmentType))
 			{
@@ -197,6 +210,7 @@ namespace SkyCore.Punishments
 			{
 				SkyUtil.log("Contains at least one ban");
 				SortedSet<Punishment> punishments = Punishments[punishmentType];
+				SkyUtil.log($"Punishments (in order):\n -{string.Join("\n -", (from o in punishments select o.ToString()).ToArray())}");
 				if (punishments.Count == 0)
 				{
 					SkyUtil.log("Doesnt?");
@@ -323,7 +337,7 @@ namespace SkyCore.Punishments
 
 								//Ensure this punishment is still active
 								if (punishment.IsActive() && punishment.DurationUnit != DurationUnit.Permanent && 
-									currentTime.CompareTo(punishment.Expiry) <= 0) //TODO: Check if this is correct
+									currentTime.CompareTo(punishment.Expiry) >= 0) //TODO: Check if this is correct
 								{
 									SkyUtil.log($"Marking {StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} as inactive (expired)");
 									punishment.Active = false;
@@ -462,6 +476,7 @@ namespace SkyCore.Punishments
 									else
 									{
 										punishments = new SortedSet<Punishment>();
+										punishmentMap.Add(punishmentType, punishments);
 									}
 
 									int durationAmount = reader.GetInt16(4);
@@ -469,8 +484,6 @@ namespace SkyCore.Punishments
 
 									punishments.Add(new Punishment(reader.GetString(2), reader.GetString(1), reader.GetBoolean(3), durationAmount, durationUnit,
 										GetExpiryFromIssueDate(reader.GetDateTime(6), durationAmount, durationUnit)));
-
-									punishmentMap.Add(punishmentType, punishments);
 								}
 								catch (Exception e)
 								{
