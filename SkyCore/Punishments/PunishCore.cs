@@ -197,7 +197,12 @@ namespace SkyCore.Punishments
 			Punishment activePunishment = GetActive(punishmentType);
 			if (activePunishment != null)
 			{
-				activePunishment.Active = false;
+				if (activePunishment.Active)
+				{
+					activePunishment.Active = false;
+					activePunishment.Dirty = true;
+				}
+				
 				return true;
 			}
 
@@ -335,8 +340,13 @@ namespace SkyCore.Punishments
 									continue;
 								}
 
+								if (!punishment.IsActive())
+								{
+									continue;
+								}
+
 								//Ensure this punishment is still active
-								if (punishment.IsActive() && punishment.DurationUnit != DurationUnit.Permanent && 
+								if (punishment.DurationUnit != DurationUnit.Permanent && 
 									currentTime.CompareTo(punishment.Expiry) >= 0) //TODO: Check if this is correct
 								{
 									SkyUtil.log($"Marking {StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} as inactive (expired)");
