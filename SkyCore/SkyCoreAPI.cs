@@ -298,6 +298,12 @@ namespace SkyCore
             {
                 return message;
             }
+
+	        if (PunishCore.GetPunishmentsFor(player.CertificateData.ExtraData.Xuid).HasActive(PunishmentType.Mute))
+	        {
+				player.SendMessage("§c§l(!)§r §cYou cannot chat while you are muted.");
+		        return null;
+	        }
             
             text = TextUtils.RemoveFormatting(text);
 

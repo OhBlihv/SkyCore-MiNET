@@ -399,13 +399,32 @@ namespace SkyCore.Punishments
 			PunishmentUpdateThread.Abort();
 		}
 
+		/// <summary>
+		/// Simplified version of AddPunishment with only paramaters
+		/// relevant to Kicks
+		/// </summary>
+		/// <param name="xuid"></param>
+		/// <param name="reason"></param>
+		/// <param name="issuerXuid"></param>
+		public static void AddKick(string xuid, string reason, string issuerXuid)
+		{
+			AddPunishment(xuid, PunishmentType.Kick, new Punishment(
+				reason, issuerXuid, false, 0, DurationUnit.Permanent, DateTime.Now
+			));
+		}
+
 		public static void AddPunishment(string xuid, PunishmentType punishmentType, Punishment punishment)
 		{
 			PlayerPunishments playerPunishments = GetPunishmentsFor(xuid);
 
 			playerPunishments.AddPunishment(punishmentType, punishment);
 			punishment.Dirty = true; //Flag for db saving
-			punishment.Active = true; //Set active by default
+
+			//Ban/Mute have durations, must be held active
+			if (punishmentType != PunishmentType.Kick)
+			{
+				punishment.Active = true; //Set active by default
+			}
 		}
 
 		public static PlayerPunishments GetPunishmentsFor(string xuid)
