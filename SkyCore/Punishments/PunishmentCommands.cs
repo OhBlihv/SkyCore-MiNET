@@ -27,77 +27,7 @@ namespace SkyCore.Punishments
 
 			RunnableTask.RunTask(() =>
 			{
-				string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
-				if (targetXuid == null)
-				{
-					player.SendMessage($"§c{playerName} has never played before.");
-					return;
-				}
-
-				args = ParseExpiryTime(player, args, out DurationUnit durationUnit, out int durationAmount);
-				if (args == null)
-				{
-					return; //Message printed to player
-				}
-	
-				string punishReason = GetReasonFromArgs(args);
-
-				DateTime expiry = DateTime.Now;
-				switch (durationUnit)
-				{
-					case DurationUnit.Permanent:
-					{
-						break; //Expiry is issue date
-					}
-					case DurationUnit.Minutes:
-					{
-						expiry = expiry.AddMinutes(durationAmount);
-						break;
-					}
-					case DurationUnit.Hours:
-					{
-						expiry = expiry.AddHours(durationAmount);
-						break;
-					}
-					case DurationUnit.Days:
-					{
-						expiry = expiry.AddDays(durationAmount);
-						break;
-					}
-					case DurationUnit.Weeks:
-					{
-						expiry = expiry.AddDays(durationAmount * 7);
-						break;
-					}
-					case DurationUnit.Months:
-					{
-						expiry = expiry.AddMonths(durationAmount);
-						break;
-					}
-					case DurationUnit.Years:
-					{
-						expiry = expiry.AddYears(durationAmount);
-						break;
-					}
-				}
-
-				PunishCore.AddPunishment(targetXuid, PunishmentType.Ban, new Punishment(punishReason, player.CertificateData.ExtraData.Xuid, true, durationAmount, durationUnit, expiry));
-
-				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
-				if (durationUnit == DurationUnit.Permanent)
-				{
-					player.SendMessage($"§c{playerName} has been banned permanently: {punishReason}");
-
-					target?.Disconnect($"§cYou have been banned permanently.\n" +
-					                   $"§6Reason: {punishReason}");
-				}
-				else
-				{
-					player.SendMessage($"§c{playerName} has been banned for {GetNeatDuration(durationAmount, durationUnit)}: {punishReason}");
-
-					target?.Disconnect($"§cYou have been banned for {GetNeatDuration(durationAmount, durationUnit)}\n" +
-					                   $"§6Reason: {punishReason}");
-				}
+				RunPunishmentCommand(player, PunishmentType.Ban, playerName, args);
 			});
 		}
 
@@ -135,7 +65,7 @@ namespace SkyCore.Punishments
 		[Authorize(Permission = CommandPermission.Operator)]
 		public void CommandKick(MiNET.Player player, string playerName, string[] reason)
 		{
-			if (!((SkyPlayer)player).PlayerGroup.isAtLeast(PlayerGroup.Mod))
+			if (!((SkyPlayer)player).PlayerGroup.isAtLeast(PlayerGroup.Helper))
 			{
 				player.SendMessage("§cInsufficient Permission.");
 				return;
@@ -162,6 +92,93 @@ namespace SkyCore.Punishments
 			});
 		}
 
+		[Command(Name = "mute")]
+		[Authorize(Permission = CommandPermission.Operator)]
+		public void CommandMute(MiNET.Player player, string playerName, params string[] args)
+		{
+			if (!((SkyPlayer)player).PlayerGroup.isAtLeast(PlayerGroup.Helper))
+			{
+				player.SendMessage("§cInsufficient Permission.");
+				return;
+			}
+
+			RunnableTask.RunTask(() =>
+			{
+				RunPunishmentCommand(player, PunishmentType.Mute, playerName, args);
+			});
+		}
+
+		[Command(Name = "unmute")]
+		[Authorize(Permission = CommandPermission.Operator)]
+		public void CommandUnmute(MiNET.Player player, string playerName)
+		{
+			if (!((SkyPlayer)player).PlayerGroup.isAtLeast(PlayerGroup.Mod))
+			{
+				player.SendMessage("§cInsufficient Permission.");
+				return;
+			}
+
+			RunnableTask.RunTask(() =>
+			{
+				string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
+				if (targetXuid == null)
+				{
+					player.SendMessage($"§c{playerName} has never played before.");
+					return;
+				}
+
+				if (PunishCore.GetPunishmentsFor(targetXuid).RemoveActive(PunishmentType.Mute))
+				{
+					player.SendMessage($"§eUnmuted {playerName}");
+				}
+				else
+				{
+					player.SendMessage($"§c{playerName} is not currently muted.");
+				}
+			});
+		}
+
+		private static void RunPunishmentCommand(MiNET.Player player, PunishmentType punishmentType, String playerName, string[] args)
+		{
+			string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
+			if (targetXuid == null)
+			{
+				player.SendMessage($"§c{playerName} has never played before.");
+				return;
+			}
+
+			args = ParseExpiryTime(player, args, out DurationUnit durationUnit, out int durationAmount);
+			if (args == null)
+			{
+				return; //Message printed to player
+			}
+
+			string punishReason = GetReasonFromArgs(args);
+
+			DateTime expiry = UpdateExpiryTime(durationUnit, durationAmount);
+
+			PunishCore.AddPunishment(targetXuid, punishmentType, new Punishment(punishReason, player.CertificateData.ExtraData.Xuid, true, durationAmount, durationUnit, expiry));
+
+			if (punishmentType == PunishmentType.Ban)
+			{
+				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
+				if (durationUnit == DurationUnit.Permanent)
+				{
+					player.SendMessage($"§c{playerName} has been banned permanently: {punishReason}");
+
+					target?.Disconnect($"§cYou have been banned permanently.\n" +
+					                   $"§6Reason: {punishReason}");
+				}
+				else
+				{
+					player.SendMessage($"§c{playerName} has been banned for {GetNeatDuration(durationAmount, durationUnit)}: {punishReason}");
+
+					target?.Disconnect($"§cYou have been banned for {GetNeatDuration(durationAmount, durationUnit)}\n" +
+					                   $"§6Reason: {punishReason}");
+				}
+			}
+		}
+
 		private static string GetNeatDuration(int durationAmount, DurationUnit durationUnit)
 		{
 			if (durationAmount != 1)
@@ -178,6 +195,50 @@ namespace SkyCore.Punishments
 
 				return $"{durationAmount} {unitString}";
 			}
+		}
+
+		private static DateTime UpdateExpiryTime(DurationUnit durationUnit, int durationAmount)
+		{
+			DateTime expiry = DateTime.Now;
+			switch (durationUnit)
+			{
+				case DurationUnit.Permanent:
+				{
+					break; //Expiry is issue date
+				}
+				case DurationUnit.Minutes:
+				{
+					expiry = expiry.AddMinutes(durationAmount);
+					break;
+				}
+				case DurationUnit.Hours:
+				{
+					expiry = expiry.AddHours(durationAmount);
+					break;
+				}
+				case DurationUnit.Days:
+				{
+					expiry = expiry.AddDays(durationAmount);
+					break;
+				}
+				case DurationUnit.Weeks:
+				{
+					expiry = expiry.AddDays(durationAmount * 7);
+					break;
+				}
+				case DurationUnit.Months:
+				{
+					expiry = expiry.AddMonths(durationAmount);
+					break;
+				}
+				case DurationUnit.Years:
+				{
+					expiry = expiry.AddYears(durationAmount);
+					break;
+				}
+			}
+
+			return expiry;
 		}
 
 		private static string[] ParseExpiryTime(MiNET.Player player, string[] args, out DurationUnit durationUnit, out int durationAmount)
