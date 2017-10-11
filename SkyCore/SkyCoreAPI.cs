@@ -95,7 +95,8 @@ namespace SkyCore
                     level.BlockBreak += LevelOnBlockBreak;
                     level.BlockPlace += LevelOnBlockPlace;
 
-	                level.CurrentWorldTime = 6000; //Midday
+	                level.CurrentWorldTime = 22000; //Sunrise?
+	                SkyUtil.log($"Set world time to {level.CurrentWorldTime}");
                 }
             };
 

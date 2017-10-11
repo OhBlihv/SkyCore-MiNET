@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using MiNET.Effects;
+using MiNET.Items;
 using MiNET.Worlds;
 using SkyCore.Game;
 using SkyCore.Game.Level;
@@ -78,6 +82,14 @@ namespace SkyCore.Games.Hub
 			}
 
 			player.SpawnLevel(_hubLevel, _hubLevel.SpawnPoint);
+
+			NightVision nightVision = new NightVision
+			{
+				Duration = int.MaxValue,
+				Level = 0,
+				Particles = false
+			};
+			player.SetEffect(nightVision);
 		}
 
 		public override void CheckCapacity()

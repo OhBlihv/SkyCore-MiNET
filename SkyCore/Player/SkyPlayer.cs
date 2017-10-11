@@ -258,33 +258,22 @@ namespace SkyCore.Player
 
                 IsSpawned = true;
 
-	            try
+	            SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
+				//Add this player to any games if available and if this is the only game available
+	            if (SkyCoreAPI.Instance.GameModes.Count == 1)
 	            {
-		            //Add this player to any games if available and if this is the only game available
-		            if (!SkyCoreApi.GameType.Equals("hub") && SkyCoreAPI.Instance.GameModes.Count <= 2)
+		            //Foreach, but only one value.
+		            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
 		            {
-			            //Foreach, but only one value.
-			            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
-			            {
-				            if (coreGameController is HubCoreController)
-				            {
-					            continue;
-				            }
-
-				            coreGameController.InstantQueuePlayer(this);
-				            break;
-			            }
+			            SkyUtil.log("Queueing for " + coreGameController.GameName);
+			            coreGameController.InstantQueuePlayer(this);
+			            break;
 		            }
-	            }
-	            catch (Exception e)
-	            {
-		            Console.WriteLine(e);
 	            }
 			}
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw;
             }
         }
 

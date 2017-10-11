@@ -39,9 +39,9 @@ namespace SkyCore.Permissions
 			{
 				new DatabaseAction().Query(
 					"CREATE TABLE IF NOT EXISTS `player_groups` (\n" +
-					"`player_xuid`       varchar(50),\n" +
-					"`group_name`        varchar(50),\n" +
-					" PRIMARY KEY(`player_xuid`)\n" +
+						"`player_xuid`       varchar(50),\n" +
+						"`group_name`        varchar(50),\n" +
+						" PRIMARY KEY(`player_xuid`)\n" +
 					");",
 					null, null, null);
 			});
