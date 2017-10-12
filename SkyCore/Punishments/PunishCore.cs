@@ -133,9 +133,13 @@ namespace SkyCore.Punishments
 				return 0;
 			}
 
+			if (Active && !pObj.Active)
+			{
+				return -1; //Order Before
+			}
 			if (!Active && pObj.Active)
 			{
-				return -1; //Order after
+				return 1; //Order after
 			}
 			
 			if (DurationUnit == DurationUnit.Permanent)

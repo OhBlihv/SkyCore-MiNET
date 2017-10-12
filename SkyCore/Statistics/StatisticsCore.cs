@@ -42,7 +42,7 @@ namespace SkyCore.Statistics
 				new DatabaseAction().Query(
 					"CREATE TABLE IF NOT EXISTS `player_global_stats` (\n" +
 						"`player_xuid`       varchar(32),\n" +
-						"`first_join`        DATETIME(1) DEFAULT CURRENT_TIMESTAMP,\n" +
+						"`first_join`        DATETIME(1) NOT NULL,\n" +
 						"`experience`        INT(4) DEFAULT 0,\n" +
 						"`coins`             INT(4) DEFAULT 0,\n" +
 						"PRIMARY KEY(`player_xuid`)\n" +
@@ -66,8 +66,8 @@ namespace SkyCore.Statistics
 						"VALUES\n" +
 							"  (@player_xuid, @current_name)\n" +
 						"ON DUPLICATE KEY UPDATE\n" +
-							"  `player_xuid`		= VALUES(`player_xuid`),\n" +
-							"  `current_name`		= VALUES(`current_name`);",
+							"  `player_xuid`	= VALUES(`player_xuid`),\n" +
+							"  `current_name`	= VALUES(`current_name`);",
 						"player_info",
 						(parameters) =>
 						{
@@ -91,17 +91,19 @@ namespace SkyCore.Statistics
 					{
 						new DatabaseBatch<string>(
 							"INSERT IGNORE INTO `player_global_stats`\n" +
-							"  (`player_xuid`)\n" +
+							"  (`player_xuid`, `first_join`)\n" +
 							"VALUES\n" +
-							"  (@player_xuid);",
+							"  (@player_xuid, @first_join);",
 							"player_info",
 							(parameters) =>
 							{
 								parameters.Add("@player_xuid", MySqlDbType.VarChar, 32, "player_xuid");
+								parameters.Add("@first_join", MySqlDbType.DateTime, 32, "first_join");
 							},
 							(dataRow, batchItem) =>
 							{
 								dataRow["player_xuid"] = batchItem;
+								dataRow["first_join"] = DateTime.Now;
 								return true;
 							},
 							null,
