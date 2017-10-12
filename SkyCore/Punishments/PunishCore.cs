@@ -320,7 +320,7 @@ namespace SkyCore.Punishments
 
 				while (!SkyCoreAPI.IsDisabled)
 				{
-					Thread.Sleep(15000); //15 Second Delay
+					Thread.Sleep(60000); //60 Second Delay
 
 					List<PendingUpdatePunishment> pendingUpdates = new List<PendingUpdatePunishment>();
 
