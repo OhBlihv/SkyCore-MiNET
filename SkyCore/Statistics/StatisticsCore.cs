@@ -22,6 +22,9 @@ namespace SkyCore.Statistics
 
 		private static readonly ISet<KeyValuePair<string, string>> PendingNameUpdates = new HashSet<KeyValuePair<string, string>>();
 
+		//TODO: Temp - First Join
+		private static readonly ISet<string> PendingFirstJoinXuids = new HashSet<string>();
+
 		private static readonly Thread StatisticUpdateThread;
 
 		static StatisticsCore()
@@ -32,7 +35,17 @@ namespace SkyCore.Statistics
 					"CREATE TABLE IF NOT EXISTS `player_info` (\n" +
 						"`player_xuid`       varchar(32),\n" +
 						"`current_name`      varchar(16),\n" +
-						" PRIMARY KEY(`player_xuid`)\n" +
+						"PRIMARY KEY(`player_xuid`)\n" +
+					");",
+					null, null, null);
+
+				new DatabaseAction().Query(
+					"CREATE TABLE IF NOT EXISTS `player_global_stats` (\n" +
+						"`player_xuid`       varchar(32),\n" +
+						"`first_join`        DATETIME(1) DEFAULT CURRENT_TIMESTAMP,\n" +
+						"`experience`        INT(4) DEFAULT 0,\n" +
+						"`coins`             INT(4) DEFAULT 0,\n" +
+						"PRIMARY KEY(`player_xuid`)\n" +
 					");",
 					null, null, null);
 			});
@@ -73,6 +86,30 @@ namespace SkyCore.Statistics
 
 						PendingNameUpdates.Clear(); //Reset
 					}
+
+					if (PendingFirstJoinXuids.Count > 0)
+					{
+						new DatabaseBatch<string>(
+							"INSERT IGNORE INTO `player_global_stats`\n" +
+							"  (`player_xuid`)\n" +
+							"VALUES\n" +
+							"  (@player_xuid);",
+							"player_info",
+							(parameters) =>
+							{
+								parameters.Add("@player_xuid", MySqlDbType.VarChar, 32, "player_xuid");
+							},
+							(dataRow, batchItem) =>
+							{
+								dataRow["player_xuid"] = batchItem;
+								return true;
+							},
+							null,
+							new HashSet<string>(PendingFirstJoinXuids)
+						).ExecuteBatch();
+
+						PendingFirstJoinXuids.Clear(); //Reset
+					}
 				}
 			});
 			StatisticUpdateThread.Start();
@@ -106,6 +143,9 @@ namespace SkyCore.Statistics
 			{
 				XuidToName.TryAdd(xuid, currentName);
 				NameToXuid.TryAdd(currentName, xuid);
+				
+				//Attempt to store first join
+				PendingFirstJoinXuids.Add(xuid);
 			}
 
 			if (updateDb)
