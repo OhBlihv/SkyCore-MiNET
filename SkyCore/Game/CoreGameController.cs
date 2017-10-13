@@ -52,9 +52,7 @@ namespace SkyCore.Game
             
             foreach(var levelName in levelNames)
             {
-                //string fullLevelPath = SkyCoreAPI.ServerPath + "\\..\\worlds\\" + gameName + "\\" + levelName;
                 string fullLevelPath = "C:\\Users\\Administrator\\Desktop\\worlds\\" + gameName + "\\" + levelName;
-                //string fullLevelPath = gameName + "\\" + levelName;
 
                 LevelNames.Add(fullLevelPath);
 
@@ -90,6 +88,13 @@ namespace SkyCore.Game
         {
             try
             {
+	            if (SkyCoreAPI.IsRebootQueued)
+	            {
+		            //Disable game-creation ticks
+		            Close();
+		            return;
+	            }
+	            
                 CoreGameTick();
             }
             catch (Exception e)
@@ -98,17 +103,17 @@ namespace SkyCore.Game
             }
         }
 
-		protected int _tick = 1;
+		protected int Tick = 1;
 
         protected virtual void CoreGameTick()
         {
-			if (++_tick % 10 == 0)
+			if (++Tick % 10 == 0)
 			{
 				CheckCapacity();
 			}
 
             //SkyUtil.log("Ticking Core");
-            if (QueuedPlayers.IsEmpty && _tick % 20 != 0)
+            if (QueuedPlayers.IsEmpty && Tick % 20 != 0)
             {
                 return;
             }
@@ -162,9 +167,6 @@ namespace SkyCore.Game
                 SkyUtil.log("Attempting to create a game to satisfy demand");
                 //Register a fresh controller
                 GetGameController();
-
-                //Try again
-                //CoreGameTick(); //Avoid an infinite loop for now. Wait the extra 499 milliseconds
             }
         }
 
@@ -183,18 +185,6 @@ namespace SkyCore.Game
 
 				    SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
 				    gameLevel.AddPlayer(player);
-
-					//Need to find something that indicates this player is loaded
-					/*if (player.Level != null)
-				    {
-					    SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
-					    gameLevel.AddPlayer(player);
-				    }
-				    else
-				    {
-					    //Re-queue this player :(
-					    QueuedPlayers.Enqueue(player);
-				    }*/
 				}
 		    }
 		}
@@ -229,10 +219,13 @@ namespace SkyCore.Game
 					GameLevels.TryRemove(gameLevel.GameId, out _);
 				}
 			}
+			
+			SkyUtil.log("Current Games " + availableGames.Count);
 
 			if (availableGames.Count == 0)
 			{
 				GetGameController(); //Create a new game for the pool
+				SkyUtil.log("Creating new game");
 			}
 			//Clean up unnecessary games
 			else if (availableGames.Count >= 5)

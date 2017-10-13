@@ -24,6 +24,7 @@ using SkyCore.Games.Murder;
 using SkyCore.Permissions;
 using SkyCore.Player;
 using SkyCore.Punishments;
+using SkyCore.Restart;
 using SkyCore.Statistics;
 using SkyCore.Util;
 
@@ -34,6 +35,8 @@ namespace SkyCore
         
         public static SkyCoreAPI Instance { get; set; }
 
+	    public static bool IsRebootQueued { get; set; }
+	    
 		public static bool IsDisabled { get; private set; }
         
         public static string ServerPath { get; private set; }
@@ -48,7 +51,7 @@ namespace SkyCore
 
         public readonly ConcurrentDictionary<string, CoreGameController> GameModes = new ConcurrentDictionary<string, CoreGameController>();
 
-		private readonly List<PendingTask> PendingTasks = new List<PendingTask>();
+		private readonly List<PendingTask> _pendingTasks = new List<PendingTask>();
 		public delegate void PendingTask();
 		private bool _shouldSchedule = true;
 		public void AddPendingTask(PendingTask pendingTask)
@@ -59,7 +62,7 @@ namespace SkyCore
 			}
 			else
 			{
-				PendingTasks.Add(pendingTask);
+				_pendingTasks.Add(pendingTask);
 			}
 		}
 
@@ -115,9 +118,9 @@ namespace SkyCore
 				}
 				player.PlayerLeave += OnPlayerLeave;
 
-				if (PendingTasks.Count > 0)
+				if (_pendingTasks.Count > 0)
 				{
-					foreach (PendingTask pendingTask in PendingTasks)
+					foreach (PendingTask pendingTask in _pendingTasks)
 					{
 						RunnableTask.RunTaskLater(() =>
 						{
@@ -125,7 +128,7 @@ namespace SkyCore
 						}, 5000);
 					}
 
-					PendingTasks.Clear();
+					_pendingTasks.Clear();
 				}
 
 				/*ThreadPool.QueueUserWorkItem(state =>
@@ -152,7 +155,10 @@ namespace SkyCore
 				});*/
 			};
 
-            SkyUtil.log("Initialized!");
+			//Start RestartHandler
+	        RestartHandler.Start();
+
+			SkyUtil.log("Initialized!");
 
             ThreadPool.QueueUserWorkItem(state =>
             {
@@ -349,8 +355,13 @@ namespace SkyCore
 
 		    if (level == null)
 		    {
-			    Console.WriteLine("§c§l(!) §r§cUnable to find level Overworld/world. Returning 0th level.");
-			    return Context.LevelManager.Levels[0];
+			    if (Context.LevelManager.Levels.Count > 0)
+			    {
+					Console.WriteLine("§c§l(!) §r§cUnable to find level Overworld/world. Returning 0th level.");
+				    return Context.LevelManager.Levels[0];
+				}
+
+			    return null;
 		    }
 
 		    return level;

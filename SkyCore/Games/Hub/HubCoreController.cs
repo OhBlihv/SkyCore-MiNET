@@ -15,11 +15,11 @@ namespace SkyCore.Games.Hub
 	public class HubCoreController : CoreGameController
 	{
 
-		private Level _hubLevel = null;
+		private Level _hubLevel;
 
 		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>())
 		{
-			_tick = 1;
+			Tick = 1;
 		}
 
 		protected override GameLevel _getGameController()
@@ -29,21 +29,26 @@ namespace SkyCore.Games.Hub
 
 		protected override void CoreGameTick()
 		{
-			if(_hubLevel == null)
+			int playerCount = 0;
+			if (_hubLevel == null)
 			{
-				return;
+				_hubLevel = SkyCoreAPI.Instance.GetHubLevel();
 			}
-
-			//Update BarHandlers for all online players every 500 milliseconds (10 ticks)
-			if (++_tick % 10 == 0)
+			else
 			{
-				foreach (SkyPlayer player in _hubLevel.Players.Values)
+				playerCount = _hubLevel.PlayerCount;
+
+				//Update BarHandlers for all online players every 500 milliseconds (10 ticks)
+				if (++Tick % 10 == 0 && _hubLevel != null)
 				{
-					player.BarHandler?.DoTick();
+					foreach (SkyPlayer player in _hubLevel.Players.Values)
+					{
+						player.BarHandler?.DoTick();
+					}
 				}
 			}
 
-			if (_tick % 100 != 0)
+			if (Tick % 20 != 0)
 			{
 				return; //Only update player counts every 100 ticks (5 seconds)
 			}
@@ -56,6 +61,7 @@ namespace SkyCore.Games.Hub
 					SkyUtil.log($"Game Not Registered! '{RawName}'. Contains: {ExternalGameHandler.GameRegistrations.Keys}");
 					return;
 				}
+				
 				instanceInfo = ExternalGameHandler.GameRegistrations[RawName].GetLocalInstance();
 			}
 			catch (Exception e)
@@ -64,9 +70,9 @@ namespace SkyCore.Games.Hub
 				return;
 			}
 
-			instanceInfo.CurrentPlayers = _hubLevel.PlayerCount;
-			//TODO: Improve?
-			instanceInfo.AvailableGames = new List<GameInfo> {new GameInfo("0", SkyCoreAPI.Instance.GetHubLevel().PlayerCount, 100)};
+			instanceInfo.CurrentPlayers = playerCount;
+			instanceInfo.AvailableGames = new List<GameInfo> {new GameInfo("0", playerCount, 100)};
+			instanceInfo.Update();
 		}
 
 		public override void QueuePlayer(SkyPlayer player)
