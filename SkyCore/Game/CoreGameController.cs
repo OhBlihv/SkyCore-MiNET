@@ -22,6 +22,8 @@ namespace SkyCore.Game
     public abstract class CoreGameController : IDisposable
     {
 
+	    public const int MaxGames = 30;
+
         protected readonly Random Random = new Random();
         
         public SkyCoreAPI Plugin { get; }
@@ -250,14 +252,19 @@ namespace SkyCore.Game
 
         public void GetGameController()
         {
-            GameLevel gameLevel = _getGameController();
+	        lock (GameLevels)
+	        {
+		        if (GameLevels.Count >= MaxGames)
+		        {
+			        return; //Cannot create any more games.
+		        }
 
-            if (gameLevel != null)
-			{
-				lock (GameLevels)
-				{
-					GameLevels.TryAdd(gameLevel.GameId, gameLevel);
-				}
+		        GameLevel gameLevel = _getGameController();
+
+		        if (gameLevel != null)
+		        {
+			        GameLevels.TryAdd(gameLevel.GameId, gameLevel);
+		        }
 			}
         }
 
