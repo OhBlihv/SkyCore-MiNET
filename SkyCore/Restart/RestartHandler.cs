@@ -18,7 +18,7 @@ namespace SkyCore.Restart
 	public class RestartHandler
 	{
 
-		private static readonly RestartTask RestartTask = new RestartTask(DateTime.Now.AddMinutes(1)); //Default to 5 minutes from now
+		private static readonly RestartTask RestartTask = new RestartTask(DateTime.Now.AddHours(12)); //Default to 12 hours from now
 		public static Timer Timer;
 
 		public static void Start()
@@ -153,7 +153,7 @@ namespace SkyCore.Restart
 
 				int secondsBetween = GetSecondDifference(currentTime, RestartTime);
 
-				Console.WriteLine($"({secondsBetween} Seconds To Reboot).", currentTime, RestartTime);
+				//Console.WriteLine($"({secondsBetween} Seconds To Reboot).", currentTime, RestartTime);
 
 				switch (secondsBetween)
 				{

@@ -454,13 +454,13 @@ namespace SkyCore.Game
 			if (!_gameInstances.ContainsKey(instanceKey))
 			{
 				_gameInstances.TryAdd(instanceKey, instanceInfo);
-				SkyUtil.log($"Added {instanceKey} to {GameName}'s Instance Pool ({instanceInfo.AvailableGames.Count} Games)");
+				//SkyUtil.log($"Added {instanceKey} to {GameName}'s Instance Pool ({instanceInfo.AvailableGames.Count} Games)");
 			}
 			else
 			{
 				//_gameInstances[instanceKey] = instanceInfo; //Update
 				_gameInstances[instanceKey].Update();
-				SkyUtil.log($"Updated {instanceKey} in {GameName}'s Instance Pool ({instanceInfo.AvailableGames.Count} Games)");
+				//SkyUtil.log($"Updated {instanceKey} in {GameName}'s Instance Pool ({instanceInfo.AvailableGames.Count} Games)");
 			}
 		}
 

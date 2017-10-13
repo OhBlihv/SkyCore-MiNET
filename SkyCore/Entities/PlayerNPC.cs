@@ -48,39 +48,6 @@ namespace SkyCore.Entities
             }
         }
 
-        /*public int Time = 0;
-
-        public int Minute = 0;
-
-        public override void OnTick()
-        {
-            Time++;
-            if (Time == 20)
-            {
-                Minute++;
-                if (Game != null)
-                {
-                    NameTag = NameString + Game.PlayerCount;
-                    BroadcastSetEntityData();
-
-                }
-                else
-                {
-                    if (LevelLobby.isGlobalLobby && NameString != null)
-                    {
-                        NameTag = string.Format(NameString, server.ServerInfo.NumberOfPlayers);
-                        BroadcastSetEntityData();
-                        if (Minute == 60)
-                        {
-                            Minute = 0;
-                            Level.BroadcastMessage(Plugin.Rm.get());
-                        }
-                    }
-                }
-                Time = 0;
-            }
-        }*/
-
         /*
          * Helper Methods
          */
@@ -152,24 +119,26 @@ namespace SkyCore.Entities
 					npc.SpawnEntity();
 				});
 
-				//Spawn a hologram with player counts //TODO: Split around the colon
-	            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, spawnLocation, gameName);
+	            {
+		            PlayerLocation playerCountLocation = (PlayerLocation) spawnLocation.Clone();
+		            
+					//Spawn a hologram with player counts
+		            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, playerCountLocation, gameName);
 
-	            hologram.BroadcastEntityEvent();
-	            hologram.BroadcastSetEntityData();
+					/*hologram.BroadcastEntityEvent();
+					hologram.BroadcastSetEntityData();*/
 
-	            SkyCoreAPI.Instance.AddPendingTask(() => hologram.SpawnEntity());
+					SkyCoreAPI.Instance.AddPendingTask(() => hologram.SpawnEntity());
+				}
 
 				{
 					PlayerLocation betaLocation = (PlayerLocation) spawnLocation.Clone();
-					betaLocation.Y += 2.80f;
+					betaLocation.Y += 2.9f;
 
-					//Spawn a hologram with player counts //TODO: Split around the colon
-					Hologram betaHologram = new Hologram(npcName, level, betaLocation);
-					betaHologram.SetNameTag("§e§lBETA");
+					Hologram betaHologram = new Hologram("§e§lBETA", level, betaLocation);
 
-					betaHologram.BroadcastEntityEvent();
-					betaHologram.BroadcastSetEntityData();
+					/*betaHologram.BroadcastEntityEvent();
+					betaHologram.BroadcastSetEntityData();*/
 
 					SkyCoreAPI.Instance.AddPendingTask(() => betaHologram.SpawnEntity());
 				}

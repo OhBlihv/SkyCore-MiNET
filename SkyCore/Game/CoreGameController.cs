@@ -222,12 +222,11 @@ namespace SkyCore.Game
 				}
 			}
 			
-			SkyUtil.log("Current Games " + availableGames.Count);
+			//SkyUtil.log("Current Games " + availableGames.Count);
 
 			if (availableGames.Count == 0)
 			{
 				GetGameController(); //Create a new game for the pool
-				SkyUtil.log("Creating new game");
 			}
 			//Clean up unnecessary games
 			else if (availableGames.Count >= 5)
