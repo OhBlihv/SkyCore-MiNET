@@ -58,67 +58,73 @@ namespace SkyCore.Statistics
 				{
 					Thread.Sleep(15000); //15 Second Delay
 
-					if (PendingNameUpdates.Count > 0)
-					{
-						new DatabaseBatch<KeyValuePair<string, string>>(
-						"INSERT INTO `player_info`\n" +
-							"  (`player_xuid`, `current_name`)\n" +
-						"VALUES\n" +
-							"  (@player_xuid, @current_name)\n" +
-						"ON DUPLICATE KEY UPDATE\n" +
-							"  `player_xuid`	= VALUES(`player_xuid`),\n" +
-							"  `current_name`	= VALUES(`current_name`);",
-						"player_info",
-						(parameters) =>
-						{
-							parameters.Add("@player_xuid", MySqlDbType.VarChar, 32, "player_xuid");
-							parameters.Add("@current_name", MySqlDbType.VarChar, 16, "current_name");
-						},
-						(dataRow, batchItem) =>
-						{
-							dataRow["player_xuid"] = batchItem.Key;
-							dataRow["current_name"] = batchItem.Value;
-							return true;
-						},
-						null,
-						new HashSet<KeyValuePair<string, string>>(PendingNameUpdates)
-						).ExecuteBatch();
-
-						PendingNameUpdates.Clear(); //Reset
-					}
-
-					if (PendingFirstJoinXuids.Count > 0)
-					{
-						new DatabaseBatch<string>(
-							"INSERT IGNORE INTO `player_global_stats`\n" +
-							"  (`player_xuid`, `first_join`)\n" +
-							"VALUES\n" +
-							"  (@player_xuid, @first_join);",
-							"player_info",
-							(parameters) =>
-							{
-								parameters.Add("@player_xuid", MySqlDbType.VarChar, 32, "player_xuid");
-								parameters.Add("@first_join", MySqlDbType.DateTime, 32, "first_join");
-							},
-							(dataRow, batchItem) =>
-							{
-								dataRow["player_xuid"] = batchItem;
-								dataRow["first_join"] = DateTime.Now;
-								return true;
-							},
-							null,
-							new HashSet<string>(PendingFirstJoinXuids)
-						).ExecuteBatch();
-
-						PendingFirstJoinXuids.Clear(); //Reset
-					}
+					RunUpdateTask();
 				}
 			});
 			StatisticUpdateThread.Start();
 		}
 
+		private static void RunUpdateTask()
+		{
+			if (PendingNameUpdates.Count > 0)
+			{
+				new DatabaseBatch<KeyValuePair<string, string>>(
+					"INSERT INTO `player_info`\n" +
+					"  (`player_xuid`, `current_name`)\n" +
+					"VALUES\n" +
+					"  (@player_xuid, @current_name)\n" +
+					"ON DUPLICATE KEY UPDATE\n" +
+					"  `player_xuid`	= VALUES(`player_xuid`),\n" +
+					"  `current_name`	= VALUES(`current_name`);",
+					"player_info",
+					(parameters) =>
+					{
+						parameters.Add("@player_xuid", MySqlDbType.VarChar, 32, "player_xuid");
+						parameters.Add("@current_name", MySqlDbType.VarChar, 16, "current_name");
+					},
+					(dataRow, batchItem) =>
+					{
+						dataRow["player_xuid"] = batchItem.Key;
+						dataRow["current_name"] = batchItem.Value;
+						return true;
+					},
+					null,
+					new HashSet<KeyValuePair<string, string>>(PendingNameUpdates)
+				).ExecuteBatch();
+
+				PendingNameUpdates.Clear(); //Reset
+			}
+
+			if (PendingFirstJoinXuids.Count > 0)
+			{
+				new DatabaseBatch<string>(
+					"INSERT IGNORE INTO `player_global_stats`\n" +
+					"  (`player_xuid`, `first_join`)\n" +
+					"VALUES\n" +
+					"  (@player_xuid, @first_join);",
+					"player_info",
+					(parameters) =>
+					{
+						parameters.Add("@player_xuid", MySqlDbType.VarChar, 32, "player_xuid");
+						parameters.Add("@first_join", MySqlDbType.DateTime, 32, "first_join");
+					},
+					(dataRow, batchItem) =>
+					{
+						dataRow["player_xuid"] = batchItem;
+						dataRow["first_join"] = DateTime.Now;
+						return true;
+					},
+					null,
+					new HashSet<string>(PendingFirstJoinXuids)
+				).ExecuteBatch();
+
+				PendingFirstJoinXuids.Clear(); //Reset
+			}
+		}
+
 		public static void Close()
 		{
+			RunUpdateTask(); //Force run the update task on the plugin thread before quitting
 			StatisticUpdateThread.Abort();
 		}
 

@@ -326,104 +326,110 @@ namespace SkyCore.Punishments
 				{
 					Thread.Sleep(60000); //60 Second Delay
 
-					List<PendingUpdatePunishment> pendingUpdates = new List<PendingUpdatePunishment>();
-
-					DateTime currentTime = DateTime.Now;
-					foreach (string playerXuid in PlayerPunishmentCache.Keys)
-					{
-						PlayerPunishments punishments = PlayerPunishmentCache[playerXuid];
-						foreach (PunishmentType punishmentType in punishments.Punishments.Keys)
-						{
-							foreach (Punishment punishment in punishments.Punishments[punishmentType])
-							{
-								if (punishment.Dirty)
-								{
-									punishment.Dirty = false;
-									pendingUpdates.Add(new PendingUpdatePunishment(playerXuid, punishmentType, punishment));
-									SkyUtil.log($"Marking {StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s {punishmentType} as non-dirty (saved)");
-									continue;
-								}
-
-								if (!punishment.IsActive())
-								{
-									continue;
-								}
-
-								//Ensure this punishment is still active
-								if (punishment.DurationUnit != DurationUnit.Permanent && 
-									currentTime.CompareTo(punishment.Expiry) >= 0) //TODO: Check if this is correct
-								{
-									SkyUtil.log($"Marking {StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} as inactive (expired)");
-									punishment.Active = false;
-
-									pendingUpdates.Add(new PendingUpdatePunishment(playerXuid, punishmentType, punishment));
-								}
-								else
-								{
-									if (punishment.DurationUnit == DurationUnit.Permanent)
-									{
-										SkyUtil.log($"{StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} is still active (PERMANENT)");
-									}
-									else
-									{
-										SkyUtil.log($"{StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} is still active ({punishment.Expiry.Subtract(currentTime).ToString()} Remaining)");
-									}
-								}
-							}
-						}
-					}
-
-					if (pendingUpdates.Count > 0)
-					{
-						new DatabaseBatch<PendingUpdatePunishment>(
-						"INSERT INTO `punishments`\n" +
-							"  (`player_xuid`, `punish_type`, `issuer`, `reason`, `active`, `duration_amount`, `duration_unit`, `issue_time`)\n" +
-						"VALUES\n" +
-							"  (@player_xuid, @punish_type, @issuer, @reason, @active, @duration_amount, @duration_unit, @issue_time)\n" +
-						"ON DUPLICATE KEY UPDATE\n" +
-							"  `player_xuid`		= VALUES(`player_xuid`),\n" +
-							"  `punish_type`		= VALUES(`punish_type`),\n" +
-							"  `issuer`				= VALUES(`issuer`),\n" +
-							"  `reason`				= VALUES(`reason`),\n" +
-							"  `active`				= VALUES(`active`),\n" +
-							"  `duration_amount`    = VALUES(`duration_amount`),\n" +
-							"  `duration_unit`      = VALUES(`duration_unit`),\n" +
-							"  `issue_time`			= VALUES(`issue_time`);",
-						"punishments",
-						(parameters) =>
-						{
-							parameters.Add("@player_xuid", MySqlDbType.VarChar, 50, "player_xuid");
-							parameters.Add("@punish_type", MySqlDbType.VarChar, 4, "punish_type");
-							parameters.Add("@issuer", MySqlDbType.VarChar, 50, "issuer");
-							parameters.Add("@reason", MySqlDbType.VarChar, 128, "reason");
-							parameters.Add("@active", MySqlDbType.Int16, 1, "active");
-							parameters.Add("@duration_amount", MySqlDbType.Int16, 2, "duration_amount");
-							parameters.Add("@duration_unit", MySqlDbType.VarChar, 10, "duration_unit");
-							parameters.Add("@issue_time", MySqlDbType.DateTime, 10, "issue_time");
-						},
-						(dataRow, batchItem) =>
-						{
-							dataRow["player_xuid"] = batchItem.PlayerXuid;
-							dataRow["punish_type"] = batchItem.PunishmentType.ToString();
-							dataRow["issuer"] = batchItem.Punishment.Issuer;
-							dataRow["reason"] = batchItem.Punishment.PunishReason;
-							dataRow["active"] = batchItem.Punishment.Active;
-							dataRow["duration_amount"] = batchItem.Punishment.DurationAmount;
-							dataRow["duration_unit"] = batchItem.Punishment.DurationUnit;
-							dataRow["issue_time"] = batchItem.Punishment.GetIssueDate();
-							return true;
-						},
-						null,
-						pendingUpdates
-						).ExecuteBatch();
-					}
+					RunUpdateTask();
 				}
 			});
 			PunishmentUpdateThread.Start();
 		}
 
+		private static void RunUpdateTask()
+		{
+			List<PendingUpdatePunishment> pendingUpdates = new List<PendingUpdatePunishment>();
+
+			DateTime currentTime = DateTime.Now;
+			foreach (string playerXuid in PlayerPunishmentCache.Keys)
+			{
+				PlayerPunishments punishments = PlayerPunishmentCache[playerXuid];
+				foreach (PunishmentType punishmentType in punishments.Punishments.Keys)
+				{
+					foreach (Punishment punishment in punishments.Punishments[punishmentType])
+					{
+						if (punishment.Dirty)
+						{
+							punishment.Dirty = false;
+							pendingUpdates.Add(new PendingUpdatePunishment(playerXuid, punishmentType, punishment));
+							SkyUtil.log($"Marking {StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s {punishmentType} as non-dirty (saved)");
+							continue;
+						}
+
+						if (!punishment.IsActive())
+						{
+							continue;
+						}
+
+						//Ensure this punishment is still active
+						if (punishment.DurationUnit != DurationUnit.Permanent &&
+							currentTime.CompareTo(punishment.Expiry) >= 0) //TODO: Check if this is correct
+						{
+							SkyUtil.log($"Marking {StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} as inactive (expired)");
+							punishment.Active = false;
+
+							pendingUpdates.Add(new PendingUpdatePunishment(playerXuid, punishmentType, punishment));
+						}
+						else
+						{
+							if (punishment.DurationUnit == DurationUnit.Permanent)
+							{
+								SkyUtil.log($"{StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} is still active (PERMANENT)");
+							}
+							else
+							{
+								SkyUtil.log($"{StatisticsCore.GetPlayerNameFromXuid(playerXuid)}'s active {punishmentType} is still active ({punishment.Expiry.Subtract(currentTime).ToString()} Remaining)");
+							}
+						}
+					}
+				}
+			}
+
+			if (pendingUpdates.Count > 0)
+			{
+				new DatabaseBatch<PendingUpdatePunishment>(
+				"INSERT INTO `punishments`\n" +
+					"  (`player_xuid`, `punish_type`, `issuer`, `reason`, `active`, `duration_amount`, `duration_unit`, `issue_time`)\n" +
+				"VALUES\n" +
+					"  (@player_xuid, @punish_type, @issuer, @reason, @active, @duration_amount, @duration_unit, @issue_time)\n" +
+				"ON DUPLICATE KEY UPDATE\n" +
+					"  `player_xuid`		= VALUES(`player_xuid`),\n" +
+					"  `punish_type`		= VALUES(`punish_type`),\n" +
+					"  `issuer`				= VALUES(`issuer`),\n" +
+					"  `reason`				= VALUES(`reason`),\n" +
+					"  `active`				= VALUES(`active`),\n" +
+					"  `duration_amount`    = VALUES(`duration_amount`),\n" +
+					"  `duration_unit`      = VALUES(`duration_unit`),\n" +
+					"  `issue_time`			= VALUES(`issue_time`);",
+				"punishments",
+				(parameters) =>
+				{
+					parameters.Add("@player_xuid", MySqlDbType.VarChar, 50, "player_xuid");
+					parameters.Add("@punish_type", MySqlDbType.VarChar, 4, "punish_type");
+					parameters.Add("@issuer", MySqlDbType.VarChar, 50, "issuer");
+					parameters.Add("@reason", MySqlDbType.VarChar, 128, "reason");
+					parameters.Add("@active", MySqlDbType.Int16, 1, "active");
+					parameters.Add("@duration_amount", MySqlDbType.Int16, 2, "duration_amount");
+					parameters.Add("@duration_unit", MySqlDbType.VarChar, 10, "duration_unit");
+					parameters.Add("@issue_time", MySqlDbType.DateTime, 10, "issue_time");
+				},
+				(dataRow, batchItem) =>
+				{
+					dataRow["player_xuid"] = batchItem.PlayerXuid;
+					dataRow["punish_type"] = batchItem.PunishmentType.ToString();
+					dataRow["issuer"] = batchItem.Punishment.Issuer;
+					dataRow["reason"] = batchItem.Punishment.PunishReason;
+					dataRow["active"] = batchItem.Punishment.Active;
+					dataRow["duration_amount"] = batchItem.Punishment.DurationAmount;
+					dataRow["duration_unit"] = batchItem.Punishment.DurationUnit;
+					dataRow["issue_time"] = batchItem.Punishment.GetIssueDate();
+					return true;
+				},
+				null,
+				pendingUpdates
+				).ExecuteBatch();
+			}
+		}
+
 		public static void Close()
 		{
+			RunUpdateTask(); //Run the update task on the plugin thread before closing
 			PunishmentUpdateThread.Abort();
 		}
 
