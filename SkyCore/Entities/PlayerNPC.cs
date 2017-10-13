@@ -111,15 +111,14 @@ namespace SkyCore.Entities
 						gameName = command.Split(':')[1];
 						action = player =>
                         {
-	                        //player.FreezePlayer = true; //Avoid movement //TODO: Set speed to 0
+	                        //Freeze the players movement
+	                        player.SetNoAi(true);
 							switch (gameName)
                             {
                                 case "murder":
-                                    player.SendMessage($"Queueing for {gameName}");
 									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
                                     break;
 								case "build-battle":
-									player.SendMessage($"Queueing for {gameName}");
 									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
 									break;
 								default:
