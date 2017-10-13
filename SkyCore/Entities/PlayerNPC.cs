@@ -10,6 +10,7 @@ using MiNET.Entities.Hostile;
 using MiNET.Net;
 using MiNET.Plugins;
 using MiNET.Utils;
+using MiNET.Utils.Skins;
 using MiNET.Worlds;
 using SkyCore.Entities.Holograms;
 using SkyCore.Game;
@@ -133,7 +134,7 @@ namespace SkyCore.Entities
 
 				{
 					PlayerLocation betaLocation = (PlayerLocation) spawnLocation.Clone();
-					betaLocation.Y += 2.9f;
+					betaLocation.Y += 2.8f;
 
 					Hologram betaHologram = new Hologram("§e§lBETA", level, betaLocation);
 
