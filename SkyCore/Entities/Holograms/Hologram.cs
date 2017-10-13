@@ -21,6 +21,11 @@ namespace SkyCore.Entities
 
         public virtual void SetNameTag(string nameTag)
         {
+	        if (nameTag.Equals(NameTag))
+	        {
+		        return; //No Change
+	        }
+	        
             NameTag = nameTag;
 
             BroadcastSetEntityData();
