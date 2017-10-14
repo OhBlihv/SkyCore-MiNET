@@ -31,9 +31,7 @@ namespace SkyCore.Games.Murder.Items
                         new NbtString("Name", "§r§c§lMurder Knife§r"),
                         new NbtList("Lore")
                         {
-                            new NbtString("§r§7Stick the pointy end toward innocents."),
-                            //new NbtString(),
-                            //new NbtString(),
+                            new NbtString("§r§7Stick the pointy end toward innocents.")
                         }
                     }
                 };

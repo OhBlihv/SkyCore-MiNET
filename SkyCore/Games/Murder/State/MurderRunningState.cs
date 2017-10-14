@@ -418,7 +418,8 @@ namespace SkyCore.Games.Murder.State
             if (player == murderLevel.Murderer && itemInHand is ItemMurderKnife && target != null)
             {
                 KillPlayer((MurderLevel) gameLevel, target);
-            }
+				player.Inventory.SetInventorySlot(0, new ItemMurderKnife()); //Update Knife
+			}
 			//Left click only (Right click charges up)
             else if (/*interactId == 1 && */itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
             {
