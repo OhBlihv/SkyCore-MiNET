@@ -245,7 +245,7 @@ namespace SkyCore.Game
 
             //player.SpawnLevel(this, new PlayerLocation(7.5, 181, -20.5));
             //player.SpawnLevel(this, new PlayerLocation(255, 70, 255));
-            player.SpawnLevel(this, GameLevelInfo.LobbyLocation);
+            player.SpawnLevel(this, GameLevelInfo.LobbyLocation, true);
 
 			CurrentState.InitializePlayer(this, player);
         }
@@ -284,7 +284,7 @@ namespace SkyCore.Game
 			        return;
 		        }
 
-		        player.SpawnLevel(level, level.SpawnPoint);
+		        player.SpawnLevel(level, level.SpawnPoint, true);
 			}
         }
 

@@ -20,26 +20,6 @@ namespace SkyCore.Commands
             this.skyCoreApi = skyCoreApi;
         }
 
-	    [Command(Name = "form")]
-	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandForm(MiNET.Player player)
-	    {
-		    if (player.CommandPermission < CommandPermission.Admin)
-		    {
-			    player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
-			    return;
-		    }
-
-			if (player.Level is GameLevel)
-		    {
-			    ((GameLevel) player.Level).ShowEndGameMenu((SkyPlayer) player);
-		    }
-		    else
-		    {
-			    player.SendMessage("Unable to use form on non GameLevel");
-		    }
-		}
-
 		[Command(Name = "hub")]
 	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandHub(MiNET.Player player)
@@ -64,13 +44,15 @@ namespace SkyCore.Commands
 
 			player.SendMessage("§e§l(!)§r §eMoving to Hub...");
 
-		    McpeTransfer transferPacket = new McpeTransfer
+		    ExternalGameHandler.AddPlayer((SkyPlayer) player, "hub");
+		    
+		    /*McpeTransfer transferPacket = new McpeTransfer
 		    {
 			    serverAddress = "184.171.171.26",
 			    port = 19132
 		    };
 
-		    player.SendPackage(transferPacket);
+		    player.SendPackage(transferPacket);*/
 		}
 
 	    [Command(Name = "popuptest")]

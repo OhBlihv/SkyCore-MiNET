@@ -92,7 +92,7 @@ namespace SkyCore.Games.Hub
 				_hubLevel = SkyCoreAPI.Instance.GetHubLevel();
 			}
 
-			player.SpawnLevel(_hubLevel, _hubLevel.SpawnPoint);
+			player.SpawnLevel(_hubLevel, _hubLevel.SpawnPoint, true);
 
 			NightVision nightVision = new NightVision
 			{

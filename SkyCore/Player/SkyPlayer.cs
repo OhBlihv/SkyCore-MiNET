@@ -11,6 +11,7 @@ using MiNET.Utils;
 using log4net;
 using MiNET.Entities;
 using MiNET.Items;
+using MiNET.UI;
 using MiNET.Worlds;
 using SkyCore.Database;
 using SkyCore.Entities;
@@ -360,10 +361,21 @@ namespace SkyCore.Player
             IsFlying = false;
             IsSpectator = false;
 
-            base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc);
+            //base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc);
+            base.SpawnLevel(toLevel, spawnPoint, true, levelFunc);
         }
 
-	    public override string ToString()
+		public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
+		{
+			/*SkyUtil.log("Replying with Skytonia settings");
+			CustomForm customForm1 = new CustomForm {Title = "Skytonia Settings"};
+			McpeServerSettingsResponse settingsResponse = Package<McpeServerSettingsResponse>.CreateObject(1L);
+			settingsResponse.formId = 12345L;
+			settingsResponse.data = customForm1.ToJson();
+			this.SendPackage((Package)settingsResponse);*/
+		}
+
+		public override string ToString()
 	    {
 		    return $"SkyPlayer: {Username}";
 	    }
