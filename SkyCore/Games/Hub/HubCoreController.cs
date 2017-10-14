@@ -5,6 +5,9 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using MiNET.Effects;
 using MiNET.Items;
+using MiNET.Net;
+using MiNET.Particles;
+using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
 using SkyCore.Game.Level;
@@ -14,7 +17,9 @@ namespace SkyCore.Games.Hub
 {
 	public class HubCoreController : CoreGameController
 	{
-
+		
+		private static readonly PlayerLocation HubCentreLocation = new PlayerLocation(256.5, 80, 264);
+		
 		private Level _hubLevel;
 
 		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>())
@@ -51,6 +56,37 @@ namespace SkyCore.Games.Hub
 						player.BarHandler?.DoTick();
 					}
 				}
+
+				//SkyUtil.log($"Spawning {10} Witch Particles");
+				//Do Hub Particles
+				for (int i = 0; i < 10; i++)
+				{
+					Vector3 particleLocation = HubCentreLocation.ToVector3();
+
+					particleLocation.X += (Random.Next(2) == 0 ? -1 : 1) * (float) (Random.NextDouble() * 25);
+					particleLocation.Y += (Random.Next(2) == 0 ? -1 : 1) * (float) (Random.NextDouble() * 15);
+					particleLocation.Z += (Random.Next(2) == 0 ? -1 : 1) * (float) (Random.NextDouble() * 25);
+
+					/*new Particle((int) ParticleType.WitchSpell, _hubLevel)
+					{
+						Position = particleLocation,
+					};*/
+
+					McpeLevelEvent particleEvent = McpeLevelEvent.CreateObject();
+					particleEvent.eventId = 0x4000 | (int) ParticleType.WitchSpell;
+					particleEvent.position = particleLocation;
+					particleEvent.data = 13369599;
+					_hubLevel.RelayBroadcast(particleEvent);
+
+					/*new FlameParticle(_hubLevel)
+					{
+						Position = particleLocation
+					}.Spawn();*/
+
+					//Console.WriteLine($"#{i} at {particleLocation}");
+				}
+				
+				//Console.WriteLine("Done!");
 			}
 
 			if (Tick % 20 != 0)

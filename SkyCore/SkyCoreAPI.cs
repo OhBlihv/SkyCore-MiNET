@@ -85,7 +85,7 @@ namespace SkyCore
 
             context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
             context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
-
+	        
             context.LevelManager.LevelCreated += (sender, args) =>
             {
                 Level level = args.Level;
@@ -93,8 +93,8 @@ namespace SkyCore
                 //Override Spawn Point for testing
                 if (level.LevelId.Equals("Overworld"))
                 {
-                    //level.SpawnPoint = new PlayerLocation(0D, 36D, 10D, 0f, 0f, 90f);
-                    level.SpawnPoint = new PlayerLocation(256.5, 78, 255.5);
+					//level.SpawnPoint = new PlayerLocation(0D, 36D, 10D, 0f, 0f, 90f);
+					level.SpawnPoint = new PlayerLocation(256.5, 78, 255.5);
 
                     level.BlockBreak += LevelOnBlockBreak;
                     level.BlockPlace += LevelOnBlockPlace;
@@ -128,6 +128,9 @@ namespace SkyCore
 
                 //SkyPlayer player = (SkyPlayer) args.Player;
                 MiNET.Player player = args.Player;
+
+				//Disable inventory editing
+				//player.Inventory.InventoryChange
 
 				//Only add this join listener for hubs
 				if (GameModes.Count == 0)

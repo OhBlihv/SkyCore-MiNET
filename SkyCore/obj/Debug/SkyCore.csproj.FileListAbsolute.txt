@@ -69,7 +69,6 @@ E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\jose-jwt.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\LibNoise.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\log4net.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
-E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MySql.Data.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\Newtonsoft.Json.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\SharpAvi.dll
@@ -85,3 +84,5 @@ E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.csprojResolveAssemblyReferen
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.csproj.CoreCompileInputs.cache
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.pdb
+E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.pdb
+E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.dll

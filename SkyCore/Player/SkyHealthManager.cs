@@ -22,15 +22,23 @@ namespace SkyCore.Player
 
         public override void TakeHit(Entity source, Item tool, int damage = 1, DamageCause cause = DamageCause.Unknown)
         {
-            //SkyUtil.log($"{Entity} Received damage from {source} with {tool}");
-            if (Entity.Level is GameLevel)
-            {
-                //SkyUtil.log("Handling in GameLevel");
-                ((GameLevel) Entity.Level).HandleDamage(source, Entity, tool, damage, cause);
-            }
+	        if (Entity.Level is GameLevel level)
+	        {
+		        level.HandleDamage(source, Entity, tool, damage, cause);
+	        }
+	        else
+	        {
+		        if (cause == DamageCause.Void)
+		        {
+			        PlayerLocation spawnLocation = (PlayerLocation) Entity.Level.SpawnPoint.Clone();
+			        spawnLocation.Y += 1; //Spawn slightly above the spawn block
+
+					((SkyPlayer) Entity).Teleport(spawnLocation);
+		        }
+	        }
         }
 
-        private object _killSync = new object();
+        private readonly object _killSync = new object();
 
         public override void Kill()
         {

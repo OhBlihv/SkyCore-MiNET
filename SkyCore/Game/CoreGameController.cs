@@ -24,7 +24,7 @@ namespace SkyCore.Game
 
 	    public const int MaxGames = 30;
 
-        protected readonly Random Random = new Random();
+        protected static readonly Random Random = new Random();
         
         public SkyCoreAPI Plugin { get; }
 

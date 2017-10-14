@@ -1,5 +1,7 @@
 ﻿using System;
 using MiNET;
+using MiNET.Blocks;
+using MiNET.Items;
 using MiNET.Net;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
@@ -19,6 +21,34 @@ namespace SkyCore.Commands
         {
             this.skyCoreApi = skyCoreApi;
         }
+
+		[Command(Name = "giveironingot")]
+		[Authorize(Permission = CommandPermission.Normal)]
+		public void CommandGiveIronIngot(MiNET.Player player)
+		{
+			player.Inventory.SetFirstEmptySlot(new ItemIronIngot(), true, false);
+		}
+
+	    [Command(Name = "giveironnugget")]
+	    [Authorize(Permission = CommandPermission.Normal)]
+	    public void CommandGiveIronNugget(MiNET.Player player)
+	    {
+		    player.Inventory.SetFirstEmptySlot(new ItemIronNugget(), true, false);
+	    }
+
+		[Command(Name = "givegoldingot")]
+	    [Authorize(Permission = CommandPermission.Normal)]
+	    public void CommandGiveGoldIngot(MiNET.Player player)
+	    {
+		    player.Inventory.SetFirstEmptySlot(new ItemGoldIngot(), true, false);
+	    }
+
+	    [Command(Name = "givegoldnugget")]
+	    [Authorize(Permission = CommandPermission.Normal)]
+	    public void CommandGiveGoldNugget(MiNET.Player player)
+	    {
+		    player.Inventory.SetFirstEmptySlot(new ItemGoldNugget(), true, false);
+	    }
 
 		[Command(Name = "hub")]
 	    [Authorize(Permission = CommandPermission.Normal)]
@@ -146,8 +176,35 @@ namespace SkyCore.Commands
 
 			player.MovementSpeed = speed;
 			player.SendAdventureSettings();
-			
+
 			player.SendMessage($"§eUpdated movement speed to {speed}");
+		}
+
+		[Command(Name = "time")]
+		[Authorize(Permission = CommandPermission.Normal)]
+		public void CommandTime(MiNET.Player player, string timeString)
+		{
+			if (player.CommandPermission < CommandPermission.Admin)
+			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+				return;
+			}
+
+			int time = 0;
+			switch (timeString.ToLower())
+			{
+				case "day":
+					time = 6000;
+					break;
+				case "night":
+					time = 12000;
+					break;
+				default:
+					player.SendMessage("Unknown time string.");
+					return;
+			}
+
+			player.Level.CurrentWorldTime = time;
 		}
 
 		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
