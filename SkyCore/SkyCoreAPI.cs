@@ -93,7 +93,8 @@ namespace SkyCore
                 //Override Spawn Point for testing
                 if (level.LevelId.Equals("Overworld"))
                 {
-                    level.SpawnPoint = new PlayerLocation(0D, 36D, 10D, 0f, 0f, 90f);
+                    //level.SpawnPoint = new PlayerLocation(0D, 36D, 10D, 0f, 0f, 90f);
+                    level.SpawnPoint = new PlayerLocation(256.5, 78, 255.5);
 
                     level.BlockBreak += LevelOnBlockBreak;
                     level.BlockPlace += LevelOnBlockPlace;

@@ -131,13 +131,13 @@ namespace SkyCore.Game
 							case "murder":
 							{
 								neatName = "§c§lMurder Mystery";
-								npcLocation = new PlayerLocation(-1.5D, 30D, 16.5D, 180F, 180F, 0F);
+								npcLocation = new PlayerLocation(260.5, 77, 271.5, 180F, 180F, 0F);
 								break;
 							}
 							case "build-battle":
 							{
 								neatName = "§e§lBuild Battle";
-								npcLocation = new PlayerLocation(2.5D, 30D, 16.5D, 180F, 180F, 0F);
+								npcLocation = new PlayerLocation(252.5, 77, 271.5, 180F, 180F, 0F);
 								break;
 							}
 						}
