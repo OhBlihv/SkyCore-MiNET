@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -99,128 +100,125 @@ namespace SkyCore.Game
 
 		//
 
-		public static void RegisterExternalGame(string connectingAddress, ushort connectingPort, string targetServer, string gameName)
+		public static void RegisterGameIntent(string gameName)
 		{
-			bool newRegistration;
+			if (!gameName.Equals("hub"))
 			{
-				InstanceInfo instanceInfo = new InstanceInfo
+				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
-					CurrentPlayers = 0,
-					HostAddress = connectingAddress,
-					HostPort = connectingPort
-				};
+					MiNET.Worlds.Level level = SkyCoreAPI.Instance.GetHubLevel();
 
-				newRegistration = !GameRegistrations.ContainsKey(gameName);
+					string neatName = gameName;
+					PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);
 
-				RegisterGame(gameName, instanceInfo);
-			}
-			
-			if (newRegistration)
-			{
-				if (!gameName.Equals("hub"))
-				{
-					SkyCoreAPI.Instance.AddPendingTask(() =>
+					switch (gameName)
 					{
-						MiNET.Worlds.Level level = SkyCoreAPI.Instance.GetHubLevel();
-
-						string neatName = gameName;
-						PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);
-
-						switch (gameName)
-						{
-							case "murder":
+						case "murder":
 							{
 								neatName = "§c§lMurder Mystery";
 								npcLocation = new PlayerLocation(260.5, 77, 271.5, 180F, 180F, 0F);
 								break;
 							}
-							case "build-battle":
+						case "build-battle":
 							{
 								neatName = "§e§lBuild Battle";
 								npcLocation = new PlayerLocation(252.5, 77, 271.5, 180F, 180F, 0F);
 								break;
 							}
-						}
-
-						PlayerNPC.SpawnNPC(level, $"§e§l{neatName}", npcLocation, $"GID:{gameName}");
-					});
-				}
-
-				ISubscriber subscriber = RedisPool.GetSubscriber();
-
-				/*
-				 * Channel <game>_info
-				 * Format:
-				 * {current-players}:{available-servers} //TODO: Update format?
-				 */
-				subscriber.SubscribeAsync($"{gameName}_info", (channel, message) =>
-				{
-					try
-					{
-						string[] messageSplit = ((string)message).Split(':');
-
-						string hostAddress = messageSplit[0];
-						if (!ushort.TryParse(messageSplit[1], out ushort hostPort))
-						{
-							SkyUtil.log($"Invalid format of port in message {message}");
-							return;
-						}
-
-						InstanceInfo instanceInfo;
-
-						if (!GameRegistrations.TryGetValue(gameName, out var gamePool))
-						{
-							instanceInfo = new InstanceInfo { HostAddress = hostAddress, HostPort = hostPort };
-
-							SkyUtil.log($"Game {gameName} missing from GameRegistrations! Re-Registering...");
-							RegisterGame(gameName, instanceInfo);
-						}
-						else
-						{
-							instanceInfo = gamePool.GetInstance(hostAddress + ":" + hostPort);
-						}
-
-						int.TryParse(messageSplit[2], out var instancePlayers);
-
-						instanceInfo.CurrentPlayers = instancePlayers;
-
-						List<GameInfo> availableGames = new List<GameInfo>();
-						int i = 3;
-						while (i < messageSplit.Length)
-						{
-							string messageSplitContent = messageSplit[i];
-							if (messageSplitContent.Length == 0)
-							{
-								break; //Empty content - End of message
-							}
-
-							string[] gameInfoSplit = messageSplitContent.Split(',');
-
-							int.TryParse(gameInfoSplit[1], out var currentPlayers);
-							int.TryParse(gameInfoSplit[2], out var maxPlayers);
-
-							availableGames.Add(new GameInfo(gameInfoSplit[0], currentPlayers, maxPlayers));
-
-							i++;
-						}
-
-						instanceInfo.AvailableGames = availableGames;
-						instanceInfo.Update();
-						//SkyUtil.log($"Updated {availableGames.Count} available games on {gameName} ({hostAddress + ":" + hostPort})");
 					}
-					catch (Exception e)
-					{
-						Console.WriteLine(e);
-					}
+
+					PlayerNPC.SpawnNPC(level, $"§e§l{neatName}", npcLocation, $"GID:{gameName}");
 				});
 			}
+			
+			//Initialize GamePool
+			GetGamePool(gameName);
+
+			ISubscriber subscriber = RedisPool.GetSubscriber();
+
+			/*
+			 * Channel <game>_info
+			 * Format:
+			 * {current-players}:{available-servers} //TODO: Update format?
+			 */
+			subscriber.SubscribeAsync($"{gameName}_info", (channel, message) =>
+			{
+				try
+				{
+					string[] messageSplit = ((string)message).Split(':');
+
+					string hostAddress = messageSplit[0];
+					if (!ushort.TryParse(messageSplit[1], out ushort hostPort))
+					{
+						SkyUtil.log($"Invalid format of port in message {message}");
+						return;
+					}
+
+					InstanceInfo instanceInfo;
+
+					if (!GameRegistrations.TryGetValue(gameName, out var gamePool))
+					{
+						instanceInfo = new InstanceInfo { HostAddress = hostAddress, HostPort = hostPort };
+
+						SkyUtil.log($"Game {gameName} missing from GameRegistrations! Re-Registering...");
+						RegisterGame(gameName, instanceInfo);
+					}
+					else
+					{
+						instanceInfo = gamePool.GetInstance(hostAddress + ":" + hostPort);
+					}
+
+					int.TryParse(messageSplit[2], out var instancePlayers);
+
+					instanceInfo.CurrentPlayers = instancePlayers;
+
+					List<GameInfo> availableGames = new List<GameInfo>();
+					int i = 3;
+					while (i < messageSplit.Length)
+					{
+						string messageSplitContent = messageSplit[i];
+						if (messageSplitContent.Length == 0)
+						{
+							break; //Empty content - End of message
+						}
+
+						string[] gameInfoSplit = messageSplitContent.Split(',');
+
+						int.TryParse(gameInfoSplit[1], out var currentPlayers);
+						int.TryParse(gameInfoSplit[2], out var maxPlayers);
+
+						availableGames.Add(new GameInfo(gameInfoSplit[0], currentPlayers, maxPlayers));
+
+						i++;
+					}
+
+					instanceInfo.AvailableGames = availableGames;
+					instanceInfo.Update();
+					//SkyUtil.log($"Updated {availableGames.Count} available games on {gameName} ({hostAddress + ":" + hostPort})");
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
+			});
+		}
+
+		public static void RegisterExternalGame(string connectingAddress, ushort connectingPort, string targetServer, string gameName)
+		{
+			InstanceInfo instanceInfo = new InstanceInfo
+			{
+				CurrentPlayers = 0,
+				HostAddress = connectingAddress,
+				HostPort = connectingPort
+			};
+
+			RegisterGame(gameName, instanceInfo);
 		}
 
 		public static void RegisterInternalGame(string gameName)
 		{
 			new Thread(delegate()
 			{
-
 				int threadTick = -1;
 
 				while (!SkyCoreAPI.IsDisabled)
@@ -251,7 +249,6 @@ namespace SkyCore.Game
 					string messageContents =
 						SkyCoreAPI.Instance.CurrentIp + ":" + instanceInfo.CurrentPlayers + ":" + availableGameConcat;
 
-
 					//SkyUtil.log($"Sending update on {gameName}_info as {messageContents}");
 					RedisPool.GetSubscriber().PublishAsync($"{gameName}_info", messageContents);
 				}
@@ -266,7 +263,7 @@ namespace SkyCore.Game
 			});
 		}
 
-		public static void RegisterGame(string gameName, InstanceInfo instanceInfo)
+		public static GamePool GetGamePool(string gameName)
 		{
 			GamePool gamePool;
 			if (GameRegistrations.ContainsKey(gameName))
@@ -277,8 +274,13 @@ namespace SkyCore.Game
 			{
 				GameRegistrations.TryAdd(gameName, gamePool = new GamePool(gameName));
 			}
-			
-			gamePool.AddInstance(instanceInfo);
+
+			return gamePool;
+		}
+
+		public static void RegisterGame(string gameName, InstanceInfo instanceInfo)
+		{
+			GetGamePool(gameName).AddInstance(instanceInfo);
 		}
 
 		public static void AddPlayer(SkyPlayer player, string gameName)
@@ -403,6 +405,8 @@ namespace SkyCore.Game
 			if (bestAvailableGame == null)
 			{
 				player.SendMessage($"§cWe were unable to move you to another game of {GameName}.");
+				
+				player.SetNoAi(false); //Unfreeze
 			}
 			else
 			{
@@ -434,7 +438,25 @@ namespace SkyCore.Game
 
 		public InstanceInfo GetInstance(string instanceKey)
 		{
-			_gameInstances.TryGetValue(instanceKey, out var instanceInfo);
+			if (!_gameInstances.TryGetValue(instanceKey, out var instanceInfo))
+			{
+				string[] messageSplit = instanceKey.Split(':');
+
+				string hostAddress = messageSplit[0];
+				if (!ushort.TryParse(messageSplit[1], out ushort hostPort))
+				{
+					SkyUtil.log($"Invalid format of port in instancekey {instanceKey}");
+					return new InstanceInfo(); //Return empty instance info to keep them happy
+				}
+
+				instanceInfo = new InstanceInfo
+				{
+					HostAddress = hostAddress,
+					HostPort = hostPort
+				};
+
+				_gameInstances.TryAdd(instanceKey, instanceInfo);
+			}
 
 			return instanceInfo;
 		}

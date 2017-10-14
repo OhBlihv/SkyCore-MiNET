@@ -20,6 +20,9 @@ namespace SkyCore.Games.Hub
 		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>())
 		{
 			Tick = 1;
+			
+			ExternalGameHandler.RegisterGameIntent("murder");
+			ExternalGameHandler.RegisterGameIntent("build-battle");
 		}
 
 		protected override GameLevel _getGameController()

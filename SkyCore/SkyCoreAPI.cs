@@ -101,6 +101,23 @@ namespace SkyCore
 
 	                level.CurrentWorldTime = 22000; //Sunrise?
 	                SkyUtil.log($"Set world time to {level.CurrentWorldTime}");
+	                
+	                AddPendingTask(() =>
+	                {
+						{
+							PlayerLocation portalInfoLocation = new PlayerLocation(256.5, 79.5, 276.5);
+
+							string hologramContent =
+								"  §d§lSkytonia§r §f§lNetwork§r" + "\n" + 
+								" §7Enter the portal and§r" + "\n" +
+								"§7enjoy your adventure!§r" + "\n" +
+								"     §ewww.skytonia.com§r";
+
+							Hologram portalInfoHologram = new Hologram(hologramContent, level, portalInfoLocation);
+
+							portalInfoHologram.SpawnEntity();
+						}
+					});
                 }
             };
 

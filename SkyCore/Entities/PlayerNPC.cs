@@ -28,12 +28,19 @@ namespace SkyCore.Entities
 
         private onInteract Action;
 
-        public PlayerNPC(string name, Level level, PlayerLocation playerLocation, onInteract action = null) : base(name, level)
+        public PlayerNPC(string name, Level level, PlayerLocation playerLocation, onInteract action = null, string gameName = "") : base(name, level)
         {
 	        NameTag = name;
             KnownPosition = playerLocation;
-			Skin = new Skin { SkinData = Skin.GetTextureFromFile("Skin.png")};
-	        //EntityId = 52;
+
+	        if (string.IsNullOrEmpty(gameName))
+	        {
+				Skin = new Skin { SkinData = Skin.GetTextureFromFile("Skin.png") };
+			}
+	        else
+	        {
+				Skin = new Skin { SkinData = Skin.GetTextureFromFile($"..\\npc-skins\\{gameName}-npc.png") };
+			}
 
 			Scale = 1.8D; //Ensure this NPC is visible
 
@@ -108,11 +115,7 @@ namespace SkyCore.Entities
 				}
 
 				//Ensure this NPC can be seen
-				PlayerNPC npc = new PlayerNPC(npcName, level, spawnLocation, action) {Scale = 1.2};
-				//PlayerMob npc = new PlayerMob("Name", level);
-
-				//npc.BroadcastEntityEvent();
-                //npc.BroadcastSetEntityData();
+				PlayerNPC npc = new PlayerNPC("§a(Punch to play)", level, spawnLocation, action, gameName) {Scale = 1.5};
 
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
@@ -126,25 +129,17 @@ namespace SkyCore.Entities
 					//Spawn a hologram with player counts
 		            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, playerCountLocation, gameName);
 
-					/*hologram.BroadcastEntityEvent();
-					hologram.BroadcastSetEntityData();*/
-
 					SkyCoreAPI.Instance.AddPendingTask(() => hologram.SpawnEntity());
 				}
 
 				{
-					PlayerLocation betaLocation = (PlayerLocation) spawnLocation.Clone();
-					betaLocation.Y += 2.8f;
+					PlayerLocation gameNameLocation = (PlayerLocation) spawnLocation.Clone();
+					gameNameLocation.Y += 3.3f;
 
-					Hologram betaHologram = new Hologram("§e§lBETA", level, betaLocation);
+					Hologram gameNameHologram = new Hologram(npcName, level, gameNameLocation);
 
-					/*betaHologram.BroadcastEntityEvent();
-					betaHologram.BroadcastSetEntityData();*/
-
-					SkyCoreAPI.Instance.AddPendingTask(() => betaHologram.SpawnEntity());
+					SkyCoreAPI.Instance.AddPendingTask(() => gameNameHologram.SpawnEntity());
 				}
-
-				//PendingNpcs.Add(npc);
 
                 Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
             }

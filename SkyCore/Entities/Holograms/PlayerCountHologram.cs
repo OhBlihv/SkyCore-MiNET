@@ -19,7 +19,7 @@ namespace SkyCore.Entities.Holograms
 			_gameName = gameName;
 
 			KnownPosition = (PlayerLocation) KnownPosition.Clone();
-			KnownPosition.Y += 2.5f;
+			KnownPosition.Y += 3.0f;
 		}
 
 		public override void OnTick()
@@ -38,11 +38,11 @@ namespace SkyCore.Entities.Holograms
 
 			if (playerCount >= 0)
 			{
-				SetNameTag($"§e§lCurrent Players:§r {playerCount}");
+				SetNameTag($"§fPlayers Online:§r §e{playerCount}");
 			}
 			else
 			{
-				SetNameTag("§c§lOFFLINE");
+				SetNameTag("§cUnavailable");
 			}
 		}
 
