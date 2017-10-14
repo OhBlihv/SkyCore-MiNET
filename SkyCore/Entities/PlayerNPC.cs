@@ -22,7 +22,9 @@ namespace SkyCore.Entities
     public class PlayerNPC : PlayerMob
     {
 
-        public static List<PlayerNPC> PendingNpcs = new List<PlayerNPC>();
+	    public const string ComingSoonName = "§d§lMystery Game";
+
+		public static List<PlayerNPC> PendingNpcs = new List<PlayerNPC>();
 
         public delegate void onInteract(SkyPlayer player);
 
@@ -84,27 +86,21 @@ namespace SkyCore.Entities
                     if (command.StartsWith("GID:"))
 					{
 						gameName = command.Split(':')[1];
-						action = player =>
-                        {
-	                        //Freeze the players movement
-	                        player.SetNoAi(true);
-							switch (gameName)
-                            {
-                                case "murder":
+
+						switch (gameName)
+						{
+							case "murder":
+							case "build-battle":
+							{
+								action = player =>
+								{
+									//Freeze the players movement
+									player.SetNoAi(true);
 									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
-                                    break;
-								case "build-battle":
-									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
-									break;
-								default:
-                                    Console.WriteLine($"Unable to process game command {command}");
-                                    break;
-                            }
-                        };
-                    }
-                    else
-                    {
-                        //TODO:
+								};
+								break;
+							}
+						}
                     }
                 }
 
@@ -115,7 +111,15 @@ namespace SkyCore.Entities
 				}
 
 				//Ensure this NPC can be seen
-				PlayerNPC npc = new PlayerNPC("§a(Punch to play)", level, spawnLocation, action, gameName) {Scale = 1.5};
+	            PlayerNPC npc;
+	            if (action != null)
+	            {
+					npc = new PlayerNPC("§a(Punch to play)", level, spawnLocation, action, gameName) { Scale = 1.5 };
+				}
+	            else
+	            {
+		            npc = new PlayerNPC("§e(Coming Soon)", level, spawnLocation, null, gameName) { Scale = 1.5 };
+				}
 
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{

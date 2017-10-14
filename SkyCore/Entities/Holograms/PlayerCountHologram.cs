@@ -25,9 +25,11 @@ namespace SkyCore.Entities.Holograms
 		public override void OnTick()
 		{
 			int playerCount = -1;
+			GamePool gamePool = null;
 			try
 			{
-				playerCount = ExternalGameHandler.GameRegistrations[_gameName].GetCurrentPlayers();
+				gamePool = ExternalGameHandler.GameRegistrations[_gameName];
+				playerCount = gamePool.GetCurrentPlayers();
 			}
 			catch (Exception e)
 			{
@@ -36,7 +38,7 @@ namespace SkyCore.Entities.Holograms
 				Console.WriteLine(e);
 			}
 
-			if (playerCount >= 0)
+			if (gamePool != null && gamePool.Active && playerCount >= 0)
 			{
 				SetNameTag($"§fPlayers Online:§r §e{playerCount}");
 			}

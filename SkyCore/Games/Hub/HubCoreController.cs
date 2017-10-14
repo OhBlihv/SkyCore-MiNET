@@ -23,6 +23,8 @@ namespace SkyCore.Games.Hub
 			
 			ExternalGameHandler.RegisterGameIntent("murder");
 			ExternalGameHandler.RegisterGameIntent("build-battle");
+			ExternalGameHandler.RegisterGameIntent("block-hunt");
+			ExternalGameHandler.RegisterGameIntent("bed-wars");
 		}
 
 		protected override GameLevel _getGameController()
