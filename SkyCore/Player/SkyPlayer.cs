@@ -280,28 +280,40 @@ namespace SkyCore.Player
 
         public override void HandleMcpeAnimate(McpeAnimate message)
         {
-            if (message.actionId != 1)
+			if (message.actionId != 1)
             {
                 base.HandleMcpeAnimate(message);
                 return;
             }
 
-            //SkyUtil.log($"Animate Id:{message.actionId} ({Username})");
+			//SkyUtil.log($"Animate Id:{message.actionId} ({Username})");
 
-            if (Level is GameLevel level && level.DoInteract(message.actionId, this, null))
-            {
-                //return; //Avoid default handling
-            }
+			if (Level is GameLevel level)
+			{
+				if (level.DoInteract(message.actionId, this, null))
+				{
+					//return; //Avoid default handling
+				}
+			}
+			else if (SkyCoreApi.GameType.Equals("hub"))
+			{
+				//Nothing special, must be a hub.
+				if (!(Level is GameLevel))
+				{
+					((HubCoreController)SkyCoreApi.GameModes["hub"]).DoInteract(message.actionId, this, null);
+				}
+			}
 
-            base.HandleMcpeAnimate(message);
+			base.HandleMcpeAnimate(message);
         }
 
-	    protected override void HandleTransactionItemUseOnEntity(Transaction transaction)
+		protected override void HandleTransactionItemUseOnEntity(Transaction transaction)
 	    {
-		    switch ((McpeInventoryTransaction.ItemUseOnEntityAction)transaction.ActionType)
+			switch ((McpeInventoryTransaction.ItemUseOnEntityAction)transaction.ActionType)
 		    {
 			    case McpeInventoryTransaction.ItemUseOnEntityAction.Interact: // Right click
 				case McpeInventoryTransaction.ItemUseOnEntityAction.Attack:
+					
 				    Entity target = Level.GetEntity(transaction.EntityId);
 				    
 					HandleInteract((byte) transaction.ActionType, target);
@@ -320,19 +332,30 @@ namespace SkyCore.Player
 
             SkyUtil.log($"Interact Id:{actionId} ({Username})");
 
-            if (target is PlayerNPC)
+            if (target is PlayerNPC npc)
             {
                 if (actionId == 1 || actionId == 2)
                 {
                     //SkyUtil.log($"Processing NPC Interact as {Username}");
-                    ((PlayerNPC) target).OnInteract(this);
+                    npc.OnInteract(this);
                 }
             }
             else
             {
-                if (Level is GameLevel level && level.DoInteract(actionId, this, (SkyPlayer) target))
+                if (Level is GameLevel level)
                 {
-                    //return; //Avoid default handling
+	                if (level.DoInteract(actionId, this, (SkyPlayer) target))
+	                {
+						//return; //Avoid default handling
+					}
+				}
+	            else if (SkyCoreApi.GameType.Equals("hub"))
+                {
+	                //Nothing special, must be a hub.
+	                if (!(Level is GameLevel))
+	                {
+		                ((HubCoreController) SkyCoreApi.GameModes["hub"]).DoInteract(actionId, this, (SkyPlayer) target);
+	                }
                 }
             }
 
@@ -361,18 +384,17 @@ namespace SkyCore.Player
             IsFlying = false;
             IsSpectator = false;
 
-            //base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc);
             base.SpawnLevel(toLevel, spawnPoint, true, levelFunc);
         }
 
 		public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
 		{
-			/*SkyUtil.log("Replying with Skytonia settings");
+			SkyUtil.log("Replying with Skytonia settings");
 			CustomForm customForm1 = new CustomForm {Title = "Skytonia Settings"};
 			McpeServerSettingsResponse settingsResponse = Package<McpeServerSettingsResponse>.CreateObject(1L);
 			settingsResponse.formId = 12345L;
 			settingsResponse.data = customForm1.ToJson();
-			this.SendPackage((Package)settingsResponse);*/
+			this.SendPackage((Package)settingsResponse);
 		}
 
 		public override string ToString()

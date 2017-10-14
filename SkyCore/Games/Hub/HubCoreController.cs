@@ -11,7 +11,9 @@ using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
 using SkyCore.Game.Level;
+using SkyCore.Games.Hub.Items;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Games.Hub
 {
@@ -39,6 +41,8 @@ namespace SkyCore.Games.Hub
 
 		protected override void CoreGameTick()
 		{
+			++Tick;
+			
 			int playerCount = 0;
 			if (_hubLevel == null)
 			{
@@ -48,16 +52,27 @@ namespace SkyCore.Games.Hub
 			{
 				playerCount = _hubLevel.PlayerCount;
 
-				//Update BarHandlers for all online players every 500 milliseconds (10 ticks)
-				if (++Tick % 10 == 0 && _hubLevel != null)
+				foreach (SkyPlayer player in _hubLevel.Players.Values)
 				{
-					foreach (SkyPlayer player in _hubLevel.Players.Values)
+					//Update BarHandlers for all online players every 500 milliseconds (10 ticks)
+					if (Tick % 10 == 0)
 					{
 						player.BarHandler?.DoTick();
 					}
+					if (Tick % 5 == 0)
+					{
+						if (IsInPortal(player.KnownPosition))
+						{
+							PlayerLocation teleportLocation = player.KnownPosition;
+							teleportLocation.Z -= 2;
+
+							player.Teleport(teleportLocation);
+
+							GameUtil.ShowGameList(player);
+						}
+					}
 				}
 
-				//SkyUtil.log($"Spawning {10} Witch Particles");
 				//Do Hub Particles
 				for (int i = 0; i < 10; i++)
 				{
@@ -67,26 +82,13 @@ namespace SkyCore.Games.Hub
 					particleLocation.Y += (Random.Next(2) == 0 ? -1 : 1) * (float) (Random.NextDouble() * 15);
 					particleLocation.Z += (Random.Next(2) == 0 ? -1 : 1) * (float) (Random.NextDouble() * 25);
 
-					/*new Particle((int) ParticleType.WitchSpell, _hubLevel)
-					{
-						Position = particleLocation,
-					};*/
 
 					McpeLevelEvent particleEvent = McpeLevelEvent.CreateObject();
 					particleEvent.eventId = 0x4000 | (int) ParticleType.WitchSpell;
 					particleEvent.position = particleLocation;
 					particleEvent.data = 13369599;
 					_hubLevel.RelayBroadcast(particleEvent);
-
-					/*new FlameParticle(_hubLevel)
-					{
-						Position = particleLocation
-					}.Spawn();*/
-
-					//Console.WriteLine($"#{i} at {particleLocation}");
 				}
-				
-				//Console.WriteLine("Done!");
 			}
 
 			if (Tick % 20 != 0)
@@ -116,6 +118,14 @@ namespace SkyCore.Games.Hub
 			instanceInfo.Update();
 		}
 
+		private bool IsInPortal(PlayerLocation playerLocation)
+		{
+			return
+				playerLocation.X >= 253 && playerLocation.X <= 259 &&
+				playerLocation.Y >= 77 && playerLocation.Y <= 83 &&
+				playerLocation.Z >= 276 && playerLocation.Z <= 279;
+		}
+
 		public override void QueuePlayer(SkyPlayer player)
 		{
 			InstantQueuePlayer(player);
@@ -137,6 +147,13 @@ namespace SkyCore.Games.Hub
 				Particles = false
 			};
 			player.SetEffect(nightVision);
+			
+			player.Inventory.SetInventorySlot(4, new ItemNavigationCompass());
+
+			RunnableTask.RunTaskLater(() =>
+			{
+				player.Inventory.SetHeldItemSlot(4);
+			}, 500);
 		}
 
 		public override void CheckCapacity()
@@ -147,6 +164,15 @@ namespace SkyCore.Games.Hub
 		public override Type GetGameLevelInfoType()
 		{
 			return typeof(GameLevelInfo); //Nothing Custom
+		}
+
+		public void DoInteract(int interactId, SkyPlayer player, SkyPlayer target)
+		{
+			SkyUtil.log($"Handling Hub Interacting from {player.Username} ID:{interactId}");
+			if (player.Inventory.GetItemInHand() is ItemNavigationCompass)
+			{
+				GameUtil.ShowGameList(player);
+			}
 		}
 
 	}

@@ -209,7 +209,12 @@ namespace SkyCore
 						case "none":
 						{
 							SkyUtil.log("Initializing Pure Hub Handling...");
+
+							//none -> hub
+							GameType = "hub";
+
 							_initializeCustomGame(new HubCoreController(this));
+							
 							break;
 						}
 					}

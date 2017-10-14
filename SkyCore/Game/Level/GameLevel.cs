@@ -531,55 +531,11 @@ namespace SkyCore.Game
 					    Type = "url",
 					    Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
 					},
-					ExecuteAction = delegate { ShowGameList(player); }
+					ExecuteAction = delegate { GameUtil.ShowGameList(player); }
 			    }
 			);
 
 			player.SendForm(simpleForm);
-		}
-
-	    public void ShowGameList(SkyPlayer player)
-	    {
-			var simpleForm = new SimpleForm
-		    {
-			    Title = "Game list",
-				Content = "",
-			    Buttons = new List<Button>
-			    {
-				    new Button
-				    {
-					    Text = "Murder",
-					    Image = new Image
-					    {
-						    Type = "url",
-						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
-					    },
-					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "murder"); }
-				    },
-				    new Button
-				    {
-					    Text = "Build Battle",
-					    Image = new Image
-					    {
-						    Type = "url",
-						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
-					    },
-					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "build-battle"); }
-				    },
-				    new Button
-				    {
-					    Text = "Return to Hub",
-					    Image = new Image
-					    {
-						    Type = "url",
-						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
-					    },
-					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "hub"); }
-				    }
-				}
-		    };
-
-		    player.SendForm(simpleForm);
 		}
 
     }
