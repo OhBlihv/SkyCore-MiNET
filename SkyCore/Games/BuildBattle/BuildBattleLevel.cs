@@ -59,7 +59,7 @@ namespace SkyCore.Games.BuildBattle
 		public override GameTeam GetDefaultTeam()
 		{
 			GameTeam lastTeam = null;
-			foreach (GameTeam buildTeam in BuildTeams)
+			foreach (BuildBattleTeam buildTeam in BuildTeams)
 			{
 				List<SkyPlayer> teamPlayers = TeamPlayerDict[buildTeam];
 				if (teamPlayers.Count == 0)
@@ -90,35 +90,44 @@ namespace SkyCore.Games.BuildBattle
 			{
 				PlayerLocation voteLocation = (PlayerLocation)buildTeam.SpawnLocation.Clone();
 				voteLocation.Y += 10;
+				voteLocation.Pitch = -15F; //Pitch down to look at the 'build'
 				switch (i)
 				{
 					case 0:
 						voteLocation.X -= 5;
+						voteLocation.HeadYaw = 270F;
 						break;
 					case 1:
 						voteLocation.X -= 2.5f;
 						voteLocation.Z -= 2.5f;
+						voteLocation.HeadYaw = 315F;
 						break;
 					case 2:
 						voteLocation.Z -= 5;
+						voteLocation.HeadYaw = 0F;
 						break;
 					case 3:
 						voteLocation.X += 2.5f;
 						voteLocation.Z -= 2.5f;
+						voteLocation.HeadYaw = 45F;
 						break;
 					case 4:
 						voteLocation.X += 5;
+						voteLocation.HeadYaw = 90F;
 						break;
 					case 5:
 						voteLocation.X += 2.5f;
 						voteLocation.Z += 2.5f;
+						voteLocation.HeadYaw = 135F;
 						break;
 					case 6:
 						voteLocation.Z += 5;
+						voteLocation.HeadYaw = 180F;
 						break;
 					case 7:
 						voteLocation.X -= 2.5f;
 						voteLocation.Z += 2.5f;
+						voteLocation.HeadYaw = 225F;
 						break;
 				}
 

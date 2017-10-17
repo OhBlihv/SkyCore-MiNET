@@ -358,8 +358,6 @@ namespace SkyCore.Player
 	                }
                 }
             }
-
-            //base.HandleMcpeInteract(message);
         }
 
 	    protected override void OnPlayerLeave(PlayerEventArgs e)
@@ -389,12 +387,12 @@ namespace SkyCore.Player
 
 		public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
 		{
-			SkyUtil.log("Replying with Skytonia settings");
+			/*SkyUtil.log("Replying with Skytonia settings");
 			CustomForm customForm1 = new CustomForm {Title = "Skytonia Settings"};
 			McpeServerSettingsResponse settingsResponse = Package<McpeServerSettingsResponse>.CreateObject(1L);
 			settingsResponse.formId = 12345L;
 			settingsResponse.data = customForm1.ToJson();
-			this.SendPackage((Package)settingsResponse);
+			this.SendPackage((Package)settingsResponse);*/
 		}
 
 		public override string ToString()

@@ -18,23 +18,31 @@ namespace SkyCore.Games.BuildBattle.State
 	class BuildBattleVoteState : RunningState
 	{
 
-		private const int MaxVoteTime = 30 * 2;
+		private const int MaxVoteTime = 10 * 2;
 
 		private int _currentVotingTeam = -1;
 		private SkyPlayer _currentVotingPlayer = null;
 
 		private int _endTick = -1; //Default value
 
-		private ConcurrentDictionary<SkyPlayer, int> VoteTally = new ConcurrentDictionary<SkyPlayer, int>();
+		private readonly ConcurrentDictionary<SkyPlayer, int> _voteTally = new ConcurrentDictionary<SkyPlayer, int>();
 
 		public override void EnterState(GameLevel gameLevel)
 		{
 			base.EnterState(gameLevel);
+
+			gameLevel.AllowBreak = false;
+			gameLevel.AllowBuild = false;
+
+			gameLevel.DoForAllPlayers(player =>
+			{
+				player.Inventory.Clear();
+			});
 		}
 
 		public override GameState GetNextGameState(GameLevel gameLevel)
 		{
-			return new BuildBattlePodiumState(VoteTally);
+			return new BuildBattlePodiumState(_voteTally);
 		}
 
 		public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
@@ -51,7 +59,7 @@ namespace SkyCore.Games.BuildBattle.State
 				secondsLeft = (_endTick - currentTick) / 2;
 			}
 
-			if (secondsLeft > (MaxVoteTime / 2))
+			if (secondsLeft > MaxVoteTime / 2)
 			{
 				return; //Ignore until the ticker has finished
 			}
@@ -89,7 +97,7 @@ namespace SkyCore.Games.BuildBattle.State
 						}
 					});
 
-					VoteTally.TryAdd(_currentVotingPlayer, currentVoteCount);
+					_voteTally.TryAdd(_currentVotingPlayer, currentVoteCount);
 				}
 				else
 				{
@@ -105,10 +113,9 @@ namespace SkyCore.Games.BuildBattle.State
 				BuildBattleLevel buildLevel = (BuildBattleLevel) gameLevel;
 
 				SkyPlayer nextVotePlayer = null;
-				BuildBattleTeam gameTeam;
 				do
 				{
-					gameTeam = buildLevel.BuildTeams[++_currentVotingTeam];
+					var gameTeam = buildLevel.BuildTeams[++_currentVotingTeam];
 
 					List<SkyPlayer> teamPlayer = buildLevel.GetPlayersInTeam(gameTeam);
 					if (teamPlayer.Count > 0)
@@ -222,9 +229,10 @@ namespace SkyCore.Games.BuildBattle.State
 					}
 
 					voteString = $" | {voteName} §fSelected...";
-				}
 
-				player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");
+					player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");
+				}
+				
 				player.BarHandler.AddMajorLine($"§d§lBUILDER§r §f{_currentVotingPlayer.Username}§r §7| {neatRemaining} Vote Time{voteString}", 2);
 			});
 		}

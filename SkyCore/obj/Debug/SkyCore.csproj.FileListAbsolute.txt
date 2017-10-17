@@ -84,5 +84,4 @@ E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.csprojResolveAssemblyReferen
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.csproj.CoreCompileInputs.cache
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.dll
 E:\Git\C#\SkyCore\SkyCore\SkyCore\obj\Debug\SkyCore.pdb
-E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.pdb
 E:\Git\C#\SkyCore\SkyCore\SkyCore\bin\Debug\MiNET.dll

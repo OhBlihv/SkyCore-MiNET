@@ -91,6 +91,9 @@ namespace SkyCore.Games.BuildBattle.State
 						player.Teleport(newLocation);
 					}
 				});
+
+				gameLevel.AllowBreak = true;
+				gameLevel.AllowBuild = true;
 			});
 		}
 
@@ -142,16 +145,26 @@ namespace SkyCore.Games.BuildBattle.State
 			});
 		}
 
+		public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+		{
+			SkyUtil.log($"{player.Username} attempted block interaction:{interactId} at ");
+			
+			return base.DoInteract(gameLevel, interactId, player, target);
+		}
+
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
 		{
 			BlockCoordinates centreLocation = ((BuildBattleTeam) player.GameTeam).SpawnLocation.GetCoordinates3D();
 			BlockCoordinates interactLocation = targetBlock.Coordinates;
 
-			if (Math.Abs(centreLocation.X - interactLocation.X) > 10 ||
-			    Math.Abs(centreLocation.Z - interactLocation.Z) > 10 ||
-				interactLocation.Y < centreLocation.Y || 
-				interactLocation.Y > 150) //TODO: Check heights
+			if (Math.Abs(centreLocation.X - interactLocation.X) > 20 ||
+			    Math.Abs(centreLocation.Z - interactLocation.Z) > 20 ||
+			    interactLocation.Y < (centreLocation.Y - 1) ||
+			    interactLocation.Y > 106) //TODO: Check heights (spawn heights are ~66)
 			{
+				SkyUtil.log($"{interactLocation.X}:{interactLocation.Y}:{interactLocation.Z} vs {centreLocation.X}:{centreLocation.Y}:{centreLocation.Z} " +
+				            $"({Math.Abs(centreLocation.X - interactLocation.X)}, {Math.Abs(centreLocation.Z - interactLocation.Z)}, " +
+				            $"{interactLocation.Y < (centreLocation.Y - 1)}, {interactLocation.Y > 150})");
 				player.BarHandler.AddMinorLine("§c§l(!)§r §cYou can only build within your build zone §c§l(!)§r");
 				return true;
 			}

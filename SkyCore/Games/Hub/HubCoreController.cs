@@ -150,10 +150,12 @@ namespace SkyCore.Games.Hub
 			
 			player.Inventory.SetInventorySlot(4, new ItemNavigationCompass());
 
+			player.Inventory.SetHeldItemSlot(4);
+
 			RunnableTask.RunTaskLater(() =>
 			{
 				player.Inventory.SetHeldItemSlot(4);
-			}, 500);
+			}, 2000);
 		}
 
 		public override void CheckCapacity()
