@@ -1,6 +1,7 @@
 ﻿using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State.Impl;
+using SkyCore.Games.Murder.Level;
 using SkyCore.Player;
 
 namespace SkyCore.Games.Murder.State

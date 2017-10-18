@@ -407,6 +407,8 @@ namespace SkyCore.Game.Level
         public abstract GameState GetInitialState();
 
         public abstract GameTeam GetDefaultTeam();
+	    
+        public abstract GameTeam GetSpectatorTeam(); 
 
         public abstract int GetMaxPlayers();
 
@@ -424,7 +426,7 @@ namespace SkyCore.Game.Level
 
         public void AddSpectator(SkyPlayer player)
         {
-	        player.IsGameSpectator = true;
+			player.IsGameSpectator = true;
 
 			List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
 			DoForAllPlayers(gamePlayer =>
@@ -535,8 +537,7 @@ namespace SkyCore.Game.Level
 							Type = "url",
 							Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
 						},
-						//TODO: Close the GUI, or simply ensure the player is spectating?
-						ExecuteAction = delegate {  }
+						ExecuteAction = delegate { SetPlayerTeam(player, GetSpectatorTeam()); }
 					}
 				);
 			}

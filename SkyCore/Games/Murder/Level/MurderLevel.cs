@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using MiNET.Effects;
-using MiNET.Items;
 using MiNET.Utils;
-using Newtonsoft.Json;
-using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
-using SkyCore.Games.Murder.Level;
 using SkyCore.Games.Murder.State;
 using SkyCore.Player;
 
-namespace SkyCore.Games.Murder
+namespace SkyCore.Games.Murder.Level
 {
     class MurderLevel : GameLevel
     {
@@ -114,7 +108,12 @@ namespace SkyCore.Games.Murder
             return MurderTeam.Innocent;
         }
 
-        public override int GetMaxPlayers()
+	    public override GameTeam GetSpectatorTeam()
+	    {
+		    return MurderTeam.Spectator;
+	    }
+
+	    public override int GetMaxPlayers()
         {
             return 12;
         }

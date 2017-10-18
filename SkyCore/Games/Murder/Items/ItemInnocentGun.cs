@@ -11,6 +11,7 @@ using MiNET.Worlds;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Games.Murder.Entities;
+using SkyCore.Games.Murder.Level;
 using SkyCore.Games.Murder.State;
 using SkyCore.Player;
 using SkyCore.Util;

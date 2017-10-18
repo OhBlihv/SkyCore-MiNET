@@ -66,6 +66,11 @@ namespace SkyCore.Games.Hub
 			return HubTeam.Player;
 		}
 
+		public override GameTeam GetSpectatorTeam()
+		{
+			return HubTeam.Spectator;
+		}
+
 		public override int GetMaxPlayers()
 		{
 			return 100;

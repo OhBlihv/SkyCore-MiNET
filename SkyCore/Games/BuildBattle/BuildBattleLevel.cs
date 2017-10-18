@@ -73,6 +73,11 @@ namespace SkyCore.Games.BuildBattle
 			return lastTeam;
 		}
 
+		public override GameTeam GetSpectatorTeam()
+		{
+			return null; //TODO: Proper Handling. You can't 'die' in BB, so no real reason to handle
+		}
+
 		public override int GetMaxPlayers()
 		{
 			return 9;
