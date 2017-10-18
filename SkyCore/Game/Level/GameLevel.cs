@@ -268,7 +268,6 @@ namespace SkyCore.Game.Level
 	        ((SkyPlayer) player).GameTeam = null;
 
 			player.RemoveAllEffects();
-
 		
 			base.RemovePlayer(player); //Remove player from the 'world'
 
@@ -424,7 +423,7 @@ namespace SkyCore.Game.Level
             CurrentState.HandleDamage(this, source, target, item, damage, damageCause);
         }
 
-        public void AddSpectator(SkyPlayer player)
+        public virtual void AddSpectator(SkyPlayer player)
         {
 			player.IsGameSpectator = true;
 

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using MiNET.Effects;
 using MiNET.Utils;
 using SkyCore.Entities;
 using SkyCore.Game;
@@ -54,6 +56,7 @@ namespace SkyCore.Games.Hub
 		protected override void InitializeTeamMap()
 		{
 			TeamPlayerDict.Add(HubTeam.Player, new List<SkyPlayer>());
+			TeamPlayerDict.Add(HubTeam.Spectator, new List<SkyPlayer>());
 		}
 
 		public override GameState GetInitialState()
@@ -63,12 +66,29 @@ namespace SkyCore.Games.Hub
 
 		public override GameTeam GetDefaultTeam()
 		{
-			return HubTeam.Player;
+			return HubTeam.Spectator; //Default is spectator, until you move from the spawn position
 		}
 
 		public override GameTeam GetSpectatorTeam()
 		{
 			return HubTeam.Spectator;
+		}
+
+		public override void AddSpectator(SkyPlayer player)
+		{
+			player.IsGameSpectator = true;
+
+			List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
+			DoForAllPlayers(gamePlayer =>
+			{
+				if (!gamePlayer.IsGameSpectator)
+				{
+					gamePlayers.Add(gamePlayer);
+				}
+			});
+
+			SkyUtil.log($"Despawning {player.Username} from {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
+			player.DespawnFromPlayers(gamePlayers.ToArray());
 		}
 
 		public override int GetMaxPlayers()
