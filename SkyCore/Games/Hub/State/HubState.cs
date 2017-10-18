@@ -74,6 +74,7 @@ namespace SkyCore.Games.Hub.State
 			if (player.Inventory.GetItemInHand() is ItemNavigationCompass)
 			{
 				GameUtil.ShowGameList(player);
+				RunnableTask.RunTaskLater(() => player.Inventory.SetInventorySlot(player.Inventory.InHandSlot, new ItemNavigationCompass()), 250);
 			}
 
 			return false;

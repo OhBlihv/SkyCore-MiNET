@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Threading;
-using MiNET;
+﻿using MiNET;
 using MiNET.Effects;
 using MiNET.Entities;
 using MiNET.Items;
@@ -16,10 +9,17 @@ using Newtonsoft.Json;
 using SkyCore.Game.State;
 using SkyCore.Player;
 using SkyCore.Util;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
+using System.Threading;
 
 namespace SkyCore.Game.Level
 {
-    public abstract class GameLevel : MiNET.Worlds.Level, IDisposable, IComparable<GameLevel>
+	public abstract class GameLevel : MiNET.Worlds.Level, IDisposable, IComparable<GameLevel>
     {
 
 	    public new string LevelName { get; }
@@ -380,7 +380,29 @@ namespace SkyCore.Game.Level
             return CurrentState.DoInteract(this, interactId, player, target);
         }
 
-        //
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="player"></param>
+		/// <param name="item"></param>
+		/// <returns>Whether to cancel the drop. true = cancelled</returns>
+		public virtual bool DropItem(SkyPlayer player, Item item)
+	    {
+		    return true;
+	    }
+
+	    /// <summary>
+		/// 
+		/// </summary>
+		/// <param name="player"></param>
+		/// <param name="item"></param>
+		/// <returns>Whether to cancel the pickup. true = cancelled</returns>
+	    public virtual bool PickupItem(SkyPlayer player, Item item)
+	    {
+		    return true;
+	    }
+
+	    //
 
         public abstract GameState GetInitialState();
 

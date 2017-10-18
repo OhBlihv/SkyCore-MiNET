@@ -370,7 +370,42 @@ namespace SkyCore.Player
 	        base.SpawnLevel(toLevel, spawnPoint, false, levelFunc);
         }
 
-		public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
+	    protected override void HandleTransactions(Transaction transaction)
+	    {
+		    foreach (var record in transaction.Transactions)
+		    {
+			    if (record is WorldInteractionTransactionRecord)
+			    {
+				    //Drop
+				    if (record.Slot == 0)
+				    {
+						if (Level is GameLevel level && level.DropItem(this, record.NewItem))
+						{
+							return; //Avoid default handling
+						}
+				    }
+				    //Pickup
+				    else if (record.Slot == 1)
+				    {
+					    if (Level is GameLevel level && level.PickupItem(this, record.NewItem))
+					    {
+						    return; //Avoid default handling
+					    }
+					}
+			    }
+		    }
+
+		    base.HandleTransactions(transaction);
+	    }
+
+	    protected override void HandleTransactionItemUse(Transaction transaction)
+	    {
+		    HandleInteract(2, null); //'Right Click'
+		    
+		    base.HandleTransactionItemUse(transaction);
+	    }
+
+	    public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
 		{
 			/*SkyUtil.log("Replying with Skytonia settings");
 			CustomForm customForm1 = new CustomForm {Title = "Skytonia Settings"};
