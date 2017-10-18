@@ -22,33 +22,12 @@ namespace SkyCore.Commands
             this.skyCoreApi = skyCoreApi;
         }
 
-		[Command(Name = "giveironingot")]
+		[Command(Name = "findworld")]
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandGiveIronIngot(MiNET.Player player)
 		{
-			player.Inventory.SetFirstEmptySlot(new ItemIronIngot(), true, false);
+			player.SendMessage($"In World {player.Level.LevelName}");
 		}
-
-	    [Command(Name = "giveironnugget")]
-	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandGiveIronNugget(MiNET.Player player)
-	    {
-		    player.Inventory.SetFirstEmptySlot(new ItemIronNugget(), true, false);
-	    }
-
-		[Command(Name = "givegoldingot")]
-	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandGiveGoldIngot(MiNET.Player player)
-	    {
-		    player.Inventory.SetFirstEmptySlot(new ItemGoldIngot(), true, false);
-	    }
-
-	    [Command(Name = "givegoldnugget")]
-	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandGiveGoldNugget(MiNET.Player player)
-	    {
-		    player.Inventory.SetFirstEmptySlot(new ItemGoldNugget(), true, false);
-	    }
 
 		[Command(Name = "hub")]
 	    [Authorize(Permission = CommandPermission.Normal)]

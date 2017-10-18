@@ -2,6 +2,7 @@
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
+using SkyCore.Game.Level;
 using SkyCore.Player;
 
 namespace SkyCore.Game.State.Impl
@@ -38,7 +39,6 @@ namespace SkyCore.Game.State.Impl
 					gamePlayer.BarHandler.AddMinorLine($"§e{player.PlayerGroup.Prefix} {player.Username}§r §7entered the game!");
 				});
 			});
-			
         }
 
         public override void HandleLeave(GameLevel gameController, SkyPlayer player)
@@ -140,7 +140,7 @@ namespace SkyCore.Game.State.Impl
             {
                 return StateType.Empty;
             }
-            else if (gameLevel.GetPlayerCount() == gameLevel.GetMaxPlayers())
+            if (gameLevel.GetPlayerCount() == gameLevel.GetMaxPlayers())
             {
                 return StateType.PreGameStarting;
             }

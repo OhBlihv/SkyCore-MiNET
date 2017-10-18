@@ -3,21 +3,18 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Numerics;
 using System.Threading;
-using System.Threading.Tasks;
-using log4net;
 using MiNET;
 using MiNET.Items;
 using MiNET.Net;
 using MiNET.Plugins;
 using MiNET.Plugins.Attributes;
-using MiNET.Sounds;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Commands;
 using SkyCore.Entities;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Games.BuildBattle;
 using SkyCore.Games.Hub;
 using SkyCore.Games.Murder;
@@ -85,41 +82,6 @@ namespace SkyCore
 
             context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
             context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
-	        
-            context.LevelManager.LevelCreated += (sender, args) =>
-            {
-                Level level = args.Level;
-                
-                //Override Spawn Point for testing
-                if (level.LevelId.Equals("Overworld"))
-                {
-					//level.SpawnPoint = new PlayerLocation(0D, 36D, 10D, 0f, 0f, 90f);
-					level.SpawnPoint = new PlayerLocation(256.5, 78, 255.5);
-
-                    level.BlockBreak += LevelOnBlockBreak;
-                    level.BlockPlace += LevelOnBlockPlace;
-
-	                level.CurrentWorldTime = 22000; //Sunrise?
-	                SkyUtil.log($"Set world time to {level.CurrentWorldTime}");
-	                
-	                AddPendingTask(() =>
-	                {
-						{
-							PlayerLocation portalInfoLocation = new PlayerLocation(256.5, 79.5, 276.5);
-
-							string hologramContent =
-								"  §d§lSkytonia§r §f§lNetwork§r" + "\n" + 
-								" §7Enter the portal and§r" + "\n" +
-								"§7enjoy your adventure!§r" + "\n" +
-								"     §ewww.skytonia.com§r";
-
-							Hologram portalInfoHologram = new Hologram(hologramContent, level, portalInfoLocation);
-
-							portalInfoHologram.SpawnEntity();
-						}
-					});
-                }
-            };
 
             //Register listeners
             context.Server.PlayerFactory.PlayerCreated += (sender, args) =>
@@ -259,7 +221,7 @@ namespace SkyCore
 			StatisticsCore.Close();
         }
 
-        private void LevelOnBlockBreak(object sender, BlockBreakEventArgs e)
+        public void LevelOnBlockBreak(object sender, BlockBreakEventArgs e)
         {
             if (!((SkyPlayer) e.Player).PlayerGroup.isAtLeast(PlayerGroup.Admin))
             {
@@ -267,7 +229,7 @@ namespace SkyCore
             }
         }
 
-        private void LevelOnBlockPlace(object sender, BlockPlaceEventArgs e)
+	    public void LevelOnBlockPlace(object sender, BlockPlaceEventArgs e)
         {
             if (!((SkyPlayer)e.Player).PlayerGroup.isAtLeast(PlayerGroup.Admin))
             {

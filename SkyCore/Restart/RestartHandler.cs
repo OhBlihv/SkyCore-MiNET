@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MiNET.Utils;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Player;
 using SkyCore.Util;
 using Timer = System.Threading.Timer;

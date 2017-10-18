@@ -36,7 +36,7 @@ namespace SkyCore.Game.State
 
         public bool IsJoinable()
         {
-            return IsStart();
+            return Ordinal < 2; //Do not include PreGameStarting, since this indicates a full lobby
         }
 
     }

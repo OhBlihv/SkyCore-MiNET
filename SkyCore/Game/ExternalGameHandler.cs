@@ -11,6 +11,7 @@ using MiNET.Net;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Entities;
+using SkyCore.Game.Level;
 using SkyCore.Player;
 using StackExchange.Redis;
 
@@ -140,9 +141,7 @@ namespace SkyCore.Game
 			{
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
-					MiNET.Worlds.Level level = SkyCoreAPI.Instance.GetHubLevel();
-					
-					PlayerNPC.SpawnNPC(level, neatName, npcLocation, $"GID:{gameName}");
+					PlayerNPC.SpawnNPC(null, neatName, npcLocation, $"GID:{gameName}");
 				});
 			}
 

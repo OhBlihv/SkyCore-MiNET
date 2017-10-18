@@ -8,6 +8,7 @@ using MiNET.Blocks;
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
+using SkyCore.Game.Level;
 using SkyCore.Player;
 using SkyCore.Util;
 

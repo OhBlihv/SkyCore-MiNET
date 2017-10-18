@@ -96,7 +96,10 @@
     <Compile Include="Games\BuildBattle\State\BuildBattleLobbyState.cs" />
     <Compile Include="Games\BuildBattle\State\BuildBattleVoteState.cs" />
     <Compile Include="Games\Hub\HubCoreController.cs" />
+    <Compile Include="Games\Hub\HubLevel.cs" />
+    <Compile Include="Games\Hub\HubTeam.cs" />
     <Compile Include="Games\Hub\Items\ItemNavigationCompass.cs" />
+    <Compile Include="Games\Hub\State\HubState.cs" />
     <Compile Include="Games\Murder\Entities\GunProjectile.cs" />
     <Compile Include="Games\Murder\Entities\MurderGunPartEntity.cs" />
     <Compile Include="Games\Murder\Items\ItemGunParts.cs" />

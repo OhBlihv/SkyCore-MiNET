@@ -16,6 +16,7 @@ using MiNET.Worlds;
 using SkyCore.Database;
 using SkyCore.Entities;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Games.Hub;
 using SkyCore.Punishments;
@@ -295,14 +296,6 @@ namespace SkyCore.Player
 					//return; //Avoid default handling
 				}
 			}
-			else if (SkyCoreApi.GameType.Equals("hub"))
-			{
-				//Nothing special, must be a hub.
-				if (!(Level is GameLevel))
-				{
-					((HubCoreController)SkyCoreApi.GameModes["hub"]).DoInteract(message.actionId, this, null);
-				}
-			}
 
 			base.HandleMcpeAnimate(message);
         }
@@ -349,14 +342,6 @@ namespace SkyCore.Player
 						//return; //Avoid default handling
 					}
 				}
-	            else if (SkyCoreApi.GameType.Equals("hub"))
-                {
-	                //Nothing special, must be a hub.
-	                if (!(Level is GameLevel))
-	                {
-		                ((HubCoreController) SkyCoreApi.GameModes["hub"]).DoInteract(actionId, this, (SkyPlayer) target);
-	                }
-                }
             }
         }
 
@@ -382,7 +367,7 @@ namespace SkyCore.Player
             IsFlying = false;
             IsSpectator = false;
 
-            base.SpawnLevel(toLevel, spawnPoint, true, levelFunc);
+	        base.SpawnLevel(toLevel, spawnPoint, false, levelFunc);
         }
 
 		public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)

@@ -31,8 +31,6 @@ namespace SkyCore.Games.Murder
 	    public override Type GetGameLevelInfoType()
 	    {
 		    return typeof(MurderLevelInfo);
-
-		    
 		}
 
 	    /*[Command(Name = "nospec")]

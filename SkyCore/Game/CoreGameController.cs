@@ -119,15 +119,16 @@ namespace SkyCore.Game
             {
                 return;
             }
-
+	        
             //SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 			lock (GameLevels)
 			{
 				InstanceInfo instanceInfo = ExternalGameHandler.GameRegistrations[RawName].GetLocalInstance();
 				instanceInfo.CurrentPlayers = 0;
 
+				//Show higher player count games first
 				List<GameInfo> availableGames = new List<GameInfo>();
-				foreach (GameLevel gameLevel in GameLevels.Values)
+				foreach (GameLevel gameLevel in GetMostViableGames())
 				{
 					//Update player counts
 					instanceInfo.CurrentPlayers += gameLevel.GetPlayerCount();
@@ -172,12 +173,27 @@ namespace SkyCore.Game
             }
         }
 
+	    public virtual SortedSet<GameLevel> GetMostViableGames()
+	    {
+			SortedSet<GameLevel> mostViableGames = new SortedSet<GameLevel>();
+
+			foreach (GameLevel gameLevel in GameLevels.Values)
+			{
+				if (gameLevel.CurrentState.GetEnumState(gameLevel).IsJoinable())
+				{
+					mostViableGames.Add(gameLevel);
+				}
+			}
+
+		    return mostViableGames;
+	    }
+
 	    public virtual void InstantQueuePlayer(SkyPlayer player)
 	    {
 			SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 		    lock (GameLevels)
 		    {
-			    foreach (GameLevel gameLevel in GameLevels.Values)
+			    foreach (GameLevel gameLevel in GetMostViableGames())
 			    {
 				    if (!gameLevel.CurrentState.CanAddPlayer(gameLevel))
 				    {

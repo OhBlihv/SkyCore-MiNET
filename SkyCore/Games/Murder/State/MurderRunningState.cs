@@ -12,6 +12,7 @@ using MiNET.Particles;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
 using SkyCore.Games.Murder.Entities;

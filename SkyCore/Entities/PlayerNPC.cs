@@ -14,13 +14,20 @@ using MiNET.Utils.Skins;
 using MiNET.Worlds;
 using SkyCore.Entities.Holograms;
 using SkyCore.Game;
+using SkyCore.Game.Level;
+using SkyCore.Games.Hub;
 using SkyCore.Player;
 using SkyCore.Util;
 
 namespace SkyCore.Entities
 {
-    public class PlayerNPC : PlayerMob
+
+	public delegate void NPCSpawnTask(GameLevel gameLevel);
+
+	public class PlayerNPC : PlayerMob
     {
+	    
+	    public static readonly IDictionary<string, NPCSpawnTask> GameNPCs = new Dictionary<string, NPCSpawnTask>();
 
 	    public const string ComingSoonName = "§d§lMystery Game";
 
@@ -28,7 +35,7 @@ namespace SkyCore.Entities
 
         public delegate void onInteract(SkyPlayer player);
 
-        private onInteract Action;
+        private readonly onInteract Action;
 
         public PlayerNPC(string name, Level level, PlayerLocation playerLocation, onInteract action = null, string gameName = "") : base(name, level)
         {
@@ -62,96 +69,121 @@ namespace SkyCore.Entities
          * Helper Methods
          */
 
-        public static void SpawnNPC(Level level, string npcName, PlayerLocation spawnLocation, string command)
+	    public static void SpawnAllHubNPCs(HubLevel gameLevel)
+	    {
+		    foreach (string npcName in GameNPCs.Keys)
+		    {
+			    //Only spawn NPCs which have not been spawned yet
+			    if (gameLevel.CurrentlySpawnedNPCs.Contains(npcName))
+			    {
+				    continue;
+			    }
+			    
+			    GameNPCs[npcName].Invoke(gameLevel);
+			    gameLevel.CurrentlySpawnedNPCs.Add(npcName);
+		    }
+	    }
+
+        public static void SpawnNPC(GameLevel level, string npcName, PlayerLocation spawnLocation, string command)
         {
-            try
-            {
-                if (String.IsNullOrEmpty(npcName))
-                {
-                    Console.WriteLine("§c§l(!) §r§cInvalid NPC text. /hologram <text>");
-                    return;
-                }
-
-                npcName = npcName.Replace("_", " ").Replace("&", "§");
-
-                if (npcName.Equals("\"\""))
-                {
-                    npcName = "";
-                }
-
-				string gameName = command;
-                onInteract action = null;
-                if (!String.IsNullOrEmpty(command))
-                {
-                    if (command.StartsWith("GID:"))
+	        NPCSpawnTask spawnTask = (gameLevel) =>
+	        {
+				try
+				{
+					if (String.IsNullOrEmpty(npcName))
 					{
-						gameName = command.Split(':')[1];
+						Console.WriteLine("§c§l(!) §r§cInvalid NPC text. /hologram <text>");
+						return;
+					}
 
-						switch (gameName)
+					npcName = npcName.Replace("_", " ").Replace("&", "§");
+
+					if (npcName.Equals("\"\""))
+					{
+						npcName = "";
+					}
+
+					string gameName = command;
+					onInteract action = null;
+					if (!String.IsNullOrEmpty(command))
+					{
+						if (command.StartsWith("GID:"))
 						{
-							case "murder":
-							case "build-battle":
+							gameName = command.Split(':')[1];
+
+							switch (gameName)
 							{
-								action = player =>
+								case "murder":
+								case "build-battle":
 								{
-									//Freeze the players movement
-									player.SetNoAi(true);
-									RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
-								};
-								break;
+									action = player =>
+									{
+										//Freeze the players movement
+										player.SetNoAi(true);
+										RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
+									};
+									break;
+								}
 							}
 						}
-                    }
-                }
+					}
 
-				if (gameName.Equals(command))
+					if (gameName.Equals(command))
+					{
+						SkyUtil.log($"Unknown game command '{command}'");
+						return;
+					}
+
+					//Ensure this NPC can be seen
+					PlayerNPC npc;
+					if (action != null)
+					{
+						npc = new PlayerNPC("§a(Punch to play)", gameLevel, spawnLocation, action, gameName) { Scale = 1.5 };
+					}
+					else
+					{
+						npc = new PlayerNPC("§e(Coming Soon)", gameLevel, spawnLocation, null, gameName) { Scale = 1.5 };
+					}
+
+					SkyCoreAPI.Instance.AddPendingTask(() =>
+					{
+						npc.KnownPosition = spawnLocation;
+						npc.SpawnEntity();
+					});
+
+					{
+						PlayerLocation playerCountLocation = (PlayerLocation)spawnLocation.Clone();
+
+						//Spawn a hologram with player counts
+						PlayerCountHologram hologram = new PlayerCountHologram(npcName, gameLevel, playerCountLocation, gameName);
+
+						SkyCoreAPI.Instance.AddPendingTask(() => hologram.SpawnEntity());
+					}
+
+					{
+						PlayerLocation gameNameLocation = (PlayerLocation)spawnLocation.Clone();
+						gameNameLocation.Y += 3.3f;
+
+						Hologram gameNameHologram = new Hologram(npcName, gameLevel, gameNameLocation);
+
+						SkyCoreAPI.Instance.AddPendingTask(() => gameNameHologram.SpawnEntity());
+					}
+
+					Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
+				}
+				catch (Exception e)
 				{
-					SkyUtil.log($"Unknown game command '{command}'");
-					return;
+					Console.WriteLine(e);
+					throw;
 				}
+			};
 
-				//Ensure this NPC can be seen
-	            PlayerNPC npc;
-	            if (action != null)
-	            {
-					npc = new PlayerNPC("§a(Punch to play)", level, spawnLocation, action, gameName) { Scale = 1.5 };
-				}
-	            else
-	            {
-		            npc = new PlayerNPC("§e(Coming Soon)", level, spawnLocation, null, gameName) { Scale = 1.5 };
-				}
-
-				SkyCoreAPI.Instance.AddPendingTask(() =>
-				{
-					npc.KnownPosition = spawnLocation;
-					npc.SpawnEntity();
-				});
-
-	            {
-		            PlayerLocation playerCountLocation = (PlayerLocation) spawnLocation.Clone();
-		            
-					//Spawn a hologram with player counts
-		            PlayerCountHologram hologram = new PlayerCountHologram(npcName, level, playerCountLocation, gameName);
-
-					SkyCoreAPI.Instance.AddPendingTask(() => hologram.SpawnEntity());
-				}
-
-				{
-					PlayerLocation gameNameLocation = (PlayerLocation) spawnLocation.Clone();
-					gameNameLocation.Y += 3.3f;
-
-					Hologram gameNameHologram = new Hologram(npcName, level, gameNameLocation);
-
-					SkyCoreAPI.Instance.AddPendingTask(() => gameNameHologram.SpawnEntity());
-				}
-
-                Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+	        if (level != null)
+	        {
+				spawnTask.Invoke(level);
+			}
+	        
+	        GameNPCs.Add(command, spawnTask);
         }
 
     }

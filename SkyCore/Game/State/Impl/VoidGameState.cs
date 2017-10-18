@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MiNET;
 using MiNET.Entities;
 using MiNET.Items;
+using SkyCore.Game.Level;
 using SkyCore.Player;
 
 namespace SkyCore.Game.State.Impl

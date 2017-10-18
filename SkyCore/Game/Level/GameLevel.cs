@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Numerics;
 using System.Reflection;
 using System.Threading;
@@ -10,19 +9,17 @@ using MiNET;
 using MiNET.Effects;
 using MiNET.Entities;
 using MiNET.Items;
-using MiNET.Net;
 using MiNET.UI;
 using MiNET.Utils;
 using MiNET.Worlds;
 using Newtonsoft.Json;
-using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Player;
 using SkyCore.Util;
 
-namespace SkyCore.Game
+namespace SkyCore.Game.Level
 {
-    public abstract class GameLevel : MiNET.Worlds.Level, IDisposable
+    public abstract class GameLevel : MiNET.Worlds.Level, IDisposable, IComparable<GameLevel>
     {
 
 	    public new string LevelName { get; }
@@ -245,7 +242,7 @@ namespace SkyCore.Game
 
             //player.SpawnLevel(this, new PlayerLocation(7.5, 181, -20.5));
             //player.SpawnLevel(this, new PlayerLocation(255, 70, 255));
-            player.SpawnLevel(this, GameLevelInfo.LobbyLocation, true);
+            player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false);
 
 			CurrentState.InitializePlayer(this, player);
         }
@@ -284,7 +281,8 @@ namespace SkyCore.Game
 			        return;
 		        }
 
-		        player.SpawnLevel(level, level.SpawnPoint, true);
+		        //player.SpawnLevel(level, level.SpawnPoint, true);
+		        player.SpawnLevel(level, level.SpawnPoint);
 			}
         }
 
@@ -538,6 +536,10 @@ namespace SkyCore.Game
 			player.SendForm(simpleForm);
 		}
 
+	    public int CompareTo(GameLevel other)
+	    {
+		    return Math.Sign(GetPlayerCount().CompareTo(other.GetPlayerCount()));
+	    }
     }
     
 }

@@ -9,6 +9,7 @@ using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 
 namespace SkyCore.Player
 {
