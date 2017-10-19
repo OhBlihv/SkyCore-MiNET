@@ -90,14 +90,7 @@ namespace SkyCore.Game.State.Impl
                     }
                     else
                     {
-	                    if (secondsRemaining == 1)
-	                    {
-							actionBarMessage = $"§d§lGame Starting:§r §7{secondsRemaining} §fSecond Remaining...";
-						}
-	                    else
-	                    {
-							actionBarMessage = $"§d§lGame Starting:§r §7{secondsRemaining} §fSeconds Remaining...";
-						}
+						actionBarMessage = $"§d§lGame Starting:§r §7{secondsRemaining} §fSecond{(secondsRemaining == 1 ? "" : "s")} Remaining...";
                     }
                 }
             }

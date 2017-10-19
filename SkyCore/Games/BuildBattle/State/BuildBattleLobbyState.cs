@@ -21,7 +21,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 			foreach (SkyPlayer existingPlayer in gameController.GetPlayers())
 			{
-				existingPlayer.SetGameMode(GameMode.Adventure);
+				existingPlayer.UpdateGameMode(GameMode.Creative, true);
 			}
 		}
 

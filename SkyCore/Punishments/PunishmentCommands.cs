@@ -88,7 +88,7 @@ namespace SkyCore.Punishments
 				target?.Disconnect($"§cYou have been kicked from the server.\n" +
 				                   $"§6Reason: {punishReason}");
 				
-				player.SendMessage($"§c{playerName} has been kicked: {punishReason}");
+				player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been kicked for §f\"{punishReason}\"");
 			});
 		}
 
@@ -157,24 +157,39 @@ namespace SkyCore.Punishments
 
 			DateTime expiry = UpdateExpiryTime(durationUnit, durationAmount);
 
-			PunishCore.AddPunishment(targetXuid, punishmentType, new Punishment(punishReason, player.CertificateData.ExtraData.Xuid, true, durationAmount, durationUnit, expiry));
+			Punishment punishment = new Punishment(punishReason, player.CertificateData.ExtraData.Xuid, true, durationAmount, durationUnit, expiry);
+			PunishCore.AddPunishment(targetXuid, punishmentType, punishment);
 
 			if (punishmentType == PunishmentType.Ban)
 			{
 				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
 				if (durationUnit == DurationUnit.Permanent)
 				{
-					player.SendMessage($"§c{playerName} has been banned permanently: {punishReason}");
+					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been banned permanently for \"{punishReason}\"");
 
-					target?.Disconnect($"§cYou have been banned permanently.\n" +
-					                   $"§6Reason: {punishReason}");
+					target?.Disconnect(PunishmentMessages.GetPunishmentMessage(target, punishmentType, punishment));
 				}
 				else
 				{
-					player.SendMessage($"§c{playerName} has been banned for {GetNeatDuration(durationAmount, durationUnit)}: {punishReason}");
+					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been banned for §f{GetNeatDuration(durationAmount, durationUnit)} \"{punishReason}\"");
 
-					target?.Disconnect($"§cYou have been banned for {GetNeatDuration(durationAmount, durationUnit)}\n" +
-					                   $"§6Reason: {punishReason}");
+					target?.Disconnect(PunishmentMessages.GetPunishmentMessage(target, punishmentType, punishment));
+				}
+			}
+			else if (punishmentType == PunishmentType.Mute)
+			{
+				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
+				if (durationUnit == DurationUnit.Permanent)
+				{
+					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been muted permanently for \"{punishReason}\"");
+					
+					target?.SendMessage(PunishmentMessages.GetPunishmentMessage(target, PunishmentType.Mute, punishment));
+				}
+				else
+				{
+					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been muted for §f{GetNeatDuration(durationAmount, durationUnit)} \"{punishReason}\"");
+					
+					target?.SendMessage(PunishmentMessages.GetPunishmentMessage(target, PunishmentType.Mute, punishment));
 				}
 			}
 		}

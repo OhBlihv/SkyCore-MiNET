@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using MiNET.Utils;
 using MySql.Data.MySqlClient;
 using SkyCore.Database;
+using SkyCore.Player;
 using SkyCore.Statistics;
 using SkyCore.Util;
 
@@ -573,4 +574,99 @@ namespace SkyCore.Punishments
 			}
 		}
 	}
+
+	public class PunishmentMessages
+	{
+
+		public static string GetNeatExpiryForPunishment(Punishment punishment)
+		{
+			string expiryString = "";
+			if (punishment.DurationUnit != DurationUnit.Permanent)
+			{
+				TimeSpan expiryTime = punishment.Expiry.Subtract(DateTime.Now);
+
+				if (expiryTime.Days > 0)
+				{
+					expiryString += expiryTime.Days + " Days";
+				}
+				if (expiryTime.Hours > 0)
+				{
+					if (expiryString.Length > 0)
+					{
+						expiryString += " ";
+					}
+
+					expiryString += expiryTime.Hours + " Hours";
+				}
+				if (expiryTime.Minutes > 0)
+				{
+					if (expiryString.Length > 0)
+					{
+						expiryString += " ";
+					}
+
+					expiryString += expiryTime.Minutes + " Minutes";
+				}
+				if (expiryTime.Seconds > 0)
+				{
+					if (expiryString.Length > 0)
+					{
+						expiryString += " ";
+					}
+
+					expiryString += expiryTime.Seconds + " Seconds";
+				}
+
+				expiryString += $" Remaining";
+			}
+			else
+			{
+				expiryString = "Permanent";
+			}
+
+			return expiryString;
+		}
+
+		public static string GetPunishmentMessage(SkyPlayer player, PunishmentType punishmentType, Punishment punishment)
+		{
+			switch (punishmentType)
+			{
+				case PunishmentType.Kick:
+				{
+					return
+						TextUtils.CenterLine("§d§lSkytonia §f§lNetwork") + "\n" + 
+						"\n" +
+						TextUtils.CenterLine("§r§cYou have been kicked from Skytonia!") + "\n" +
+						TextUtils.CenterLine($"§r§7Reason: §f{punishment.PunishReason}") + "\n" + 
+						"\n" +
+						TextUtils.CenterLine("§r§7Read our rules at: §e§nwww.skytonia.com/rules");
+				}
+				case PunishmentType.Ban:
+				{
+					return
+						TextUtils.CenterLine("§d§lSkytonia §f§lNetwork") + "\n" +
+						"\n" +
+						TextUtils.CenterLine("§r§cYou have been banned from entering Skytonia!") + "\n" +
+						"\n" +
+						(punishment.DurationUnit == DurationUnit.Permanent ? 
+							TextUtils.CenterLine($"§r§7Time: §fPermanent") + "\n" :
+							TextUtils.CenterLine($"§r§7Time: §f{GetNeatExpiryForPunishment(punishment)}") + "\n") + 
+						TextUtils.CenterLine($"§r§7Reason: §f{punishment.PunishReason}") + "\n" +
+						TextUtils.CenterLine($"§r§7Date: §f{punishment.GetIssueDate()}") + "\n" +
+						"\n" +
+						TextUtils.CenterLine("§r§7Appeal at: §e§nwww.skytonia.com/appeal");
+				}
+				case PunishmentType.Mute:
+				{
+					return
+						"§f[PUNISHMENT] §cYou are currently muted from talking in chat.\n" +
+						"§7Read our rules at: §e§nwww.skytonia.com/rules";
+				}
+			}
+
+			return null;
+		}
+		
+	}
+	
 }

@@ -43,12 +43,16 @@ namespace SkyCore.Games.BuildBattle.State
 				{
 					foreach (SkyPlayer player in gameLevel.GetPlayersInTeam(gameTeam))
 					{
+						player.IsWorldImmutable = true; //Allow breaking
+						player.IsWorldBuilder = false;
+						player.SendAdventureSettings();
+
 						player.Teleport(gameTeam.SpawnLocation);
-						player.MovementSpeed = 0f;
-						player.SendUpdateAttributes();
+
+						player.SetNoAi(true);
 
 						player.UseCreativeInventory = true;
-						player.SetGameMode(GameMode.Creative);
+						player.UpdateGameMode(GameMode.Creative, false);
 					}
 				}
 				
@@ -64,9 +68,6 @@ namespace SkyCore.Games.BuildBattle.State
 						if (i == 0 || i == 11)
 						{
 							player.SetNoAi(true);
-
-							player.MovementSpeed = 0f;
-							player.SendUpdateAttributes();
 						}
 					}
 
@@ -77,9 +78,10 @@ namespace SkyCore.Games.BuildBattle.State
 				gameLevel.DoForAllPlayers(player =>
 				{
 					player.SetNoAi(false);
-
-					player.MovementSpeed = 0.1f;
-					player.SendUpdateAttributes();
+					
+					player.IsWorldImmutable = true; //Allow breaking
+					player.IsWorldBuilder = false;
+					player.SendAdventureSettings();
 
 					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + SelectedCategory);
 

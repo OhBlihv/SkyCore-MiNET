@@ -255,15 +255,20 @@ namespace SkyCore.Game
 					GameLevels.TryRemove(gameLevel.GameId, out _);
 				}
 			}
-			
-			//SkyUtil.log("Current Games " + availableGames.Count);
 
-			if (availableGames.Count == 0)
+			while (availableGames.Count < 2)
 			{
-				GetGameController(); //Create a new game for the pool
+				GameLevel gameLevel = GetGameController();
+				if (gameLevel == null)
+				{
+					break;
+				}
+				
+				availableGames.Add(gameLevel); //Create a new game for the pool
 			}
+			
 			//Clean up unnecessary games
-			else if (availableGames.Count >= 5)
+			if (availableGames.Count >= 5)
 			{
 				lock (GameLevels)
 				{
@@ -283,13 +288,13 @@ namespace SkyCore.Game
 			}
 		}
 
-        public void GetGameController()
+        public GameLevel GetGameController()
         {
 	        lock (GameLevels)
 	        {
 		        if (GameLevels.Count >= MaxGames)
 		        {
-			        return; //Cannot create any more games.
+			        return null; //Cannot create any more games.
 		        }
 
 		        GameLevel gameLevel = _getGameController();
@@ -298,7 +303,9 @@ namespace SkyCore.Game
 		        {
 			        GameLevels.TryAdd(gameLevel.GameId, gameLevel);
 		        }
-			}
+
+		        return gameLevel;
+	        }
         }
 
         protected abstract GameLevel _getGameController();

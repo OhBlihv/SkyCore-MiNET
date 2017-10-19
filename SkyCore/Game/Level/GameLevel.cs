@@ -59,11 +59,9 @@ namespace SkyCore.Game.Level
         //
 
 	    protected GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, bool modifiable = false)
-                //: base(plugin.Context.LevelManager, gameId, AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath),
                 : base(plugin.Context.LevelManager, gameId, 
-					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath, modifiable),
-					//new AnvilWorldProvider(levelPath), 
-                      plugin.Context.LevelManager.EntityManager, GameMode.Creative)
+					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath, modifiable, true, !modifiable),
+                    plugin.Context.LevelManager.EntityManager, GameMode.Creative)
         {
 	        string levelName;
 	        {
@@ -91,10 +89,6 @@ namespace SkyCore.Game.Level
 
             SkyUtil.log($"Initializing world {gameId}");
             Initialize();
-
-			//TODO: Aren't required?
-            //((AnvilWorldProvider)WorldProvider).PruneAir();
-            //((AnvilWorldProvider)WorldProvider).MakeAirChunksAroundWorldToCompensateForBadRendering();
 
             if (!plugin.Context.LevelManager.Levels.Contains(this))
             {
@@ -274,8 +268,6 @@ namespace SkyCore.Game.Level
 			SetPlayerTeam(player, defaultTeam);
             SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName}");
 
-            //player.SpawnLevel(this, new PlayerLocation(7.5, 181, -20.5));
-            //player.SpawnLevel(this, new PlayerLocation(255, 70, 255));
             player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false);
 
 			CurrentState.InitializePlayer(this, player);

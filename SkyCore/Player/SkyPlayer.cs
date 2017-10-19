@@ -50,7 +50,6 @@ namespace SkyCore.Player
 		    }
 	    }
 
-
         public void SetPlayerGroup(PlayerGroup playerGroup)
         {
             PlayerGroup = playerGroup;
@@ -97,11 +96,11 @@ namespace SkyCore.Player
 
         public SkyPlayer(MiNetServer server, IPEndPoint endpoint, SkyCoreAPI skyCoreApi) : base(server, endpoint)
         {
-            this.SkyCoreApi = skyCoreApi;
+            SkyCoreApi = skyCoreApi;
         }
 
-        private bool _hasJoined = false;
-	    private bool _isRankLoaded = false;
+        private bool _hasJoined;
+	    private bool _isRankLoaded;
 
         public override void InitializePlayer()
         {
@@ -125,66 +124,11 @@ namespace SkyCore.Player
 	            Punishment activePunishment = playerPunishments.GetActive(PunishmentType.Ban);
 				if (activePunishment != null)
 	            {
-					string expiryString = "";
-		            if (activePunishment.DurationUnit != DurationUnit.Permanent)
-		            {
-						TimeSpan expiryTime = activePunishment.Expiry.Subtract(DateTime.Now);
-
-			            if (expiryTime.Days > 0)
-			            {
-				            expiryString += expiryTime.Days + " Days";
-			            }
-			            if (expiryTime.Hours > 0)
-			            {
-				            if (expiryString.Length > 0)
-				            {
-					            expiryString += " ";
-				            }
-
-				            expiryString += expiryTime.Hours + " Hours";
-			            }
-			            if (expiryTime.Minutes > 0)
-			            {
-				            if (expiryString.Length > 0)
-				            {
-					            expiryString += " ";
-				            }
-
-				            expiryString += expiryTime.Minutes + " Minutes";
-			            }
-			            if (expiryTime.Seconds > 0)
-			            {
-				            if (expiryString.Length > 0)
-				            {
-					            expiryString += " ";
-				            }
-
-				            expiryString += expiryTime.Seconds + " Seconds";
-			            }
-
-			            expiryString += $" Remaining";
-		            }
-		            else
-		            {
-			            expiryString = "Permanent";
-		            }
-
 					Disconnect("§cYou are currently banned from the §dSkytonia §eNetwork\n" +
-							   $"§c({expiryString})\n" + 
+							   $"§c({PunishmentMessages.GetNeatExpiryForPunishment(activePunishment)})\n" + 
 							   $"§cReason: {activePunishment.PunishReason}");
 		            return;
 				}
-	            else
-	            {
-		            SkyUtil.log($"{Username} has no current bans, and is allowed to connect.");
-		            foreach (PunishmentType punishmentType in playerPunishments.Punishments.Keys)
-		            {
-			            foreach (Punishment punishment in playerPunishments.Punishments[punishmentType])
-			            {
-				            SkyUtil.log(punishment.ToString());
-			            }
-		            }
-	            }
 
 				BarHandler = new BarHandler(this);
 
@@ -247,8 +191,6 @@ namespace SkyCore.Player
 
 				//Initialize once we've loaded the group etc.
 	            base.InitializePlayer();
-
-				//Scale = 2.0D;
 
 				_hasJoined = true;
 
@@ -319,6 +261,41 @@ namespace SkyCore.Player
 		    base.HandleTransactionItemUseOnEntity(transaction);
 	    }
 
+		protected override void HandleTransactions(Transaction transaction)
+	    {
+		    foreach (var record in transaction.Transactions)
+		    {
+			    if (record is WorldInteractionTransactionRecord)
+			    {
+				    //Drop
+				    if (record.Slot == 0)
+				    {
+					    if (Level is GameLevel level && level.DropItem(this, record.NewItem))
+					    {
+						    return; //Avoid default handling
+					    }
+				    }
+				    //Pickup
+				    else if (record.Slot == 1)
+				    {
+					    if (Level is GameLevel level && level.PickupItem(this, record.NewItem))
+					    {
+						    return; //Avoid default handling
+					    }
+				    }
+			    }
+		    }
+
+		    base.HandleTransactions(transaction);
+	    }
+
+	    protected override void HandleTransactionItemUse(Transaction transaction)
+	    {
+		    HandleInteract(2, null); //'Right Click'
+
+		    base.HandleTransactionItemUse(transaction);
+	    }
+
 		public virtual void HandleInteract(byte actionId, Entity target)
         {
             if (actionId == 4)
@@ -348,6 +325,24 @@ namespace SkyCore.Player
             }
         }
 
+	    public virtual void UpdateGameMode(GameMode gameMode, bool allowBreakingIfCreative = false)
+	    {
+		    SetGameMode(gameMode);
+
+		    if (gameMode == GameMode.Creative && allowBreakingIfCreative)
+		    {
+				IsWorldImmutable = false; //Allow breaking
+			    IsWorldBuilder = true;
+			    SendAdventureSettings();
+			}
+		    else if(allowBreakingIfCreative)
+		    {
+				IsWorldImmutable = true; //Prevent breaking
+			    IsWorldBuilder = false;
+			    SendAdventureSettings();
+			}
+		}
+
 	    protected override void OnPlayerLeave(PlayerEventArgs e)
 	    {
 		    BarHandler?.Clear();
@@ -372,41 +367,6 @@ namespace SkyCore.Player
 
 	        base.SpawnLevel(toLevel, spawnPoint, false, levelFunc);
         }
-
-	    protected override void HandleTransactions(Transaction transaction)
-	    {
-		    foreach (var record in transaction.Transactions)
-		    {
-			    if (record is WorldInteractionTransactionRecord)
-			    {
-				    //Drop
-				    if (record.Slot == 0)
-				    {
-						if (Level is GameLevel level && level.DropItem(this, record.NewItem))
-						{
-							return; //Avoid default handling
-						}
-				    }
-				    //Pickup
-				    else if (record.Slot == 1)
-				    {
-					    if (Level is GameLevel level && level.PickupItem(this, record.NewItem))
-					    {
-						    return; //Avoid default handling
-					    }
-					}
-			    }
-		    }
-
-		    base.HandleTransactions(transaction);
-	    }
-
-	    protected override void HandleTransactionItemUse(Transaction transaction)
-	    {
-		    HandleInteract(2, null); //'Right Click'
-		    
-		    base.HandleTransactionItemUse(transaction);
-	    }
 
 	    public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
 		{

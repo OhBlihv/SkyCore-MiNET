@@ -105,8 +105,8 @@ namespace SkyCore.Games.BuildBattle.State
 					//Reset gamemode during voting phase
 					gameLevel.DoForAllPlayers(player =>
 					{
-						player.UseCreativeInventory = false;
-						player.SetGameMode(GameMode.Adventure);
+						//player.UseCreativeInventory = false;
+						player.UpdateGameMode(GameMode.Adventure, true);
 					});
 				}
 

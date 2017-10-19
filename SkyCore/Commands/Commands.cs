@@ -237,7 +237,7 @@ namespace SkyCore.Commands
                     break;
                 case 1:
                     gamemode = GameMode.Creative;
-                    break;
+					break;
                 case 2:
                     gamemode = GameMode.Adventure;
                     break;
@@ -261,6 +261,7 @@ namespace SkyCore.Commands
             }
 
             target.SetGameMode(gamemode);
+	        
             player.SendMessage($"{ChatColors.Yellow}Updated {target.Username}'s Gamemode to {gamemode}");
         }
 
