@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using MiNET.Net;
 using MiNET.Utils;
-using MiNET.Worlds;
 using SkyCore.Entities;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -22,7 +16,7 @@ namespace SkyCore.Game
 
 		public static readonly ConcurrentDictionary<string, GamePool> GameRegistrations = new ConcurrentDictionary<string, GamePool>();
 
-		private static readonly ConnectionMultiplexer RedisPool;
+		internal static readonly ConnectionMultiplexer RedisPool;
 
 		public static int TotalPlayers { get; private set; }
 
@@ -281,8 +275,52 @@ namespace SkyCore.Game
 
 			RedisPool.GetSubscriber().SubscribeAsync($"{gameName}_join", (channel, message) =>
 			{
-				//TODO:
+				string[] messageSplit = ((string)message).Split(':');
+
+				if(GameRegistrations.TryGetValue(messageSplit[1], out var gamePool))
+				{
+					foreach (GameInfo gameInfo in gamePool.GetLocalInstance().AvailableGames)
+					{
+						if (gameInfo.GameId.Equals(messageSplit[2]))
+						{
+							if (IncomingPlayers.ContainsKey(messageSplit[0]))
+							{
+								IncomingPlayers[messageSplit[0]] = gameInfo;
+							}
+							else
+							{
+								if (!IncomingPlayers.TryAdd(messageSplit[0], gameInfo))
+								{
+									return; //Cannot process?
+								}
+							}
+
+							foreach (GameLevel gameLevel in SkyCoreAPI.Instance.GameModes[messageSplit[1]].GameLevels.Values)
+							{
+								if (gameLevel.GameId.Equals(messageSplit[2]))
+								{ 
+									gameLevel.AddIncomingPlayer(messageSplit[0]);
+									break;
+								}
+							}
+							
+							return;
+						}
+					}
+				}
 			});
+		}
+		
+		private static readonly ConcurrentDictionary<string, GameInfo> IncomingPlayers = new ConcurrentDictionary<string, GameInfo>();
+
+		public static GameInfo GetGameForIncomingPlayer(string username)
+		{
+			if (IncomingPlayers.TryGetValue(username, out var gameInfo))
+			{
+				return gameInfo;
+			}
+
+			return null;
 		}
 
 		public static GamePool GetGamePool(string gameName)
@@ -331,8 +369,6 @@ namespace SkyCore.Game
 				}
 				return;
 			}
-
-			//player.SendMessage($"§e§l(!) §r§eJoining {gameName}...");
 
 			RequeuePlayer(player, gameName);
 		}
@@ -437,12 +473,12 @@ namespace SkyCore.Game
 			{
 				if (bestGameInstance.HostAddress.Equals("local"))
 				{
-					//TODO: Target specific games
-					SkyCoreAPI.Instance.GameModes[GameName].InstantQueuePlayer(player);
+					SkyCoreAPI.Instance.GameModes[GameName].InstantQueuePlayer(player, bestAvailableGame);
 				}
 				else
 				{
-					//TODO: Target specific games
+					ExternalGameHandler.RedisPool.GetSubscriber().PublishAsync($"{GameName}_info", $"{player.Username}:{GameName}:{bestAvailableGame.GameId}");
+
 					McpeTransfer transferPacket = new McpeTransfer
 					{
 						serverAddress = bestGameInstance.HostAddress,

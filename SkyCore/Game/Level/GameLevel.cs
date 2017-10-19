@@ -26,7 +26,14 @@ namespace SkyCore.Game.Level
 
 		public delegate void PlayerAction(SkyPlayer player);
 
-        //Player -> Team
+	    private readonly IDictionary<string, long> _incomingPlayers = new Dictionary<string, long>();
+
+	    public void AddIncomingPlayer(string username)
+	    {
+			_incomingPlayers.Add(username, DateTimeOffset.Now.ToUnixTimeSeconds() + 15);
+	    }
+
+	    //Player -> Team
         protected readonly Dictionary<string, GameTeam> PlayerTeamDict = new Dictionary<string, GameTeam>();
 
         //Team -> Player(s) //TODO: Possibly remove due to complexity?
@@ -146,8 +153,13 @@ namespace SkyCore.Game.Level
 
         public int GetPlayerCount()
         {
-            return PlayerTeamDict.Count;
+            return PlayerTeamDict.Count + _incomingPlayers.Count;
         }
+
+	    public int GetGamePlayerCount()
+	    {
+		    return PlayerTeamDict.Count;
+	    }
 
 	    public new List<SkyPlayer> GetAllPlayers()
 	    {
@@ -225,7 +237,24 @@ namespace SkyCore.Game.Level
 		            player.BarHandler.DoTick();
 	            }
 
-                Tick = tick; //Workaround?
+	            /*
+				 * Clean up any 'incoming players' who never showed up
+				 * '15 seconds' to appear before they are cleared
+				 */
+	            if (_incomingPlayers.Count > 0)
+	            {
+		            long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+					foreach (KeyValuePair<string, long> entry in _incomingPlayers)
+		            {
+			            //entry.Value starts off as 15 seconds ahead of UNIX time
+			            if (entry.Value - currentTime < 0)
+			            {
+				            _incomingPlayers.Remove(entry.Key);
+			            }
+		            }
+	            }
+				
+				Tick = tick; //Workaround?
             }
             catch (Exception e)
             {
@@ -235,6 +264,11 @@ namespace SkyCore.Game.Level
 
 		public void AddPlayer(SkyPlayer player)
         {
+	        if (_incomingPlayers.ContainsKey(player.Username))
+	        {
+		        _incomingPlayers.Remove(player.Username);
+	        }
+	        
             GameTeam defaultTeam = GetDefaultTeam();
 
 			SetPlayerTeam(player, defaultTeam);

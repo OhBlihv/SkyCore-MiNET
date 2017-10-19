@@ -53,7 +53,7 @@ namespace SkyCore.Game.State.Impl
 
         public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
-            int currentPlayers  = gameLevel.GetPlayerCount(),
+            int currentPlayers  = gameLevel.GetGamePlayerCount(), //Doesn't count incoming players
                 requiredPlayers = GetRequiredPlayers(gameLevel);
 
 			string actionBarMessage = null;

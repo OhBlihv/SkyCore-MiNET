@@ -13,9 +13,29 @@ using SkyCore.Player;
 
 namespace SkyCore.Games.Hub
 {
+	
+	class HubWorldRandomiser : IComparer<GameLevel>
+	{
+
+		private static readonly Random Random = new Random();
+
+		public int Compare(GameLevel x, GameLevel y)
+		{
+			int rolledNumber = Random.Next(2);
+			if (rolledNumber == 0)
+			{
+				return rolledNumber;
+			}
+
+			return (Random.Next(2) == 0 ? 1 : -1) * rolledNumber;
+		}
+	}
+
 	public class HubCoreController : CoreGameController
 	{
 		public const int MaxHubCount = 5;
+		
+		private readonly HubWorldRandomiser _hubWorldRandomiser = new HubWorldRandomiser();
 
 		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>{"hub"})
 		{
@@ -40,7 +60,7 @@ namespace SkyCore.Games.Hub
 
 		public override SortedSet<GameLevel> GetMostViableGames()
 		{
-			SortedSet<GameLevel> mostViableGames = new SortedSet<GameLevel>();
+			SortedSet<GameLevel> mostViableGames = new SortedSet<GameLevel>(_hubWorldRandomiser);
 
 			foreach (GameLevel gameLevel in GameLevels.Values)
 			{

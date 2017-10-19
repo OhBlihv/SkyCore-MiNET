@@ -207,6 +207,24 @@ namespace SkyCore.Game
 		    }
 		}
 
+		public virtual bool InstantQueuePlayer(SkyPlayer player, GameInfo gameInfo)
+		{
+			SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
+			lock (GameLevels)
+			{
+				GameLevel targetedGame = GameLevels[gameInfo.GameId];
+				if (targetedGame == null || !targetedGame.CurrentState.CanAddPlayer(targetedGame))
+				{
+					return false;
+				}
+
+				SkyUtil.log($"(TARGETED) Adding {player.Username} to game {targetedGame.GameId}-({targetedGame.LevelId}-{targetedGame.LevelName})");
+				targetedGame.AddPlayer(player);
+
+				return true;
+			}
+		}
+
 		///<summary>Ensures at least 1 game is available to join. If not, creates one to fill capacity</summary>
 		public virtual void CheckCapacity()
 		{

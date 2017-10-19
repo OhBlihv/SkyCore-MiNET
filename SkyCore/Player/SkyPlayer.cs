@@ -1,24 +1,18 @@
 ﻿using System.Net;
 using MiNET;
 using MiNET.Net;
-using SkyCore.Commands;
 using SkyCore.Permissions;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Threading;
 using MiNET.Utils;
-using log4net;
 using MiNET.Entities;
 using MiNET.Items;
-using MiNET.UI;
 using MiNET.Worlds;
 using SkyCore.Database;
 using SkyCore.Entities;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
-using SkyCore.Games.Hub;
 using SkyCore.Punishments;
 using SkyCore.Statistics;
 using SkyCore.Util;
@@ -264,11 +258,20 @@ namespace SkyCore.Player
 				//Add this player to any games if available and if this is the only game available
 	            if (SkyCoreAPI.Instance.GameModes.Count == 1)
 	            {
+		            GameInfo targetedGame = ExternalGameHandler.GetGameForIncomingPlayer(Username);
+		            
 		            //Foreach, but only one value.
 		            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
 		            {
 			            SkyUtil.log("Queueing for " + coreGameController.GameName);
-			            coreGameController.InstantQueuePlayer(this);
+						if (targetedGame != null)
+						{
+							coreGameController.InstantQueuePlayer(this, targetedGame);
+						}
+						else
+						{
+							coreGameController.InstantQueuePlayer(this);
+						}
 			            break;
 		            }
 	            }

@@ -7,6 +7,7 @@ using MiNET.Plugins.Attributes;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
+using SkyCore.Game.Level;
 using SkyCore.Permissions;
 using SkyCore.Player;
 
@@ -15,53 +16,63 @@ namespace SkyCore.Commands
     public class SkyCommands
     {
 
-        private SkyCoreAPI skyCoreApi;
+        private readonly SkyCoreAPI _skyCoreApi;
 
         public SkyCommands(SkyCoreAPI skyCoreApi)
         {
-            this.skyCoreApi = skyCoreApi;
+            _skyCoreApi = skyCoreApi;
         }
 
 		[Command(Name = "findworld")]
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandGiveIronIngot(MiNET.Player player)
 		{
-			player.SendMessage($"In World {player.Level.LevelName}");
+			player.SendMessage($"In Game World {((GameLevel) player.Level).GameId}");
 		}
 
 		[Command(Name = "hub")]
 	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandHub(MiNET.Player player)
+	    public void CommandHub(MiNET.Player player, int hub = 0)
 	    {
 			MoveToLobby(player);
 		}
 
 	    [Command(Name = "lobby")]
 	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandLobby(MiNET.Player player)
+	    public void CommandLobby(MiNET.Player player, int hub = 0)
 	    {
-		    MoveToLobby(player);
+		    MoveToLobby(player, hub);
 	    }
 
-	    public void MoveToLobby(MiNET.Player player)
+	    public void MoveToLobby(MiNET.Player player, int hub = 0)
 	    {
-		    if (SkyCoreAPI.Instance.GameType.Equals("hub"))
+		    if (_skyCoreApi.GameType.Equals("hub"))
 		    {
-				player.SendMessage("§c§l(!)§r §cYou are already connected to a hub.");
-			    return;
+			    if (hub == 0)
+			    {
+					player.SendMessage("§c§l(!)§r §cYou are already connected to a hub.");
+				    return;
+				}
+
+			    string hubNum = hub.ToString();
+			    
+			    CoreGameController gameController = _skyCoreApi.GameModes["hub"];
+			    foreach (GameLevel hubLevel in gameController.GameLevels.Values)
+			    {
+				    if (hubLevel.GameId.Replace("hub", "").Equals(hubNum))
+				    {
+					    hubLevel.AddPlayer((SkyPlayer) player);
+					    return;
+				    }
+			    }
+
+				player.SendMessage($"§c§l(!)§r §cHub{hubNum} does not exist.");
+				return;
 		    }
 
 			player.SendMessage("§e§l(!)§r §eMoving to Hub...");
 
 		    ExternalGameHandler.AddPlayer((SkyPlayer) player, "hub");
-		    
-		    /*McpeTransfer transferPacket = new McpeTransfer
-		    {
-			    serverAddress = "184.171.171.26",
-			    port = 19132
-		    };
-
-		    player.SendPackage(transferPacket);*/
 		}
 
 	    [Command(Name = "popuptest")]
@@ -210,7 +221,7 @@ namespace SkyCore.Commands
                 return;
             }
 
-            target = skyCoreApi.GetPlayer(targetName);
+            target = _skyCoreApi.GetPlayer(targetName);
 
             if (target == null || !target.IsConnected)
             {
@@ -270,7 +281,7 @@ namespace SkyCore.Commands
             }
             else
             {
-                targetPlayer = skyCoreApi.GetPlayer(targetName);
+                targetPlayer = _skyCoreApi.GetPlayer(targetName);
                 if (targetPlayer == null)
                 {
                     player.SendMessage($"§c§l(!) §r§c{targetName} is not online.");
@@ -465,7 +476,7 @@ namespace SkyCore.Commands
             }
             else
             {
-                targetPlayer = skyCoreApi.GetPlayer(targetName);
+                targetPlayer = _skyCoreApi.GetPlayer(targetName);
                 if (targetPlayer == null)
                 {
                     player.SendMessage($"§c§l(!) §r§c{targetName} is not online.");
