@@ -351,12 +351,6 @@ namespace SkyCore.Game
 				return;
 			}
 
-			SkyUtil.log("Is Level: " + (player.Level is GameLevel));
-			if (player.Level is GameLevel level)
-			{
-				level.RemovePlayer(player);
-			}
-
 			if (gameName.Equals("hub"))
 			{
 				if (GameRegistrations.TryGetValue("hub", out var hubPool))
@@ -471,6 +465,11 @@ namespace SkyCore.Game
 			}
 			else
 			{
+				if (player.Level is GameLevel level)
+				{
+					level.RemovePlayer(player);
+				}
+
 				if (bestGameInstance.HostAddress.Equals("local"))
 				{
 					SkyCoreAPI.Instance.GameModes[GameName].InstantQueuePlayer(player, bestAvailableGame);
