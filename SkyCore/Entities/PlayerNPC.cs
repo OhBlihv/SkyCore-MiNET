@@ -136,18 +136,21 @@ namespace SkyCore.Entities
 
 					//Ensure this NPC can be seen
 					PlayerNPC npc;
-					if (action != null)
+					/*if (action != null)
 					{
 						npc = new PlayerNPC("§a(Punch to play)", gameLevel, spawnLocation, action, gameName) { Scale = 1.5 };
 					}
 					else
 					{
 						npc = new PlayerNPC("§e(Coming Soon)", gameLevel, spawnLocation, null, gameName) { Scale = 1.5 };
-					}
+					}*/
+					npc = new PlayerNPC("", gameLevel, spawnLocation, action, gameName) { Scale = 1.5 };
 
 					SkyCoreAPI.Instance.AddPendingTask(() =>
 					{
 						npc.KnownPosition = spawnLocation;
+						//npc.Width = 0D;
+						//npc.Height = 1.0D;
 						npc.SpawnEntity();
 					});
 
@@ -162,7 +165,7 @@ namespace SkyCore.Entities
 
 					{
 						PlayerLocation gameNameLocation = (PlayerLocation)spawnLocation.Clone();
-						gameNameLocation.Y += 3.3f;
+						gameNameLocation.Y += 3.1f;
 
 						Hologram gameNameHologram = new Hologram(npcName, gameLevel, gameNameLocation);
 

@@ -19,7 +19,7 @@ namespace SkyCore.Entities.Holograms
 			_gameName = gameName;
 
 			KnownPosition = (PlayerLocation) KnownPosition.Clone();
-			KnownPosition.Y += 3.0f;
+			KnownPosition.Y += 2.8f;
 		}
 
 		public override void OnTick()
@@ -44,7 +44,8 @@ namespace SkyCore.Entities.Holograms
 			}
 			else
 			{
-				SetNameTag("§cUnavailable");
+				//SetNameTag("§cUnavailable");
+				SetNameTag("§a(Coming Soon)");
 			}
 		}
 

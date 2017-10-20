@@ -464,11 +464,11 @@ namespace SkyCore.Game
 				//player.SendMessage($"§cWe were unable to move you to another game of {GameName}.");
 				if (GetCurrentPlayers() > 0) //
 				{
-					TitleUtil.SendCenteredSubtitle(player, "   §c§lGAME FULL§r" + "\n" + "§7Try joining again soon!", false);
+					TitleUtil.SendCenteredSubtitle(player, "  §c§lGAME FULL§r" + "\n" + "§7Try joining again soon!", false);
 				}
 				else //No players found, and all available servers unjoinable
 				{
-					TitleUtil.SendCenteredSubtitle(player, "   §c§lGAME UNAVAILABLE§r" + "\n" + "§7Try joining again soon!", false);
+					TitleUtil.SendCenteredSubtitle(player, " §c§lGAME UNAVAILABLE§r" + "\n" + "§7Try joining again soon!", false);
 				}
 				
 				player.SetNoAi(false); //Unfreeze
