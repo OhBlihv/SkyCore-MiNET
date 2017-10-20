@@ -10,12 +10,12 @@ namespace SkyCore.Util
 	public class TitleUtil
 	{
 
-		public static void SendCenteredSubtitle(MiNET.Player player, string content)
+		public static void SendCenteredSubtitle(MiNET.Player player, string content, bool centerText = true)
 		{
-			SendCenteredSubtitle(player, content, 5, 5, 100);
+			SendCenteredSubtitle(player, content, centerText, 5, 5, 100);
 		}
 
-		public static void SendCenteredSubtitle(MiNET.Player player, string content, int fadein, int fadeOut, int stayTime)
+		public static void SendCenteredSubtitle(MiNET.Player player, string content, bool centreText, int fadein, int fadeOut, int stayTime)
 		{
 			string subtitleString = "";
 			int i = 0;
@@ -39,31 +39,33 @@ namespace SkyCore.Util
 				}
 			}
 
-			//foreach (string line in centeredLines)
 			foreach (string line in content.Split('\n'))
 			{
 				string centeredLine = line;
 
-				//int j = centeredLine.Length;
-				int j = TextUtil.GetLineLength(centeredLine);
-				//SkyUtil.log($"({longestLine - centeredLine.Length} < {j}) - ({longestLine} - {centeredLine.Length})");
-				if (j < longestLine)
+				if (centreText)
 				{
-					//int spaceLength = TextUtil.GetCharLength(' ');
-
-					do
+					//int j = centeredLine.Length;
+					int j = TextUtil.GetLineLength(centeredLine);
+					//SkyUtil.log($"({longestLine - centeredLine.Length} < {j}) - ({longestLine} - {centeredLine.Length})");
+					if (j < longestLine)
 					{
-						//SkyUtil.log($"Adding space to ({j} < {longestLine - centeredLine.Length}) - ({longestLine} - {centeredLine.Length})");
-						centeredLine = " " + centeredLine;
+						//int spaceLength = TextUtil.GetCharLength(' ');
 
-						//j += 3; //(3 is the length of the space character)
-						//j += spaceLength; //(3 is the length of the space character)
-						j += 6; //(3 is the length of the space character)
-					} while (j < longestLine);
+						do
+						{
+							//SkyUtil.log($"Adding space to ({j} < {longestLine - centeredLine.Length}) - ({longestLine} - {centeredLine.Length})");
+							centeredLine = " " + centeredLine;
 
-					centeredLine = " " + centeredLine; //Add one more space for good luck
+							//j += 3; //(3 is the length of the space character)
+							//j += spaceLength; //(3 is the length of the space character)
+							j += 6; //(3 is the length of the space character)
+						} while (j < longestLine);
 
-					centeredLine = "§f" + centeredLine;
+						centeredLine = " " + centeredLine; //Add one more space for good luck
+
+						centeredLine = "§f" + centeredLine;
+					}
 				}
 
 				subtitleString += centeredLine + "\n";

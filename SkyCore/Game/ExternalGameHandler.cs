@@ -2,11 +2,13 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using MiNET;
 using MiNET.Net;
 using MiNET.Utils;
 using SkyCore.Entities;
 using SkyCore.Game.Level;
 using SkyCore.Player;
+using SkyCore.Util;
 using StackExchange.Redis;
 
 namespace SkyCore.Game
@@ -459,7 +461,15 @@ namespace SkyCore.Game
 
 			if (bestAvailableGame == null)
 			{
-				player.SendMessage($"§cWe were unable to move you to another game of {GameName}.");
+				//player.SendMessage($"§cWe were unable to move you to another game of {GameName}.");
+				if (GetCurrentPlayers() > 0) //
+				{
+					TitleUtil.SendCenteredSubtitle(player, "   §c§lGAME FULL§r" + "\n" + "§7Try joining again soon!", false);
+				}
+				else //No players found, and all available servers unjoinable
+				{
+					TitleUtil.SendCenteredSubtitle(player, "   §c§lGAME UNAVAILABLE§r" + "\n" + "§7Try joining again soon!", false);
+				}
 				
 				player.SetNoAi(false); //Unfreeze
 			}
