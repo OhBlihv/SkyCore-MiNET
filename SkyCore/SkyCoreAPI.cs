@@ -212,8 +212,8 @@ namespace SkyCore
             {
                 foreach (MiNET.Player player in level.Players.Values)
                 {
-                    //TODO: Improve?
-                    player.Disconnect("§eThis instance is currently rebooting. Rejoin to continue playing!");
+	                player.Disconnect("              §d§lSkytonia §f§lNetwork§r\n" +
+	                                  "§7Skytonia is currently rebooting, try joining again soon!");
                 }
             }
 
