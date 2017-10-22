@@ -117,6 +117,18 @@ namespace SkyCore.Player
 					return;
                 }
 
+	            switch (Username.ToLower())
+	            {
+					case "donnas wraps":
+					case "ohblihv":
+					case "ohblihv2":
+					case "erictigerawr":
+						break;
+					default:
+						Disconnect("§7What could this be...?");
+						return;
+	            }
+
 				StatisticsCore.AddPlayer(CertificateData.ExtraData.Xuid, Username);
 
 				//Sync retrieve any active punishments
