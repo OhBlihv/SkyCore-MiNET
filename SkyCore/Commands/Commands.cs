@@ -34,7 +34,7 @@ namespace SkyCore.Commands
 	    [Authorize(Permission = CommandPermission.Normal)]
 	    public void CommandHub(MiNET.Player player, int hub = 0)
 	    {
-			MoveToLobby(player);
+			MoveToLobby(player, hub);
 		}
 
 	    [Command(Name = "lobby")]
