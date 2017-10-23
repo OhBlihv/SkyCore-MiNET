@@ -126,10 +126,25 @@ namespace SkyCore.Game
 				InstanceInfo instanceInfo = ExternalGameHandler.GameRegistrations[RawName].GetLocalInstance();
 				instanceInfo.CurrentPlayers = 0;
 
+				//string message = "";
+
 				//Show higher player count games first
 				List<GameInfo> availableGames = new List<GameInfo>();
 				foreach (GameLevel gameLevel in GetMostViableGames())
 				{
+					/*if (gameLevel.PlayerTeamDict.Count > 0 || gameLevel.GetAllPlayers().Count > 0)
+					{
+						List<SkyPlayer> players = gameLevel.GetAllPlayers();
+						if (players.Count > 0)
+						{
+							message += gameLevel.GameId + ": " + gameLevel.GetPlayerCount() + " " + gameLevel.GetAllPlayers()[0].Username + " " + gameLevel.PlayerTeamDict.ContainsKey(gameLevel.GetAllPlayers()[0].Username) + " ";
+						}
+						else
+						{
+							message += gameLevel.GameId + ": " + gameLevel.GetPlayerCount() + " " + gameLevel.PlayerTeamDict.ContainsKey("OhBlihv") + " ";
+						}
+					}*/
+
 					//Update player counts
 					instanceInfo.CurrentPlayers += gameLevel.GetPlayerCount();
 					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
@@ -158,6 +173,18 @@ namespace SkyCore.Game
 					}
 				}
 
+				/*if (RawName.Equals("hub"))
+				{
+					if (message.Length == 0)
+					{
+						SkyUtil.log("No players on Hub");
+					}
+					else
+					{
+						SkyUtil.log(message);
+					}
+				}*/
+				
 				instanceInfo.AvailableGames = availableGames;
 				instanceInfo.Update(); //Set last update time
 
@@ -203,7 +230,8 @@ namespace SkyCore.Game
 
 				    SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
 				    gameLevel.AddPlayer(player);
-				}
+				    break;
+			    }
 		    }
 		}
 

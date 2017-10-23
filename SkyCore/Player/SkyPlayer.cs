@@ -217,7 +217,7 @@ namespace SkyCore.Player
 		            //Foreach, but only one value.
 		            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
 		            {
-			            SkyUtil.log("Queueing for " + coreGameController.GameName);
+			            SkyUtil.log("Queueing for " + coreGameController.GameName + " In " + (targetedGame == null ? "nothing specific" : $"GameId:{targetedGame.GameId}"));
 						if (targetedGame != null)
 						{
 							coreGameController.InstantQueuePlayer(this, targetedGame);

@@ -34,7 +34,7 @@ namespace SkyCore.Game.Level
 	    }
 
 	    //Player -> Team
-        protected readonly Dictionary<string, GameTeam> PlayerTeamDict = new Dictionary<string, GameTeam>();
+        public readonly Dictionary<string, GameTeam> PlayerTeamDict = new Dictionary<string, GameTeam>();
 
         //Team -> Player(s) //TODO: Possibly remove due to complexity?
         protected readonly Dictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
@@ -258,6 +258,11 @@ namespace SkyCore.Game.Level
 
 		public void AddPlayer(SkyPlayer player)
         {
+	        if (player.Level != this && player.Level is GameLevel)
+	        {
+		        player.Level.RemovePlayer(player); //Clear from old world
+	        }
+	        
 	        if (_incomingPlayers.ContainsKey(player.Username))
 	        {
 		        _incomingPlayers.Remove(player.Username);
@@ -266,7 +271,7 @@ namespace SkyCore.Game.Level
             GameTeam defaultTeam = GetDefaultTeam();
 
 			SetPlayerTeam(player, defaultTeam);
-            SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName}");
+            SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName} in game {GameId}");
 
             player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false);
 

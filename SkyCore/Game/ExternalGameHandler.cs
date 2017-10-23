@@ -404,6 +404,7 @@ namespace SkyCore.Game
 		public int GetCurrentPlayers()
 		{
 			int playerCount = 0;
+			string message = "";
 			foreach (InstanceInfo instanceInfo in _gameInstances.Values)
 			{
 				playerCount += instanceInfo.CurrentPlayers;

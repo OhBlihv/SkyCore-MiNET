@@ -53,6 +53,11 @@ namespace SkyCore
 		private bool _shouldSchedule = true;
 		public void AddPendingTask(PendingTask pendingTask)
 		{
+			if (pendingTask == null)
+			{
+				throw new NullReferenceException("Null Task Provided");
+			}
+			
 			if (!_shouldSchedule)
 			{
 				pendingTask.Invoke();
@@ -107,7 +112,15 @@ namespace SkyCore
 					{
 						RunnableTask.RunTaskLater(() =>
 						{
-							pendingTask.DynamicInvoke();
+							try
+							{
+								pendingTask.Invoke();
+							}
+							catch (Exception e)
+							{
+								Console.WriteLine(e);
+							}
+							
 						}, 5000);
 					}
 
@@ -212,7 +225,7 @@ namespace SkyCore
             {
                 foreach (MiNET.Player player in level.Players.Values)
                 {
-	                player.Disconnect("              §d§lSkytonia §f§lNetwork§r\n" +
+	                player.Disconnect("                     §d§lSkytonia §f§lNetwork§r\n" +
 	                                  "§7Skytonia is currently rebooting, try joining again soon!");
                 }
             }

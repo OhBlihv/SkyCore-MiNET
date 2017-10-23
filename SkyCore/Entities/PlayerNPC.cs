@@ -71,16 +71,16 @@ namespace SkyCore.Entities
 
 	    public static void SpawnAllHubNPCs(HubLevel gameLevel)
 	    {
-		    foreach (string npcName in GameNPCs.Keys)
+		    foreach (KeyValuePair<string, NPCSpawnTask> entry in GameNPCs)
 		    {
 			    //Only spawn NPCs which have not been spawned yet
-			    if (gameLevel.CurrentlySpawnedNPCs.Contains(npcName))
+			    if (gameLevel.CurrentlySpawnedNPCs.Contains(entry.Key))
 			    {
 				    continue;
 			    }
 			    
-			    GameNPCs[npcName].Invoke(gameLevel);
-			    gameLevel.CurrentlySpawnedNPCs.Add(npcName);
+			    entry.Value.Invoke(gameLevel);
+			    gameLevel.CurrentlySpawnedNPCs.Add(entry.Key);
 		    }
 	    }
 
