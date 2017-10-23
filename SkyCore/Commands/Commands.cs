@@ -382,7 +382,12 @@ namespace SkyCore.Commands
 						ExternalGameHandler.AddPlayer((SkyPlayer)player, "build-battle");
 						break;
 			        }
-			        default:
+					case "hub":
+					{
+						ExternalGameHandler.AddPlayer((SkyPlayer)player, "hub");
+						break;
+					}
+					default:
 			        {
 				        player.SendMessage($"{ChatColors.Red}Unable to resolve game '{gameName}'.");
 				        return;

@@ -54,7 +54,7 @@ namespace SkyCore.Games.Hub.State
 			}, 2000);
 		}
 
-		private const int ParticleEventCount = 6;
+		private const int ParticleEventCount = 10;
 
 		private static readonly PlayerLocation HubCentreLocation = new PlayerLocation(256.5, 80, 264);
 
