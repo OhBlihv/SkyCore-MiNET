@@ -98,7 +98,7 @@ namespace SkyCore.Games.Hub
 
 		public override void GameTick(int tick)
 		{
-			if (tick % 10 == 0 && PlayerCount > 0)
+			if (tick % 2 == 0 && PlayerCount > 0)
 			{
 				PlayerNPC.SpawnAllHubNPCs(this);
 			}
