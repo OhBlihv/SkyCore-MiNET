@@ -155,15 +155,18 @@ namespace SkyCore.Games.BuildBattle.State
 			return base.DoInteract(gameLevel, interactId, player, target);
 		}
 
+		public const int PlotRadius = 15;
+		public const int MaxHeight = 92;
+
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
 		{
 			BlockCoordinates centreLocation = ((BuildBattleTeam) player.GameTeam).SpawnLocation.GetCoordinates3D();
 			BlockCoordinates interactLocation = targetBlock.Coordinates;
 
-			if (Math.Abs(centreLocation.X - interactLocation.X) > 20 ||
-			    Math.Abs(centreLocation.Z - interactLocation.Z) > 20 ||
+			if (Math.Abs(centreLocation.X - interactLocation.X) > PlotRadius ||
+			    Math.Abs(centreLocation.Z - interactLocation.Z) > PlotRadius ||
 			    interactLocation.Y < (centreLocation.Y - 1) ||
-			    interactLocation.Y > 106) //TODO: Check heights (spawn heights are ~66)
+			    interactLocation.Y > MaxHeight) //TODO: Check heights (spawn heights are ~66)
 			{
 				SkyUtil.log($"{interactLocation.X}:{interactLocation.Y}:{interactLocation.Z} vs {centreLocation.X}:{centreLocation.Y}:{centreLocation.Z} " +
 				            $"({Math.Abs(centreLocation.X - interactLocation.X)}, {Math.Abs(centreLocation.Z - interactLocation.Z)}, " +
@@ -180,10 +183,10 @@ namespace SkyCore.Games.BuildBattle.State
 			BlockCoordinates centreLocation = ((BuildBattleTeam)player.GameTeam).SpawnLocation.GetCoordinates3D();
 			BlockCoordinates interactLocation = block.Coordinates;
 
-			if (Math.Abs(centreLocation.X - interactLocation.X) > 20 ||
-			    Math.Abs(centreLocation.Z - interactLocation.Z) > 20 ||
+			if (Math.Abs(centreLocation.X - interactLocation.X) > PlotRadius ||
+			    Math.Abs(centreLocation.Z - interactLocation.Z) > PlotRadius ||
 			    interactLocation.Y < (centreLocation.Y - 1) ||
-			    interactLocation.Y > 106) //TODO: Check heights (spawn heights are ~66)
+			    interactLocation.Y > MaxHeight) //TODO: Check heights (spawn heights are ~66)
 			{
 				SkyUtil.log($"{interactLocation.X}:{interactLocation.Y}:{interactLocation.Z} vs {centreLocation.X}:{centreLocation.Y}:{centreLocation.Z} " +
 				            $"({Math.Abs(centreLocation.X - interactLocation.X)}, {Math.Abs(centreLocation.Z - interactLocation.Z)}, " +
