@@ -23,9 +23,8 @@ namespace SkyCore.Games.Hub
 	
 		public HubLevel(SkyCoreAPI plugin, string gameId, string levelPath, bool modifiable = false) : base(plugin, "hub", gameId, levelPath, modifiable)
 		{
-			//level.SpawnPoint = new PlayerLocation(0D, 36D, 10D, 0f, 0f, 90f);
-			SpawnPoint = new PlayerLocation(256.5, 80, 264);
-			GameLevelInfo.LobbyLocation = new PlayerLocation(256.5, 80, 264);
+			SpawnPoint = new PlayerLocation(256.5, 78, 255);
+			GameLevelInfo.LobbyLocation = new PlayerLocation(256.5, 78, 255);
 
 			SkyCoreAPI instance = SkyCoreAPI.Instance;
 
