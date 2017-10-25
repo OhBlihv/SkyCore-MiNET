@@ -46,17 +46,17 @@ namespace SkyCore.Punishments
 				string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
 				if (targetXuid == null)
 				{
-					player.SendMessage($"§c{playerName} has never played before.");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §cis not a Skytonia user.");
 					return;
 				}
 
 				if (PunishCore.GetPunishmentsFor(targetXuid).RemoveActive(PunishmentType.Ban))
 				{
-					player.SendMessage($"§eUnbanned {playerName}");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §chas been unbanned.");
 				}
 				else
 				{
-					player.SendMessage($"§c{playerName} is not currently banned.");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §cis not currently banned.");
 				}
 			});
 		}
@@ -76,7 +76,7 @@ namespace SkyCore.Punishments
 				string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
 				if (targetXuid == null)
 				{
-					player.SendMessage($"§c{playerName} has never played before.");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §cis not a Skytonia user.");
 					return;
 				}
 
@@ -88,7 +88,7 @@ namespace SkyCore.Punishments
 				target?.Disconnect($"§cYou have been kicked from the server.\n" +
 				                   $"§6Reason: {punishReason}");
 				
-				player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been kicked for §f\"{punishReason}\"");
+				player.SendMessage($"§f[PUNISH] §7{playerName} §chas been kicked for: §f\"{punishReason}\"");
 			});
 		}
 
@@ -123,17 +123,17 @@ namespace SkyCore.Punishments
 				string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
 				if (targetXuid == null)
 				{
-					player.SendMessage($"§c{playerName} has never played before.");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §cis not a Skytonia user.");
 					return;
 				}
 
 				if (PunishCore.GetPunishmentsFor(targetXuid).RemoveActive(PunishmentType.Mute))
 				{
-					player.SendMessage($"§eUnmuted {playerName}");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §chas been unmuted.");
 				}
 				else
 				{
-					player.SendMessage($"§c{playerName} is not currently muted.");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §ch9is not currently muted.");
 				}
 			});
 		}
@@ -143,7 +143,7 @@ namespace SkyCore.Punishments
 			string targetXuid = StatisticsCore.GetXuidForPlayername(playerName);
 			if (targetXuid == null)
 			{
-				player.SendMessage($"§c{playerName} has never played before.");
+				player.SendMessage($"§f[PUNISH] §7{playerName} §cis not a Skytonia user.");
 				return;
 			}
 
@@ -165,13 +165,13 @@ namespace SkyCore.Punishments
 				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
 				if (durationUnit == DurationUnit.Permanent)
 				{
-					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been banned permanently for \"{punishReason}\"");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §chas been banned permanently for: \"{punishReason}\"");
 
 					target?.Disconnect(PunishmentMessages.GetPunishmentMessage(target, punishmentType, punishment));
 				}
 				else
 				{
-					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been banned for §f{GetNeatDuration(durationAmount, durationUnit)} \"{punishReason}\"");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §chas been banned for: §f{GetNeatDuration(durationAmount, durationUnit)} \"{punishReason}\"");
 
 					target?.Disconnect(PunishmentMessages.GetPunishmentMessage(target, punishmentType, punishment));
 				}
@@ -181,13 +181,13 @@ namespace SkyCore.Punishments
 				SkyPlayer target = SkyCoreAPI.Instance.GetPlayer(playerName);
 				if (durationUnit == DurationUnit.Permanent)
 				{
-					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been muted permanently for \"{punishReason}\"");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §chas been muted permanently for: \"{punishReason}\"");
 					
 					target?.SendMessage(PunishmentMessages.GetPunishmentMessage(target, PunishmentType.Mute, punishment));
 				}
 				else
 				{
-					player.SendMessage($"§f[PUNISHMENT] §7{playerName} §chas been muted for §f{GetNeatDuration(durationAmount, durationUnit)} \"{punishReason}\"");
+					player.SendMessage($"§f[PUNISH] §7{playerName} §chas been muted for: §f{GetNeatDuration(durationAmount, durationUnit)} \"{punishReason}\"");
 					
 					target?.SendMessage(PunishmentMessages.GetPunishmentMessage(target, PunishmentType.Mute, punishment));
 				}

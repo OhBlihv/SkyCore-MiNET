@@ -136,10 +136,10 @@ namespace SkyCore.Player
 	            Punishment activePunishment = playerPunishments.GetActive(PunishmentType.Ban);
 				if (activePunishment != null)
 	            {
-					Disconnect("§cYou are currently banned from the §dSkytonia §eNetwork\n" +
-							   $"§c({PunishmentMessages.GetNeatExpiryForPunishment(activePunishment)})\n" + 
-							   $"§cReason: {activePunishment.PunishReason}");
-		            return;
+		            Disconnect("§cYou are currently banned from the §dSkytonia §eNetwork\n" +
+		                       $"§c({PunishmentMessages.GetNeatExpiryForPunishment(activePunishment)})\n" +
+		                       $"§cReason: {activePunishment.PunishReason}");
+					return;
 				}
 
 				BarHandler = new BarHandler(this);

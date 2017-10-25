@@ -634,13 +634,13 @@ namespace SkyCore.Punishments
 				case PunishmentType.Kick:
 				{
 					return
-						TextUtils.CenterLine("§d§lSkytonia §f§lNetwork") + "\n" + 
+						TextUtils.CenterLine("§d§lSkytonia §f§lNetwork") + "\n" +
 						"\n" +
 						TextUtils.CenterLine("§r§cYou have been kicked from Skytonia!") + "\n" +
-						TextUtils.CenterLine($"§r§7Reason: §f{punishment.PunishReason}") + "\n" + 
+						TextUtils.CenterLine($"§r§7Reason: §f{punishment.PunishReason}") + "\n" +
 						"\n" +
 						TextUtils.CenterLine("§r§7Read our rules at: §e§nwww.skytonia.com/rules");
-				}
+					}
 				case PunishmentType.Ban:
 				{
 					return
@@ -648,20 +648,20 @@ namespace SkyCore.Punishments
 						"\n" +
 						TextUtils.CenterLine("§r§cYou have been banned from entering Skytonia!") + "\n" +
 						"\n" +
-						(punishment.DurationUnit == DurationUnit.Permanent ? 
+						(punishment.DurationUnit == DurationUnit.Permanent ?
 							TextUtils.CenterLine($"§r§7Time: §fPermanent") + "\n" :
-							TextUtils.CenterLine($"§r§7Time: §f{GetNeatExpiryForPunishment(punishment)}") + "\n") + 
+							TextUtils.CenterLine($"§r§7Time: §f{GetNeatExpiryForPunishment(punishment)}") + "\n") +
 						TextUtils.CenterLine($"§r§7Reason: §f{punishment.PunishReason}") + "\n" +
 						TextUtils.CenterLine($"§r§7Date: §f{punishment.GetIssueDate()}") + "\n" +
 						"\n" +
 						TextUtils.CenterLine("§r§7Appeal at: §e§nwww.skytonia.com/appeal");
-				}
+					}
 				case PunishmentType.Mute:
 				{
 					return
-						"§f[PUNISHMENT] §cYou are currently muted from talking in chat.\n" +
+						"§f[PUNISH] §cYou are currently muted from talking in chat.\n" +
 						"§7Read our rules at: §e§nwww.skytonia.com/rules";
-				}
+					}
 			}
 
 			return null;
