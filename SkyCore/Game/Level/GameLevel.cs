@@ -280,6 +280,7 @@ namespace SkyCore.Game.Level
         
         public new void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
         {
+	        SkyUtil.log($"Attempting to remove {player.Username} from {GameId}");
 	        if (((SkyPlayer) player).GameTeam == null)
 	        {
 				return; //Shouldn't be in the/any game.

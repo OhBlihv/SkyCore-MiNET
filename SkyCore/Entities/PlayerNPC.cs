@@ -71,6 +71,12 @@ namespace SkyCore.Entities
 
 	    public static void SpawnAllHubNPCs(HubLevel gameLevel)
 	    {
+		    if (gameLevel == null)
+		    {
+			    SkyUtil.log($"Attempted to spawn NPCs on gameLevel == null");
+			    return;
+		    }
+		    
 		    foreach (KeyValuePair<string, NPCSpawnTask> entry in GameNPCs)
 		    {
 			    //Only spawn NPCs which have not been spawned yet

@@ -59,8 +59,6 @@ namespace SkyCore.Player
 
 	        this.SetHideNameTag(false);
 			UpdatePlayerName();
-
-	        SkyUtil.log($"Set {Username}'s name to {DisplayName}");
 		}
 
 	    public void UpdatePlayerName()
@@ -169,7 +167,7 @@ namespace SkyCore.Player
 						new Action(delegate
 						{
 							_isRankLoaded = true;
-							SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommandPermission})");
+							//SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommandPermission})");
 
 							if (PlayerGroup == PlayerGroup.Admin)
 							{
@@ -199,7 +197,7 @@ namespace SkyCore.Player
 					);
 				});
 
-                SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({CommandPermission})");
+                //SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({CommandPermission})");
 
 				//Initialize once we've loaded the group etc.
 	            base.InitializePlayer();
@@ -208,7 +206,7 @@ namespace SkyCore.Player
 
                 IsSpawned = true;
 
-	            SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
+	            //SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
 				//Add this player to any games if available and if this is the only game available
 	            if (SkyCoreAPI.Instance.GameModes.Count == 1)
 	            {
@@ -217,7 +215,7 @@ namespace SkyCore.Player
 		            //Foreach, but only one value.
 		            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
 		            {
-			            SkyUtil.log("Queueing for " + coreGameController.GameName + " In " + (targetedGame == null ? "nothing specific" : $"GameId:{targetedGame.GameId}"));
+			            //SkyUtil.log("Queueing for " + coreGameController.GameName + " In " + (targetedGame == null ? "nothing specific" : $"GameId:{targetedGame.GameId}"));
 						if (targetedGame != null)
 						{
 							coreGameController.InstantQueuePlayer(this, targetedGame);
