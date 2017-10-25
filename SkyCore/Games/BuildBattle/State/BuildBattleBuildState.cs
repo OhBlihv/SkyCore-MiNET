@@ -55,8 +55,8 @@ namespace SkyCore.Games.BuildBattle.State
 						player.UpdateGameMode(GameMode.Creative, false);
 					}
 				}
-				
-				List<string> categoryRotation = new List<string> { "§7Castle", "§cCar", "§6House", "§aTree", "§cVolcano", "§aPark", "§bLake" };
+
+				List<string> categoryRotation = ((BuildBattleLevel) gameLevel).ThemeList;
 				for (int i = 0; i < 12; i++)
 				{
 					string category = categoryRotation[i % categoryRotation.Count];

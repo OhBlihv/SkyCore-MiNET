@@ -18,9 +18,11 @@ namespace SkyCore.Games.BuildBattle
 
 		public readonly List<BuildBattleTeam> BuildTeams = new List<BuildBattleTeam>();
 
-		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "build-battle", gameId, levelPath, true)
+		public readonly List<string> ThemeList;
+
+		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath, List<string> themeList) : base(plugin, "build-battle", gameId, levelPath, true)
 		{
-			
+			ThemeList = themeList;
 		}
 
 		protected override void InitializeTeamMap()
