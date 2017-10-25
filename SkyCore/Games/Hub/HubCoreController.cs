@@ -24,7 +24,7 @@ namespace SkyCore.Games.Hub
 			int rolledNumber = Random.Next(2);
 			if (rolledNumber == 0)
 			{
-				return rolledNumber;
+				return 1;
 			}
 
 			return (Random.Next(2) == 0 ? 1 : -1) * rolledNumber;

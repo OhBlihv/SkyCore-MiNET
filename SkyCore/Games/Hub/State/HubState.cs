@@ -133,7 +133,7 @@ namespace SkyCore.Games.Hub.State
 				playerLocation.Y >= 77 && playerLocation.Y <= 83 &&
 				playerLocation.Z >= 252 && playerLocation.Z <= 258;
 		}
-
+	
 		public override GameState GetNextGameState(GameLevel gameLevel)
 		{
 			return this; //No state changing

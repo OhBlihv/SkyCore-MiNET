@@ -592,7 +592,14 @@ namespace SkyCore.Game.Level
 
 	    public int CompareTo(GameLevel other)
 	    {
-		    return 0 - Math.Sign(GetPlayerCount().CompareTo(other.GetPlayerCount()));
+			int result = 0 - Math.Sign(GetPlayerCount().CompareTo(other.GetPlayerCount()));
+		    
+		    if (result == 0)
+		    {
+			    return 1;
+		    }
+		    
+		    return result;
 	    }
     }
     

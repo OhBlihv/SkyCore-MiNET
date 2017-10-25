@@ -49,6 +49,8 @@ namespace SkyCore.Game
 
 						foreach (InstanceInfo instanceInfo in gamePool.GetAllInstances())
 						{
+							SkyUtil.log($"{instanceInfo.AvailableGames.Count} Games Available for {gamePool.GameName}");
+							
 							if (!instanceInfo.HostAddress.Equals("local") && instanceInfo.LastUpdate < expiryTime)
 							{
 								toRemoveInstances.Add(instanceInfo);
@@ -93,6 +95,9 @@ namespace SkyCore.Game
 
 				RegisterExternalGame(messageSplit[2], connectingPort, messageSplit[0], messageSplit[1]);
 			});
+
+			//Always register the intent of a hub to exist
+			RegisterGameIntent("hub");
 		}
 
 		//
@@ -350,19 +355,6 @@ namespace SkyCore.Game
 			if (!GameRegistrations.ContainsKey(gameName))
 			{
 				player.SendMessage($"{ChatColors.Red}No game existed for the name '{gameName}'");
-				return;
-			}
-
-			if (gameName.Equals("hub"))
-			{
-				if (GameRegistrations.TryGetValue("hub", out var hubPool))
-				{
-					hubPool.AddPlayer(player);
-				}
-				else
-				{
-					player.Disconnect("§cUnable to move you to Hub.");
-				}
 				return;
 			}
 

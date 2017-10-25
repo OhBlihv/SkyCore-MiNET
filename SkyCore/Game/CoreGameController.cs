@@ -147,6 +147,7 @@ namespace SkyCore.Game
 
 					//Update player counts
 					instanceInfo.CurrentPlayers += gameLevel.GetPlayerCount();
+					//SkyUtil.log($"{gameLevel.GameId} Is Available: {gameLevel.CurrentState.CanAddPlayer(gameLevel)}");
 					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
 					{
 						availableGames.Add(new GameInfo(gameLevel.GameId, gameLevel.GetPlayerCount(), gameLevel.GetMaxPlayers()));
