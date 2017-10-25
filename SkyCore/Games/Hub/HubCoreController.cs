@@ -37,6 +37,8 @@ namespace SkyCore.Games.Hub
 		
 		private readonly HubWorldRandomiser _hubWorldRandomiser = new HubWorldRandomiser();
 
+		public int NextGameId;
+
 		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>{"hub"})
 		{
 			Tick = 1;
@@ -49,11 +51,16 @@ namespace SkyCore.Games.Hub
 			//Register all hubs
 			for (int i = 0; i < MaxHubCount; i++)
 			{
-				GetGameController();
+				InitializeNewGame();
 			}
 		}
 
-		protected override GameLevel _getGameController()
+		public override string GetNextGameId()
+		{
+			return $"{RawName}{++NextGameId}";
+		}
+
+		protected override GameLevel _initializeNewGame()
 		{
 			return new HubLevel(Plugin, GetNextGameId(), GetRandomLevelName());
 		}

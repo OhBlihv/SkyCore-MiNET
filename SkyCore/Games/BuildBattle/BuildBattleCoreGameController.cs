@@ -27,7 +27,7 @@ namespace SkyCore.Games.BuildBattle
 			SkyUtil.log($"Initialized {_themeList.Count} Themes");
 		}
 
-		protected override GameLevel _getGameController()
+		protected override GameLevel _initializeNewGame()
 		{
 			return new BuildBattleLevel(Plugin, GetNextGameId(), GetRandomLevelName(), _themeList);
 		}

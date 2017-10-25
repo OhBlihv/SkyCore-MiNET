@@ -683,7 +683,7 @@ namespace SkyCore.Commands
         {
             if (worldName.Equals("world-treasurewars"))
             {
-                new MurderCoreGameController(skyCoreApi).GetGameController(); //initialize new level
+                new MurderCoreGameController(skyCoreApi).InitializeNewGame(); //initialize new level
             }
             
             Level level = skyCoreApi.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals(worldName, StringComparison.InvariantCultureIgnoreCase));

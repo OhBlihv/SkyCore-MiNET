@@ -16,6 +16,7 @@ using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Player;
 using SkyCore.Util;
+using StackExchange.Redis;
 
 namespace SkyCore.Game
 {
@@ -41,7 +42,7 @@ namespace SkyCore.Game
 
         public string RawName { get; }
 
-        public int NextGameId;
+	    private string RedisGameIdKey { get; }
 
 	    protected CoreGameController(SkyCoreAPI plugin, string gameName, string neatName, List<string> levelNames)
         {
@@ -49,6 +50,8 @@ namespace SkyCore.Game
             
             GameName = neatName;
             RawName = gameName;
+
+	        RedisGameIdKey = $"next_game_id_{GameName}";
 
 			ExternalGameHandler.RegisterInternalGame(RawName);
             
@@ -114,40 +117,22 @@ namespace SkyCore.Game
 				CheckCapacity();
 			}
 
-            //SkyUtil.log("Ticking Core");
             if (QueuedPlayers.IsEmpty && Tick % 20 != 0)
             {
                 return;
             }
 	        
-            //SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 			lock (GameLevels)
 			{
 				InstanceInfo instanceInfo = ExternalGameHandler.GameRegistrations[RawName].GetLocalInstance();
 				instanceInfo.CurrentPlayers = 0;
 
-				//string message = "";
-
 				//Show higher player count games first
 				List<GameInfo> availableGames = new List<GameInfo>();
 				foreach (GameLevel gameLevel in GetMostViableGames())
 				{
-					/*if (gameLevel.PlayerTeamDict.Count > 0 || gameLevel.GetAllPlayers().Count > 0)
-					{
-						List<SkyPlayer> players = gameLevel.GetAllPlayers();
-						if (players.Count > 0)
-						{
-							message += gameLevel.GameId + ": " + gameLevel.GetPlayerCount() + " " + gameLevel.GetAllPlayers()[0].Username + " " + gameLevel.PlayerTeamDict.ContainsKey(gameLevel.GetAllPlayers()[0].Username) + " ";
-						}
-						else
-						{
-							message += gameLevel.GameId + ": " + gameLevel.GetPlayerCount() + " " + gameLevel.PlayerTeamDict.ContainsKey("OhBlihv") + " ";
-						}
-					}*/
-
 					//Update player counts
 					instanceInfo.CurrentPlayers += gameLevel.GetPlayerCount();
-					//SkyUtil.log($"{gameLevel.GameId} Is Available: {gameLevel.CurrentState.CanAddPlayer(gameLevel)}");
 					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
 					{
 						availableGames.Add(new GameInfo(gameLevel.GameId, gameLevel.GetPlayerCount(), gameLevel.GetMaxPlayers()));
@@ -173,23 +158,9 @@ namespace SkyCore.Game
 						}
 					}
 				}
-
-				/*if (RawName.Equals("hub"))
-				{
-					if (message.Length == 0)
-					{
-						SkyUtil.log("No players on Hub");
-					}
-					else
-					{
-						SkyUtil.log(message);
-					}
-				}*/
 				
 				instanceInfo.AvailableGames = availableGames;
 				instanceInfo.Update(); //Set last update time
-
-				//SkyUtil.log($"InstanceInfo at {instanceInfo.CurrentPlayers} with {instanceInfo.AvailableGames}");
 			}
 
             //If we're running out of free slots, create a new game lobby
@@ -197,7 +168,7 @@ namespace SkyCore.Game
             {
                 SkyUtil.log("Attempting to create a game to satisfy demand");
                 //Register a fresh controller
-                GetGameController();
+                InitializeNewGame();
             }
         }
 
@@ -285,15 +256,10 @@ namespace SkyCore.Game
 				}
 			}
 
-			while (availableGames.Count < 2)
+			int j = 0;
+			while (j++ + availableGames.Count < 2)
 			{
-				GameLevel gameLevel = GetGameController();
-				if (gameLevel == null)
-				{
-					break;
-				}
-				
-				availableGames.Add(gameLevel); //Create a new game for the pool
+				InitializeNewGame(); //Cannot add the new games to the available games list this tick.
 			}
 			
 			//Clean up unnecessary games
@@ -317,36 +283,61 @@ namespace SkyCore.Game
 			}
 		}
 
-        public GameLevel GetGameController()
+        public void InitializeNewGame()
         {
-	        lock (GameLevels)
-	        {
-		        if (GameLevels.Count >= MaxGames)
-		        {
-			        return null; //Cannot create any more games.
-		        }
+			RunnableTask.RunTask(() =>
+			{
+				lock (GameLevels)
+				{
+					if (GameLevels.Count >= MaxGames)
+					{
+						return; //Cannot create any more games.
+					}
 
-		        GameLevel gameLevel = _getGameController();
+					GameLevel gameLevel = _initializeNewGame();
 
-		        if (gameLevel != null)
-		        {
-			        GameLevels.TryAdd(gameLevel.GameId, gameLevel);
-		        }
+					if (gameLevel != null)
+					{
+						GameLevels.TryAdd(gameLevel.GameId, gameLevel);
+					}
+				}
+			});
+		}
 
-		        return gameLevel;
-	        }
-        }
-
-        protected abstract GameLevel _getGameController();
+        protected abstract GameLevel _initializeNewGame();
 
         public string GetRandomLevelName()
         {
             return LevelNames[Random.Next(LevelNames.Count)];
         }
 
-        public string GetNextGameId()
+	    private readonly TimeSpan _defaultRedisTimestamp = TimeSpan.FromHours(96); //4 Days. In-case a game goes idle, it won't reset.
+	    private const int MaxGameIdVal = 99999; //Stop at 5 characters, reset to 1
+
+		public virtual string GetNextGameId()
         {
-            return $"{RawName}{++NextGameId}";
+	        IDatabase redis = ExternalGameHandler.RedisPool.GetDatabase();
+
+	        int nextGameId = 0;
+			RedisValue nextGameIdVal = redis.StringGet(RedisGameIdKey);
+	        if (nextGameIdVal.HasValue && int.TryParse(nextGameIdVal, out var nextGameIdResult))
+	        {
+		        nextGameId = nextGameIdResult;
+				SkyUtil.log($"Loaded Redis Cached GameId As {nextGameId}");
+			}
+	        else
+	        {
+				SkyUtil.log($"No Redis Cached Value Found. Using {nextGameId}");
+			}
+
+			if (nextGameId + 1 > MaxGameIdVal)
+			{
+				nextGameId = 0;
+			}
+
+			redis.StringSet(RedisGameIdKey, nextGameId + 1, _defaultRedisTimestamp);
+
+			return $"{RawName}{nextGameId}";
         }
 
         public virtual void QueuePlayer(SkyPlayer player)

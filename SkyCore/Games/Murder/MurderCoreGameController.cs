@@ -23,7 +23,7 @@ namespace SkyCore.Games.Murder
 			SkyCoreAPI.Instance.Context.PluginManager.LoadCommands(this);  //Initialize Location/Murder Commands
 		}
 
-        protected override GameLevel _getGameController()
+        protected override GameLevel _initializeNewGame()
         {
             return new MurderLevel(Plugin, GetNextGameId(), GetRandomLevelName());
         }

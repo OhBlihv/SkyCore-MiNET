@@ -49,8 +49,6 @@ namespace SkyCore.Game
 
 						foreach (InstanceInfo instanceInfo in gamePool.GetAllInstances())
 						{
-							SkyUtil.log($"{instanceInfo.AvailableGames.Count} Games Available for {gamePool.GameName}");
-							
 							if (!instanceInfo.HostAddress.Equals("local") && instanceInfo.LastUpdate < expiryTime)
 							{
 								toRemoveInstances.Add(instanceInfo);
