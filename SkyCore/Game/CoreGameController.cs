@@ -217,7 +217,7 @@ namespace SkyCore.Game
 
 	    public virtual void InstantQueuePlayer(SkyPlayer player)
 	    {
-			SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
+			SkyUtil.log($"Trying to add {player.Username} player to {GameLevels.Count} games");
 		    lock (GameLevels)
 		    {
 			    foreach (GameLevel gameLevel in GetMostViableGames())

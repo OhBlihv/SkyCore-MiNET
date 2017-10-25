@@ -103,38 +103,46 @@ namespace SkyCore.Games.BuildBattle
 					case 0:
 						voteLocation.X -= 5;
 						voteLocation.HeadYaw = 270F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 					case 1:
 						voteLocation.X -= 2.5f;
 						voteLocation.Z -= 2.5f;
 						voteLocation.HeadYaw = 315F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 					case 2:
 						voteLocation.Z -= 5;
 						voteLocation.HeadYaw = 0F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 					case 3:
 						voteLocation.X += 2.5f;
 						voteLocation.Z -= 2.5f;
 						voteLocation.HeadYaw = 45F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 					case 4:
 						voteLocation.X += 5;
 						voteLocation.HeadYaw = 90F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 					case 5:
 						voteLocation.X += 2.5f;
 						voteLocation.Z += 2.5f;
 						voteLocation.HeadYaw = 135F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 					case 6:
 						voteLocation.Z += 5;
 						voteLocation.HeadYaw = 180F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 					case 7:
 						voteLocation.X -= 2.5f;
 						voteLocation.Z += 2.5f;
 						voteLocation.HeadYaw = 225F;
+						voteLocation.Yaw = voteLocation.HeadYaw;
 						break;
 				}
 

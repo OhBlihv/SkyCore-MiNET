@@ -82,6 +82,8 @@ namespace SkyCore.Games.BuildBattle.State
 					player.IsWorldImmutable = true; //Allow breaking
 					player.IsWorldBuilder = false;
 					player.SendAdventureSettings();
+					
+					player.UpdateGameMode(GameMode.Creative, true);
 
 					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + SelectedCategory);
 
