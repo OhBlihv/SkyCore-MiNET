@@ -34,7 +34,6 @@ namespace SkyCore.Games.Murder.State
 	    private const int MaxGunAmmo = 5;
 
         private int _endTick = -1; //Default value
-	    private bool _isStarted = false;
 
         private static readonly List<PlayerLocation> GunPartLocations = new List<PlayerLocation>();
         private static readonly List<PlayerLocation> PlayerSpawnLocations = new List<PlayerLocation>();
@@ -192,8 +191,6 @@ namespace SkyCore.Games.Murder.State
 							player.Teleport(newLocation);
 						}
 					});
-
-		            _isStarted = true;
 	            });
 			}
             catch (Exception e)
