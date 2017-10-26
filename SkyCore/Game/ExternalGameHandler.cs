@@ -477,7 +477,7 @@ namespace SkyCore.Game
 				}
 				else
 				{
-					ExternalGameHandler.RedisPool.GetSubscriber().PublishAsync($"{GameName}_info", $"{player.Username}:{GameName}:{bestAvailableGame.GameId}");
+					ExternalGameHandler.RedisPool.GetSubscriber().PublishAsync($"{GameName}_join", $"{player.Username}:{GameName}:{bestAvailableGame.GameId}");
 
 					McpeTransfer transferPacket = new McpeTransfer
 					{
