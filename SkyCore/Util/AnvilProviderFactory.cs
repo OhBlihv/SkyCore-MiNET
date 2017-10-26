@@ -46,10 +46,9 @@ namespace SkyCore.Util
 			{
 				for (var z = -radius; z < radius; z++)
 				{
-					ChunkColumn column;
 					var location = new ChunkCoordinates(spawn.X + x, spawn.Z + z);
 
-					provider._chunkCache.TryGetValue(location, out column);
+					provider._chunkCache.TryGetValue(location, out var column);
 
 					if (column != null) continue;
 

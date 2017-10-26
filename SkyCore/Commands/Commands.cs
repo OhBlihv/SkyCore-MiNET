@@ -244,7 +244,7 @@ namespace SkyCore.Commands
                 case 3:
                     gamemode = GameMode.Spectator;
                     //Avoid having regular players noclipping
-                    if (((SkyPlayer) target).PlayerGroup.isAtLeast(PlayerGroup.Youtuber))
+                    if (((SkyPlayer) target).PlayerGroup.IsAtLeast(PlayerGroup.Youtuber))
                     {
                         target.IsNoClip = true;
                     }

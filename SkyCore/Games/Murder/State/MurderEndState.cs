@@ -18,12 +18,12 @@ namespace SkyCore.Games.Murder.State
 				player.AddExperience(-1000, true); //Reset gun cooldowns
 			});
 
-            MurderVictoryType victoryType;
+            //MurderVictoryType victoryType;
 
             //Innocents Win (Murderer Dead)
             if (gameLevel.GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
             {
-                victoryType = MurderVictoryType.MURDERER_DEAD;
+                //victoryType = MurderVictoryType.MURDERER_DEAD;
 
 				MiNET.Player murderer = ((MurderLevel)gameLevel).Murderer;
 
@@ -44,7 +44,7 @@ namespace SkyCore.Games.Murder.State
             //Murderer Wins (Innocents + Detective Dead)
             else if(gameLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0)
             {
-                victoryType = MurderVictoryType.CONQUEST;
+                //victoryType = MurderVictoryType.CONQUEST;
 
                 gameLevel.DoForPlayersIn(player =>
                 {
@@ -62,7 +62,7 @@ namespace SkyCore.Games.Murder.State
             //Innocents Win (Timeout)
             else
             {
-                victoryType = MurderVictoryType.TIMEOUT;
+                //victoryType = MurderVictoryType.TIMEOUT;
 
                 gameLevel.DoForPlayersIn(player =>
                 {

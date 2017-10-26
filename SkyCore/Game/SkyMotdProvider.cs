@@ -29,7 +29,9 @@ namespace SkyCore.Game
 				edition = "MCEE";
 			}
 
+#pragma warning disable CS0618 // Type or member is obsolete
 			return string.Format($"{edition};{Motd};{protocolVersion};{clientVersion};{ExternalGameHandler.TotalPlayers};{MaxNumberOfPlayers};{Motd.GetHashCode() + caller.Address.Address + caller.Port};{SecondLine};Survival;");
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 	}
 }

@@ -69,14 +69,14 @@ namespace SkyCore.Permissions
 			Values.Add(this);
         }
 
-        public int compareTo(PlayerGroup playerGroup)
+        public int CompareTo(PlayerGroup playerGroup)
         {
             return _enumVal.CompareTo(playerGroup._enumVal);
         }
 
-        public bool isAtLeast(PlayerGroup playerGroup)
+        public bool IsAtLeast(PlayerGroup playerGroup)
         {
-            return compareTo(playerGroup) >= 0;
+            return CompareTo(playerGroup) >= 0;
         }
 
         public static bool ValueOf(string groupName, out PlayerGroup playerGroup)
@@ -120,7 +120,7 @@ namespace SkyCore.Permissions
             this.skyCoreApi = skyCoreApi;
         }
 
-        public PlayerGroup getPlayerGroup(string playerName)
+        public PlayerGroup GetPlayerGroup(string playerName)
         {
             PlayerGroup playerGroup = PlayerGroup.Player;
             if (playerName.Equals("OhBlihv") || playerName.Equals("OhBlihv2") || playerName.Equals("Donnas_Wraps"))
@@ -154,8 +154,7 @@ namespace SkyCore.Permissions
             targetGroupName = targetGroupName.ToLower();
             targetGroupName = Char.ToUpper(targetGroupName.ToCharArray()[0]) + targetGroupName.Substring(1);
 
-            PlayerGroup targetGroup;
-            if (!PlayerGroup.ValueOf(targetGroupName, out targetGroup))
+	        if (!PlayerGroup.ValueOf(targetGroupName, out var targetGroup))
             {
                 player.SendMessage($"{ChatColors.Red}Unrecognized group name '{targetGroupName}'.");
                 string possibleGroups = "";

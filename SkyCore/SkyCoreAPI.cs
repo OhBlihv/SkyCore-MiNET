@@ -236,7 +236,7 @@ namespace SkyCore
 
         public void LevelOnBlockBreak(object sender, BlockBreakEventArgs e)
         {
-            if (!((SkyPlayer) e.Player).PlayerGroup.isAtLeast(PlayerGroup.Admin))
+            if (!((SkyPlayer) e.Player).PlayerGroup.IsAtLeast(PlayerGroup.Admin))
             {
                 e.Cancel = true;
             }
@@ -244,7 +244,7 @@ namespace SkyCore
 
 	    public void LevelOnBlockPlace(object sender, BlockPlaceEventArgs e)
         {
-            if (!((SkyPlayer)e.Player).PlayerGroup.isAtLeast(PlayerGroup.Admin))
+            if (!((SkyPlayer)e.Player).PlayerGroup.IsAtLeast(PlayerGroup.Admin))
             {
                 e.Cancel = true;
             }
@@ -277,7 +277,7 @@ namespace SkyCore
 				Thread.Sleep(2000);
 
                 //Group isn't initialized yet - wait.
-                SkyUtil.log($"{++i} Group for {player.Username} == {player.PlayerGroup} vs {PlayerGroup.Youtuber} == {player.PlayerGroup.CompareTo(PlayerGroup.Youtuber)}");
+                SkyUtil.log($"{++i} Group for {player.Username} == {player.PlayerGroup} vs {PlayerGroup.Youtuber} == {((Enumeration) player.PlayerGroup).CompareTo(PlayerGroup.Youtuber)}");
 
                 //player.SendTitle($"{ChatColors.Gold}Welcome {player.Username}\n{ChatColors.LightPurple}~ To the Skytonia Network ~", TitleType.ActionBar);
                 Console.WriteLine(" (Joined!)");
@@ -339,7 +339,7 @@ namespace SkyCore
             }
             else
             {
-                rank = Permissions.getPlayerGroup(player.Username).Prefix;
+                rank = Permissions.GetPlayerGroup(player.Username).Prefix;
             }
 
             if (rank.Length > 2)

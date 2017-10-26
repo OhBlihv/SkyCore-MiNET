@@ -154,8 +154,7 @@ namespace SkyCore.Player
 						},
 						(reader) =>
 						{
-							PlayerGroup playerGroup;
-							PlayerGroup.ValueOf(reader.GetString(0), out playerGroup);
+							PlayerGroup.ValueOf(reader.GetString(0), out var playerGroup);
 
 							if (playerGroup == null)
 							{
@@ -177,7 +176,7 @@ namespace SkyCore.Player
 							{
 								SetGameMode(GameMode.Adventure);
 
-								if (SkyCoreApi.GameType.Equals("hub") && PlayerGroup.isAtLeast(PlayerGroup.Mvp))
+								if (SkyCoreApi.GameType.Equals("hub") && PlayerGroup.IsAtLeast(PlayerGroup.Mvp))
 								{
 									SetAllowFly(true);
 								}

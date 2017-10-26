@@ -222,8 +222,7 @@ namespace SkyCore.Games.Murder.Entities
 
 			if (Shooter != null && IsCritical)
 			{
-				var particle = new CriticalParticle(Level);
-				particle.Position = KnownPosition.ToVector3();
+				var particle = new CriticalParticle(Level) {Position = KnownPosition.ToVector3()};
 				particle.Spawn(new[] { Shooter });
 			}
 		}

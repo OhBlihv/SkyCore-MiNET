@@ -144,10 +144,9 @@ namespace SkyCore.Database
 				connection = DatabaseAction.GetConnection();
 
 				MySqlCommand command = new MySqlCommand(_queryString, connection);
-				batchAdapter = new MySqlDataAdapter();
+				batchAdapter = new MySqlDataAdapter {InsertCommand = command};
 
 				//TODO: Allow different query types
-				batchAdapter.InsertCommand = command;
 				batchAdapter.InsertCommand.UpdatedRowSource = UpdateRowSource.None;
 
 				DataTable dataTable = new DataTable(_tableName);
