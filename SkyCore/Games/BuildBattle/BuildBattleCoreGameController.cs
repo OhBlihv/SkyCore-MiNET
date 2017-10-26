@@ -29,7 +29,9 @@ namespace SkyCore.Games.BuildBattle
 
 		protected override GameLevel _initializeNewGame()
 		{
-			return new BuildBattleLevel(Plugin, GetNextGameId(), GetRandomLevelName(), _themeList);
+			string selelectedLevel = GetRandomLevelName();
+
+			return new BuildBattleLevel(Plugin, GetNextGameId(), selelectedLevel, GetGameLevelInfo(selelectedLevel), _themeList);
 		}
 
 		public override Type GetGameLevelInfoType()

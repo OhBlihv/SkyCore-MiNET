@@ -58,7 +58,7 @@ namespace SkyCore.Game.Level
 
         //
 
-	    protected GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, bool modifiable = false)
+	    protected GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, GameLevelInfo gameLevelInfo, bool modifiable = false)
                 : base(plugin.Context.LevelManager, gameId, 
 					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath, modifiable, true, !modifiable),
                     plugin.Context.LevelManager.EntityManager, GameMode.Creative)
@@ -74,15 +74,7 @@ namespace SkyCore.Game.Level
 			Plugin = plugin;
             GameId = gameId;
 	        GameType = gameType;
-
-	        GameLevelInfo = new GameLevelInfo(gameType, LevelName, new PlayerLocation(266, 11, 256));
-	        {
-		        GameLevelInfo gameLevelInfo = LoadThisLevelInfo();
-		        if (gameLevelInfo != null)
-		        {
-			        GameLevelInfo = gameLevelInfo;
-		        }
-	        }
+	        GameLevelInfo = gameLevelInfo;
 
 	        EnableBlockTicking = false;
             EnableChunkTicking = false;
@@ -489,42 +481,6 @@ namespace SkyCore.Game.Level
             //Bump the player up into the air to signify death
             player.Knockback(new Vector3(0f, 0.5f, 0f));
         }
-
-	    // JSON
-
-	    public abstract Type GetGameLevelInfoType();
-
-		public GameLevelInfo LoadThisLevelInfo()
-	    {
-		    try
-		    {
-			    string levelInfoFilename =
-				    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{GameType}-{LevelName}.json";
-
-			    if (File.Exists(levelInfoFilename))
-			    {
-				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
-
-				    //return JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), new GameLevelInfoConverter());
-				    GameLevelInfo gameLevelInfo = (GameLevelInfo)JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), GetGameLevelInfoType());
-
-				    SkyUtil.log("Returning of type " + gameLevelInfo.GetType());
-
-				    return gameLevelInfo;
-			    }
-			    else
-			    {
-				    SkyUtil.log($"Could not find '{levelInfoFilename} for level. Not loading.");
-			    }
-
-			    return null;
-			}
-		    catch (Exception e)
-		    {
-			    Console.WriteLine(e);
-			    return null;
-		    }
-	    }
 
 		// Forms
 

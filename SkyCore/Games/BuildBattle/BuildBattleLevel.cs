@@ -20,7 +20,8 @@ namespace SkyCore.Games.BuildBattle
 
 		public readonly List<string> ThemeList;
 
-		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath, List<string> themeList) : base(plugin, "build-battle", gameId, levelPath, true)
+		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo, List<string> themeList) :
+			base(plugin, "build-battle", gameId, levelPath, gameLevelInfo, true)
 		{
 			ThemeList = themeList;
 		}
@@ -150,11 +151,6 @@ namespace SkyCore.Games.BuildBattle
 			}
 
 			return voteLocations;
-		}
-
-		public override Type GetGameLevelInfoType()
-		{
-			return typeof(GameLevelInfo); //Nothing Custom
 		}
 
 		public override string GetGameModalTitle()

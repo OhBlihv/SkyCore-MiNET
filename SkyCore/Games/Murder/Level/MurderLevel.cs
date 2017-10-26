@@ -15,7 +15,7 @@ namespace SkyCore.Games.Murder.Level
         public SkyPlayer Murderer { get; set; }
         public SkyPlayer Detective { get; set; }
 
-        public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath) : base(plugin, "murder", gameId, levelPath)
+        public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo) : base(plugin, "murder", gameId, levelPath, gameLevelInfo)
         {
 			SkyUtil.log($"Initializing level '{LevelName}'");
 
@@ -120,13 +120,8 @@ namespace SkyCore.Games.Murder.Level
 
         public override void GameTick(int tick)
         {
-            //Console.WriteLine("Tick: " + tick);
+            
         }
-
-	    public override Type GetGameLevelInfoType()
-	    {
-		    return typeof(MurderLevelInfo);
-	    }
 
 	    public override string GetGameModalTitle()
 	    {

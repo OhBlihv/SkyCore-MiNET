@@ -25,7 +25,9 @@ namespace SkyCore.Games.Murder
 
         protected override GameLevel _initializeNewGame()
         {
-            return new MurderLevel(Plugin, GetNextGameId(), GetRandomLevelName());
+			string selelectedLevel = GetRandomLevelName();
+
+	        return new MurderLevel(Plugin, GetNextGameId(), selelectedLevel, GetGameLevelInfo(selelectedLevel));
         }
 
 	    public override Type GetGameLevelInfoType()
@@ -73,10 +75,11 @@ namespace SkyCore.Games.Murder
 		    }
 
 		    MurderLevel murderLevel = (MurderLevel) player.Level;
-
-			//TODO: Don't clone until we know we have a correct arg?
-			//MurderLevelInfo murderLevelInfo = (MurderLevelInfo) ((MurderLevel) player.Level).GameLevelInfo.Clone();
-			MurderLevelInfo murderLevelInfo = (MurderLevelInfo) murderLevel.LoadThisLevelInfo();
+		    if (!(SkyCoreAPI.Instance.GameModes["murder"].LoadGameLevelInfo(murderLevel.LevelName) is MurderLevelInfo murderLevelInfo))
+		    {
+			    player.SendMessage("§cThe current level's information could not be loaded.");
+			    return;
+		    }
 
 			List<PlayerLocation> locationList = null;
 		    if (type.Equals("spawn"))

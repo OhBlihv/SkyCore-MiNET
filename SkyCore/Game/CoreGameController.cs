@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -172,7 +173,61 @@ namespace SkyCore.Game
             }
         }
 
-	    public virtual SortedSet<GameLevel> GetMostViableGames()
+		// JSON
+	    
+	    private readonly IDictionary<string, GameLevelInfo> _cachedGameLevelInfos = new ConcurrentDictionary<string, GameLevelInfo>();
+
+		public virtual GameLevelInfo GetGameLevelInfo(string levelName)
+	    {
+		    if (_cachedGameLevelInfos.TryGetValue(levelName, out var gameLevelInfo))
+		    {
+			    return gameLevelInfo;
+		    }
+		    
+			gameLevelInfo = LoadGameLevelInfo(levelName);
+		    if (gameLevelInfo == null)
+		    {
+				gameLevelInfo = new GameLevelInfo(RawName, levelName, new PlayerLocation(266, 11, 256));
+			}
+		    
+		    _cachedGameLevelInfos.Add(levelName, gameLevelInfo);
+
+		    return gameLevelInfo;
+	    }
+
+	    public GameLevelInfo LoadGameLevelInfo(string levelName)
+	    {
+		    try
+		    {
+			    string levelInfoFilename =
+				    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{RawName}-{levelName}.json";
+
+			    if (File.Exists(levelInfoFilename))
+			    {
+				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
+
+				    //return JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), new GameLevelInfoConverter());
+				    GameLevelInfo gameLevelInfo = (GameLevelInfo)JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), GetGameLevelInfoType());
+
+				    SkyUtil.log("Returning of type " + gameLevelInfo.GetType());
+
+				    return gameLevelInfo;
+			    }
+
+				SkyUtil.log($"Could not find '{levelInfoFilename} for level. Not loading.");
+
+				return null;
+		    }
+		    catch (Exception e)
+		    {
+			    Console.WriteLine(e);
+			    return null;
+		    }
+	    }
+	    
+	    // Games
+
+		public virtual SortedSet<GameLevel> GetMostViableGames()
 	    {
 			SortedSet<GameLevel> mostViableGames = new SortedSet<GameLevel>();
 
@@ -306,7 +361,7 @@ namespace SkyCore.Game
 
         protected abstract GameLevel _initializeNewGame();
 
-        public string GetRandomLevelName()
+        public virtual string GetRandomLevelName() //TODO: Override and select games fairly, to not use the same small pool of maps
         {
             return LevelNames[Random.Next(LevelNames.Count)];
         }

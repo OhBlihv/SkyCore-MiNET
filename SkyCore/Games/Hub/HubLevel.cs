@@ -21,7 +21,8 @@ namespace SkyCore.Games.Hub
 		
 		public readonly ISet<string> CurrentlySpawnedNPCs = new HashSet<string>();
 	
-		public HubLevel(SkyCoreAPI plugin, string gameId, string levelPath, bool modifiable = false) : base(plugin, "hub", gameId, levelPath, modifiable)
+		public HubLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo, bool modifiable = false) : 
+			base(plugin, "hub", gameId, levelPath, gameLevelInfo, modifiable)
 		{
 			SpawnPoint = new PlayerLocation(256.5, 78, 255);
 			GameLevelInfo.LobbyLocation = new PlayerLocation(256.5, 78, 255);
@@ -101,11 +102,6 @@ namespace SkyCore.Games.Hub
 			{
 				PlayerNPC.SpawnAllHubNPCs(this);
 			}
-		}
-
-		public override Type GetGameLevelInfoType()
-		{
-			return typeof(GameLevelInfo);
 		}
 
 		public override string GetEndOfGameContent(SkyPlayer player)
