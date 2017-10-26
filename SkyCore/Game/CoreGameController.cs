@@ -318,7 +318,7 @@ namespace SkyCore.Game
         {
 	        IDatabase redis = ExternalGameHandler.RedisPool.GetDatabase();
 
-	        int nextGameId = 0;
+	        int nextGameId = 1;
 			RedisValue nextGameIdVal = redis.StringGet(RedisGameIdKey);
 	        if (nextGameIdVal.HasValue && int.TryParse(nextGameIdVal, out var nextGameIdResult))
 	        {
