@@ -208,7 +208,7 @@ namespace SkyCore.Player
 
                 IsSpawned = true;
 
-	            //SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
+	            SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
 				//Add this player to any games if available and if this is the only game available
 	            if (SkyCoreAPI.Instance.GameModes.Count == 1)
 	            {

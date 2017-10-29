@@ -1,20 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using MiNET;
 using MiNET.Blocks;
-using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
 using MiNET.Worlds;
-using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
-using SkyCore.Games.Murder;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -27,7 +20,7 @@ namespace SkyCore.Games.BuildBattle.State
 		//private const int MaxGameTime = 300 * 2;
 		private const int PreStartTime = 10;
 
-		public string SelectedCategory { get; private set; }
+		public BuildBattleTheme SelectedCategory { get; private set; }
 
 		private int _endTick = -1; //Default value
 
@@ -56,13 +49,13 @@ namespace SkyCore.Games.BuildBattle.State
 					}
 				}
 
-				List<string> categoryRotation = ((BuildBattleLevel) gameLevel).ThemeList;
+				List<BuildBattleTheme> categoryRotation = ((BuildBattleLevel) gameLevel).ThemeList;
 				for (int i = 0; i < 12; i++)
 				{
-					string category = categoryRotation[i % categoryRotation.Count];
+					BuildBattleTheme category = categoryRotation[i % categoryRotation.Count];
 					foreach (SkyPlayer player in players)
 					{
-						TitleUtil.SendCenteredSubtitle(player, category);
+						TitleUtil.SendCenteredSubtitle(player, category.ThemeName);
 
 						//Poorly enforce speed
 						if (i == 0 || i == 11)
@@ -85,7 +78,13 @@ namespace SkyCore.Games.BuildBattle.State
 					
 					player.UpdateGameMode(GameMode.Creative, true);
 
-					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + TextUtils.Center(SelectedCategory, "§eCategory:".Length));
+					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + TextUtils.Center(SelectedCategory.ThemeName, "§eCategory:".Length));
+					
+					player.Inventory.Clear();
+					for (int i = 0; i < SelectedCategory.TemplateItems.Count;i++)
+					{
+						player.Inventory.SetInventorySlot(i, SelectedCategory.TemplateItems[i].GetItem());
+					}
 
 					//Ensure this player is at the correct spawn location
 					if (gameLevel.GetBlock(player.KnownPosition).Id != 0)
@@ -146,7 +145,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 			gameLevel.DoForAllPlayers(player =>
 			{
-				player.BarHandler.AddMajorLine($"§d§lTime Remaining:§r §e{neatRemaining} §f| §d§lCategory:§r §f{SelectedCategory}§r", 2);
+				player.BarHandler.AddMajorLine($"§d§lTime Remaining:§r §e{neatRemaining} §f| §d§lCategory:§r §f{SelectedCategory.ThemeName}§r", 2);
 			});
 		}
 

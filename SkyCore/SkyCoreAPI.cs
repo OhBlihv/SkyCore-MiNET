@@ -197,6 +197,7 @@ namespace SkyCore
 				catch (Exception e)
 				{
 					Console.WriteLine(e.StackTrace);
+					//TODO: Prevent players joining
 				}
 			});
         }

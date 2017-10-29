@@ -18,9 +18,9 @@ namespace SkyCore.Games.BuildBattle
 
 		public readonly List<BuildBattleTeam> BuildTeams = new List<BuildBattleTeam>();
 
-		public readonly List<string> ThemeList;
+		public readonly List<BuildBattleTheme> ThemeList;
 
-		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo, List<string> themeList) :
+		public BuildBattleLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo, List<BuildBattleTheme> themeList) :
 			base(plugin, "build-battle", gameId, levelPath, gameLevelInfo, true)
 		{
 			ThemeList = themeList;

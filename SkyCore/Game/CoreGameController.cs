@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using MiNET.Utils;
-using MiNET.Worlds;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SkyCore.Entities;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Player;
@@ -202,7 +196,6 @@ namespace SkyCore.Game
 			    {
 				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
 
-				    //return JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), new GameLevelInfoConverter());
 				    GameLevelInfo gameLevelInfo = (GameLevelInfo)JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), GetGameLevelInfoType());
 
 				    SkyUtil.log("Returning of type " + gameLevelInfo.GetType());

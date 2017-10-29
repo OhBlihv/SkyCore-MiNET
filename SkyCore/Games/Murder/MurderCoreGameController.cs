@@ -109,7 +109,7 @@ namespace SkyCore.Games.Murder
 
 			SkyUtil.log($"Saving as '{fileName}' -> {murderLevel.GameType} AND {murderLevel.LevelName}");
 
-			File.WriteAllText(fileName, JsonConvert.SerializeObject(murderLevelInfo));
+			File.WriteAllText(fileName, JsonConvert.SerializeObject(murderLevelInfo, Formatting.Indented));
 
 			player.SendMessage($"§cUpdated {action} location list ({locationList.Count}) with current location.");
 	    }
