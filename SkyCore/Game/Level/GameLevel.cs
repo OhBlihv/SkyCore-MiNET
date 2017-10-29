@@ -16,6 +16,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Threading;
+using SkyCore.Entities;
 
 namespace SkyCore.Game.Level
 {
@@ -103,6 +104,9 @@ namespace SkyCore.Game.Level
 
 			BlockBreak += HandleBlockBreak;
 			BlockPlace += HandleBlockPlace;
+	        
+	        //Spawn Lobby NPC
+	        PlayerNPC.SpawnLobbyNPC(this, "§eChange Game", new PlayerLocation(260.5, 10, 252.5));
         }
 
 		protected virtual void HandleBlockPlace(object sender, BlockPlaceEventArgs e)

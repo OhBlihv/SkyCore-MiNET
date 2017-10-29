@@ -98,7 +98,7 @@ namespace SkyCore.Games.BuildBattle
 			{
 				PlayerLocation voteLocation = (PlayerLocation)buildTeam.SpawnLocation.Clone();
 				voteLocation.Y += 10;
-				voteLocation.Pitch = -15F; //Pitch down to look at the 'build'
+				voteLocation.Pitch = -45F; //Pitch down to look at the 'build'
 				switch (i)
 				{
 					case 0:

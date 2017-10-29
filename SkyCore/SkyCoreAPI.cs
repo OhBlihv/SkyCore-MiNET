@@ -221,14 +221,27 @@ namespace SkyCore
         {
 	        IsDisabled = true;
 
-            foreach (Level level in Context.LevelManager.Levels)
-            {
-                foreach (MiNET.Player player in level.Players.Values)
-                {
-	                player.Disconnect("                     §d§lSkytonia §f§lNetwork§r\n" +
-	                                  "§7Skytonia is currently rebooting, try joining again soon!");
-                }
-            }
+	        if (!GameType.Equals("hub")) //TODO: Support multiple hub servers
+	        {
+				foreach (Level level in Context.LevelManager.Levels)
+		        {
+			        foreach (MiNET.Player player in level.Players.Values)
+			        {
+				        ExternalGameHandler.AddPlayer(player as SkyPlayer, "hub");
+			        }
+		        }
+
+		        Thread.Sleep(1000);
+			}
+
+			foreach (Level level in Context.LevelManager.Levels)
+			{
+				foreach (MiNET.Player player in level.Players.Values)
+				{
+					player.Disconnect("                     §d§lSkytonia §f§lNetwork§r\n" +
+					                  "§7Skytonia is currently rebooting, try joining again soon!");
+				}
+			}
 
 			PunishCore.Close();
 			StatisticsCore.Close();

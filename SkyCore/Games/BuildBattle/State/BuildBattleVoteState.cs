@@ -19,10 +19,10 @@ namespace SkyCore.Games.BuildBattle.State
 	class BuildBattleVoteState : RunningState
 	{
 
-		private const int MaxVoteTime = 10 * 2;
+		private const int MaxVoteTime = 15 * 2;
 
 		private int _currentVotingTeam = -1;
-		private SkyPlayer _currentVotingPlayer = null;
+		private SkyPlayer _currentVotingPlayer;
 
 		private int _endTick = -1; //Default value
 

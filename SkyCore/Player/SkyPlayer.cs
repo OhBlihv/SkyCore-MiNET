@@ -187,11 +187,14 @@ namespace SkyCore.Player
 								action.Invoke();
 							}
 
-							/*if (Username.Equals("OhBlihv"))
+							if (Username.Equals("OhBlihv") || Username.Equals("Donnas Wraps"))
 							{
-								setPlayerGroup(PlayerGroup.Admin);
-								SkyUtil.log("Overriding OhBlihv's group to Admin");
-							}*/
+								if (PlayerGroup != PlayerGroup.Admin)
+								{
+									SetPlayerGroup(PlayerGroup.Admin);
+									SkyUtil.log($"Overriding {Username}'s group to Admin");
+								}
+							}
 						})
 					);
 				});

@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using log4net;
-using MiNET;
 using MiNET.Entities;
-using MiNET.Entities.Hostile;
-using MiNET.Net;
-using MiNET.Plugins;
 using MiNET.Utils;
 using MiNET.Utils.Skins;
 using MiNET.Worlds;
@@ -35,7 +27,7 @@ namespace SkyCore.Entities
 
         public delegate void onInteract(SkyPlayer player);
 
-        private readonly onInteract Action;
+        private readonly onInteract _action;
 
         public PlayerNPC(string name, Level level, PlayerLocation playerLocation, onInteract action = null, string gameName = "") : base(name, level)
         {
@@ -53,15 +45,15 @@ namespace SkyCore.Entities
 
 			Scale = 1.8D; //Ensure this NPC is visible
 
-            Action = action;
+            _action = action;
         }
 
         public void OnInteract(MiNET.Player player)
         {
-            if (Action != null)
+            if (_action != null)
             {
                 SkyUtil.log($"(2) Processing NPC Interact as {player.Username}");
-                Action((SkyPlayer)player);
+                _action((SkyPlayer)player);
             }
         }
 
@@ -90,7 +82,7 @@ namespace SkyCore.Entities
 		    }
 	    }
 
-        public static void SpawnNPC(GameLevel level, string npcName, PlayerLocation spawnLocation, string command)
+        public static void SpawnHubNPC(GameLevel level, string npcName, PlayerLocation spawnLocation, string command)
         {
 	        NPCSpawnTask spawnTask = (gameLevel) =>
 	        {
@@ -195,5 +187,35 @@ namespace SkyCore.Entities
 	        GameNPCs.Add(command, spawnTask);
         }
 
-    }
+		public static void SpawnLobbyNPC(GameLevel level, string npcName, PlayerLocation spawnLocation)
+		{
+			try
+			{
+				npcName = npcName.Replace("_", " ").Replace("&", "§");
+
+				if (npcName.Equals("\"\""))
+				{
+					npcName = "";
+				}
+
+				//Ensure this NPC can be seen
+				PlayerNPC npc = new PlayerNPC("", level, spawnLocation) { Scale = 1.5 };
+
+				SkyCoreAPI.Instance.AddPendingTask(() =>
+				{
+					npc.KnownPosition = spawnLocation;
+
+					npc.SpawnEntity();
+				});
+
+				Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				throw;
+			}
+		}
+
+	}
 }

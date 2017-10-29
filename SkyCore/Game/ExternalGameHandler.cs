@@ -140,7 +140,7 @@ namespace SkyCore.Game
 			{
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
-					PlayerNPC.SpawnNPC(null, neatName, npcLocation, $"GID:{gameName}");
+					PlayerNPC.SpawnHubNPC(null, neatName, npcLocation, $"GID:{gameName}");
 				});
 			}
 

@@ -23,8 +23,8 @@ namespace SkyCore.Games.BuildBattle.State
 	class BuildBattleBuildState : RunningState
 	{
 
-		//private const int MaxGameTime = 120;
-		private const int MaxGameTime = 30;
+		private const int MaxGameTime = 60 * 2;
+		//private const int MaxGameTime = 300 * 2;
 		private const int PreStartTime = 10;
 
 		public string SelectedCategory { get; private set; }
@@ -85,7 +85,7 @@ namespace SkyCore.Games.BuildBattle.State
 					
 					player.UpdateGameMode(GameMode.Creative, true);
 
-					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + SelectedCategory);
+					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + TextUtils.Center(SelectedCategory, "§eCategory:".Length));
 
 					//Ensure this player is at the correct spawn location
 					if (gameLevel.GetBlock(player.KnownPosition).Id != 0)
@@ -146,7 +146,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 			gameLevel.DoForAllPlayers(player =>
 			{
-				player.BarHandler.AddMajorLine($"§d§lTime Remaining:§r §e{neatRemaining} §f| §d§lCategory:§r {SelectedCategory}", 2);
+				player.BarHandler.AddMajorLine($"§d§lTime Remaining:§r §e{neatRemaining} §f| §d§lCategory:§r §f{SelectedCategory}§r", 2);
 			});
 		}
 
@@ -157,7 +157,7 @@ namespace SkyCore.Games.BuildBattle.State
 			return base.DoInteract(gameLevel, interactId, player, target);
 		}
 
-		public const int PlotRadius = 15;
+		public const int PlotRadius = 13;
 		public const int MaxHeight = 92;
 
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
@@ -192,7 +192,7 @@ namespace SkyCore.Games.BuildBattle.State
 			{
 				SkyUtil.log($"{interactLocation.X}:{interactLocation.Y}:{interactLocation.Z} vs {centreLocation.X}:{centreLocation.Y}:{centreLocation.Z} " +
 				            $"({Math.Abs(centreLocation.X - interactLocation.X)}, {Math.Abs(centreLocation.Z - interactLocation.Z)}, " +
-				            $"{interactLocation.Y < (centreLocation.Y - 1)}, {interactLocation.Y > 150})");
+				            $"{interactLocation.Y < centreLocation.Y - 1}, {interactLocation.Y > 150})");
 				player.BarHandler.AddMinorLine("§c§l(!)§r §cYou can only build within your build zone §c§l(!)§r");
 				return true;
 			}

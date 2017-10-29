@@ -123,7 +123,7 @@ namespace SkyCore.Permissions
         public PlayerGroup GetPlayerGroup(string playerName)
         {
             PlayerGroup playerGroup = PlayerGroup.Player;
-            if (playerName.Equals("OhBlihv") || playerName.Equals("OhBlihv2") || playerName.Equals("Donnas_Wraps"))
+            if (playerName.Equals("OhBlihv") || playerName.Equals("OhBlihv2") || playerName.Equals("Donnas Wraps"))
             {
                 playerGroup = PlayerGroup.Admin;
             }
