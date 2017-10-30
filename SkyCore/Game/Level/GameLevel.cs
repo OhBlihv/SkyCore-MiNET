@@ -507,7 +507,7 @@ namespace SkyCore.Game.Level
 					    Image = new Image
 					    {
 						    Type = "url",
-						    Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
+						    Url = "https://static.skytonia.com/dl/replayicon.png"
 						},
 					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, GameType); }
 				    }
@@ -526,7 +526,7 @@ namespace SkyCore.Game.Level
 						Image = new Image
 						{
 							Type = "url",
-							Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
+							Url = "https://static.skytonia.com/dl/spectateicon.png"
 						},
 						ExecuteAction = delegate { SetPlayerTeam(player, GetSpectatorTeam()); }
 					}
@@ -541,7 +541,7 @@ namespace SkyCore.Game.Level
 				    Image = new Image
 				    {
 					    Type = "url",
-					    Url = "https://cdn.discordapp.com/attachments/192533470608621570/365816559513370624/TestMiNetIcon.png"
+					    Url = "https://static.skytonia.com/dl/comingsoonicon.png"
 					},
 					ExecuteAction = delegate { GameUtil.ShowGameList(player); }
 			    }

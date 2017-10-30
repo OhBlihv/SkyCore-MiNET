@@ -189,10 +189,18 @@ namespace SkyCore.Game
 	    {
 		    try
 		    {
-			    string levelInfoFilename =
-				    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{RawName}-{levelName}.json";
+			    string shortLevelName;
+			    {
+				    string[] levelNameSplit = levelName.Split('\\');
 
-			    if (File.Exists(levelInfoFilename))
+				    shortLevelName = levelNameSplit[levelNameSplit.Length - 1];
+			    }
+
+			    string levelInfoFilename =
+				    //$"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{RawName}-{shortLevelName}.json";
+				    $"C:\\Users\\Administrator\\Desktop\\worlds\\{RawName}\\{RawName}-{shortLevelName}.json";
+
+				if (File.Exists(levelInfoFilename))
 			    {
 				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
 

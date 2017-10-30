@@ -21,11 +21,21 @@ namespace SkyCore.Game
 				{
 					new Button
 					{
+						Text = "Hub",
+						Image = new Image
+						{
+							Type = "url",
+							Url = "https://static.skytonia.com/dl/hubicon.png"
+						},
+						ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "hub"); }
+					},
+					new Button
+					{
 						Text = "Murder",
 						Image = new Image
 						{
 							Type = "url",
-							Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+							Url = "https://static.skytonia.com/dl/murdericon.png"
 						},
 						ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "murder"); }
 					},
@@ -35,19 +45,19 @@ namespace SkyCore.Game
 						Image = new Image
 						{
 							Type = "url",
-							Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+							Url = "https://static.skytonia.com/dl/buildbattleicon.png"
 						},
 						ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "build-battle"); }
 					},
 					new Button
 					{
-						Text = "Return to Hub",
+						Text = "Coming Soon",
 						Image = new Image
 						{
 							Type = "url",
-							Url = "https://cdn.discordapp.com/attachments/192533470608621570/363945144992399362/TestMiNetIcon.png"
+							Url = "https://static.skytonia.com/dl/comingsoonicon.png"
 						},
-						ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "hub"); }
+						ExecuteAction = delegate {  } //Empty
 					}
 				}
 			};
