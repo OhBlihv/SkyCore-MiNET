@@ -178,7 +178,7 @@ namespace SkyCore.Game
 			    return gameLevelInfo;
 		    }
 		    
-			gameLevelInfo = LoadGameLevelInfo(levelName) ?? new GameLevelInfo(RawName, levelName, new PlayerLocation(255.5, 11, 268.5, 180, 180));
+			gameLevelInfo = LoadGameLevelInfo(levelName) ?? new GameLevelInfo(RawName, levelName, 6000, new PlayerLocation(255.5, 11, 268.5, 180, 180));
 
 		    _cachedGameLevelInfos.Add(levelName, gameLevelInfo);
 

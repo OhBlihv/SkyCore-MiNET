@@ -166,7 +166,17 @@ namespace SkyCore.Games.BuildBattle.State
 
 						player.Inventory.SetHeldItemSlot(4); //Default to middle rating if AFK
 
-						player.Teleport(voteLocations[i]);
+						PlayerLocation voteSpawnLocation = voteLocations[i];
+						BlockCoordinates voteSpawnCoordinates = voteSpawnLocation.GetCoordinates3D();
+						while (!player.Level.IsAir(voteSpawnCoordinates))
+						{
+							voteSpawnCoordinates.Y++;
+						}
+						
+						voteSpawnLocation = new PlayerLocation(voteSpawnCoordinates.X, voteSpawnCoordinates.Y, voteSpawnCoordinates.Z,
+																voteSpawnLocation.HeadYaw, voteSpawnLocation.Yaw, voteSpawnLocation.Pitch);
+						
+						player.Teleport(voteSpawnLocation);
 					}
 
 					TitleUtil.SendCenteredSubtitle(player, $"§d§lNow Voting for:\n§e{nextVotePlayer.Username}");
