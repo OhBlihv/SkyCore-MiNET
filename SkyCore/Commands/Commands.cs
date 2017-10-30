@@ -194,8 +194,25 @@ namespace SkyCore.Commands
 					return;
 			}
 
-			player.Level.CurrentWorldTime = time;
+			//player.Level.CurrentWorldTime = time;
+			player.Level.WorldTime = time;
 		}
+
+		[Command(Name = "stop")]
+		[Authorize(Permission = CommandPermission.Admin)]
+		public void CommandStop(MiNET.Player player)
+		{
+			if (((SkyPlayer) player).PlayerGroup != PlayerGroup.Admin)
+			{
+				return;
+			}
+			
+		    SkyCoreAPI.Instance.OnDisable();
+		    SkyCoreAPI.Instance.Context.PluginManager.Plugins.Remove(SkyCoreAPI.Instance);
+		    SkyCoreAPI.Instance.Context.Server.StopServer();
+
+		    Environment.Exit(0);
+	    }
 
 		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
         [Authorize(Permission = CommandPermission.Normal)]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MiNET.Entities;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Game;
@@ -22,7 +23,7 @@ namespace SkyCore.Entities.Holograms
 			KnownPosition.Y += 2.8f;
 		}
 
-		public override void OnTick()
+		public override void OnTick(Entity[] entities)
 		{
 			int playerCount = -1;
 			GamePool gamePool = null;

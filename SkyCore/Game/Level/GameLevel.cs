@@ -16,6 +16,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Threading;
+using MiNET.Net;
 using SkyCore.Entities;
 
 namespace SkyCore.Game.Level
@@ -63,7 +64,7 @@ namespace SkyCore.Game.Level
                 : base(plugin.Context.LevelManager, gameId, 
 					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath, modifiable, true, !modifiable),
                     plugin.Context.LevelManager.EntityManager, GameMode.Creative)
-        {
+	    {
 	        string levelName;
 	        {
 		        string[] split = levelPath.Split('\\');
@@ -272,7 +273,12 @@ namespace SkyCore.Game.Level
             player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false);
 
 			CurrentState.InitializePlayer(this, player);
-        }
+
+			McpeGameRulesChanged gameRulesChanged = McpeGameRulesChanged.CreateObject();
+	        gameRulesChanged.rules = GetGameRules();
+	        
+	        player.SendPackage(gameRulesChanged);
+		}
         
         public new void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
         {
@@ -561,6 +567,33 @@ namespace SkyCore.Game.Level
 		    
 		    return result;
 	    }
-    }
+
+		public override GameRules GetGameRules()
+		{
+			GameRules rules = new GameRules
+			{
+				new GameRule<bool>(GameRulesEnum.DrowningDamage, false),
+				new GameRule<bool>(GameRulesEnum.CommandblockOutput, false),
+				new GameRule<bool>(GameRulesEnum.DoTiledrops, false),
+				new GameRule<bool>(GameRulesEnum.DoMobloot, false),
+				new GameRule<bool>(GameRulesEnum.KeepInventory, false),
+				new GameRule<bool>(GameRulesEnum.DoDaylightcycle, false),
+				new GameRule<bool>(GameRulesEnum.DoMobspawning, false),
+				new GameRule<bool>(GameRulesEnum.DoEntitydrops, false),
+				new GameRule<bool>(GameRulesEnum.DoFiretick, false),
+				new GameRule<bool>(GameRulesEnum.DoWeathercycle, false),
+				new GameRule<bool>(GameRulesEnum.Pvp, false),
+				new GameRule<bool>(GameRulesEnum.Falldamage, false),
+				new GameRule<bool>(GameRulesEnum.Firedamage, false),
+				new GameRule<bool>(GameRulesEnum.Mobgriefing, false),
+				new GameRule<bool>(GameRulesEnum.ShowCoordinates, false),
+				new GameRule<bool>(GameRulesEnum.NaturalRegeneration, false),
+				new GameRule<bool>(GameRulesEnum.TntExploads, false),
+				new GameRule<bool>(GameRulesEnum.SendCommandfeedback, false)
+			};
+			return rules;
+		}
+	}
+	
     
 }

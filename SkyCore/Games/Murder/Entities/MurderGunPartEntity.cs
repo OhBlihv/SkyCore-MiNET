@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using MiNET.Blocks;
+using MiNET.Entities;
 using MiNET.Entities.World;
 using MiNET.Items;
 using MiNET.Net;
@@ -31,8 +32,8 @@ namespace SkyCore.Games.Murder.Entities
             SpawnLocation = spawnLocation;
         }
 
-        public override void OnTick()
-        {
+        public override void OnTick(Entity[] entities)
+		{
             TimeToLive--;
             PickupDelay--;
 

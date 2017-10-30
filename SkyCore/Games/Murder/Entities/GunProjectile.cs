@@ -22,7 +22,7 @@ namespace SkyCore.Games.Murder.Entities
 	
 		}
 
-		public override void OnTick()
+		public override void OnTick(Entity[] entities)
 		{
 			//base.OnTick();
 

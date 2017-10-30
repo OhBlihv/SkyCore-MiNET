@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using MiNET.Effects;
+using MiNET.Net;
 using MiNET.Utils;
 using SkyCore.Entities;
 using SkyCore.Game;
@@ -32,8 +33,16 @@ namespace SkyCore.Games.Hub
 			BlockBreak += instance.LevelOnBlockBreak;
 			BlockPlace += instance.LevelOnBlockPlace;
 
-			CurrentWorldTime = 22000; //Sunrise?
+			//CurrentWorldTime = 22000; //Sunrise?
+			WorldTime = 22000; //Sunrise?
 			SkyUtil.log($"Set world time to {CurrentWorldTime}");
+			IsWorldTimeStarted = false; //Freeze Time
+
+			McpeSetTime message = McpeSetTime.CreateObject();
+			message.time = (int) CurrentWorldTime;
+			//message.started = level.IsWorldTimeStarted;
+
+			RelayBroadcast(message);
 
 			instance.AddPendingTask(() =>
 			{

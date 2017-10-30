@@ -50,7 +50,7 @@ namespace SkyCore.Entities.Holograms
                 {
                     if (hologram is TickingHologram)
                     {
-                        hologram.OnTick();
+                        hologram.OnTick(null); //Shouldn't need the entity list
                     }
                 }
             }

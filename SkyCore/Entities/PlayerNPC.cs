@@ -72,7 +72,14 @@ namespace SkyCore.Entities
 		    foreach (KeyValuePair<string, NPCSpawnTask> entry in GameNPCs)
 		    {
 			    //Only spawn NPCs which have not been spawned yet
-			    if (gameLevel.CurrentlySpawnedNPCs.Contains(entry.Key))
+			    if (gameLevel
+				    .
+				    CurrentlySpawnedNPCs
+				    .
+				    Contains
+				    (entry
+					    .
+					    Key))
 			    {
 				    continue;
 			    }

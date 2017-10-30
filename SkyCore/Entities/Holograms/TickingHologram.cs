@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MiNET.Entities;
 using MiNET.Utils;
 using MiNET.Worlds;
 
@@ -18,9 +19,9 @@ namespace SkyCore.Entities.Holograms
 
         public int Tick = 0;
 
-        public abstract override void OnTick();
+	    public abstract override void OnTick(Entity[] entities);
 
-        /*public override void OnTick()
+	    /*public override void OnTick()
         {
             if (Tick++ == 20)
             {

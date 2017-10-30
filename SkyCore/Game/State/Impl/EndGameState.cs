@@ -9,6 +9,7 @@ using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Net;
 using MiNET.Worlds;
+using SkyCore.Game.Items;
 using SkyCore.Game.Level;
 using SkyCore.Games.Murder;
 using SkyCore.Games.Murder.State;
@@ -21,13 +22,19 @@ namespace SkyCore.Game.State.Impl
     {
 
 	    protected int TimeRemaining { get; set; }
+	    
+	    private readonly IDictionary<string, int> _modalCountdownDict = new Dictionary<string, int>(); 
 
         public override void EnterState(GameLevel gameLevel)
         {
-	        TimeRemaining = 30 * 2;  //30 Seconds
+	        TimeRemaining = 30 * 2; //30 Seconds
 
 			//Re-enable the player nametags
-			gameLevel.DoForAllPlayers(player => player.HideNameTag = false);
+			gameLevel.DoForAllPlayers(player =>
+			{
+				player.HideNameTag = false;
+				player.Inventory.SetInventorySlot(4, new ItemEndNav());
+			});
 
 			RunnableTask.RunTaskLater(() =>
 			{
@@ -92,6 +99,44 @@ namespace SkyCore.Game.State.Impl
 				gameLevel.DoForAllPlayers(player =>
 				{
 					player.BarHandler.AddMajorLine(message, 4, 3);
+
+					if (player.Inventory.InHandSlot == 4)
+					{
+						int remainingTime;
+						
+						if (_modalCountdownDict.TryGetValue(player.Username, out var countdownValue))
+						{
+							if (countdownValue == 0)
+							{
+								if (player.Level is GameLevel level)
+								{
+									level.ShowEndGameMenu(player);
+									_modalCountdownDict[player.Username] = 3; //Reset to default
+									player.Inventory.SetHeldItemSlot(3); //Shift off slot.
+									return;
+								}
+
+								remainingTime = countdownValue;
+							}
+							else
+							{
+								_modalCountdownDict[player.Username] = countdownValue - 1;
+								remainingTime = countdownValue - 1;
+							}
+						}
+						else
+						{
+							_modalCountdownDict.Add(player.Username, 3); //Default to 3 seconds
+
+							remainingTime = 3;
+						}
+						
+						player.BarHandler.AddMinorLine($"§eContinue Holding for {remainingTime} seconds to Reopen Modal!");
+					}
+					else
+					{
+						_modalCountdownDict.Remove(player.Username);
+					}
 				});
 			}
 	        else
