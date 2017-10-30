@@ -15,6 +15,8 @@ namespace SkyCore.Game.Level
 		public string GameType { get; }
 
 		public string LevelName { get; }
+		
+		public int WorldTime { get; }
 
 		public PlayerLocation LobbyLocation { get; set; }
 
@@ -24,16 +26,17 @@ namespace SkyCore.Game.Level
 			
 		}
 
-		public GameLevelInfo(string gameType, string levelName, PlayerLocation lobbyLocation)
+		public GameLevelInfo(string gameType, string levelName, int worldTime, PlayerLocation lobbyLocation)
 		{
 			GameType = gameType;
 			LevelName = levelName;
+			WorldTime = worldTime;
 			LobbyLocation = lobbyLocation;
 		}
 
 		public virtual object Clone()
 		{
-			return new GameLevelInfo(GameType, LevelName, (PlayerLocation) LobbyLocation.Clone());
+			return new GameLevelInfo(GameType, LevelName, WorldTime, (PlayerLocation) LobbyLocation.Clone());
 		}
 
 	}

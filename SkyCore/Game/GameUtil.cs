@@ -45,7 +45,7 @@ namespace SkyCore.Game
 						Image = new Image
 						{
 							Type = "url",
-							Url = "https://static.skytonia.com/dl/buildbattleicon5.png"
+							Url = "https://static.skytonia.com/dl/buildbattleicon6.png"
 						},
 						ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "build-battle"); }
 					},

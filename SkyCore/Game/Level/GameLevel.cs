@@ -78,6 +78,8 @@ namespace SkyCore.Game.Level
 	        GameType = gameType;
 	        GameLevelInfo = gameLevelInfo;
 
+		    WorldTime = GameLevelInfo.WorldTime;
+
 	        EnableBlockTicking = false;
             EnableChunkTicking = false;
 
