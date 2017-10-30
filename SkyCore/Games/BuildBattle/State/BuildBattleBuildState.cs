@@ -46,6 +46,8 @@ namespace SkyCore.Games.BuildBattle.State
 
 						player.UseCreativeInventory = true;
 						player.UpdateGameMode(GameMode.Creative, false);
+
+						player.SetNameTagVisibility(false);
 					}
 				}
 

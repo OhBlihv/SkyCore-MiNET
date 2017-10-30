@@ -38,6 +38,8 @@ namespace SkyCore.Games.BuildBattle.State
 			gameLevel.DoForAllPlayers(player =>
 			{
 				player.Inventory.Clear();
+
+				player.SetNameTagVisibility(true);
 			});
 		}
 
