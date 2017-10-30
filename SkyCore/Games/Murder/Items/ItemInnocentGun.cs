@@ -37,8 +37,9 @@ namespace SkyCore.Games.Murder.Items
                 {
                     new NbtCompound("display")
                     {
-                        new NbtString("Name", "§r§d§lInnocent's Gun§r"),
-                        new NbtList("Lore")
+                        //new NbtString("Name", "§r§d§lInnocent's Gun§r"),
+	                    new NbtString("Name", "§r"),
+						new NbtList("Lore")
                         {
                             new NbtString("§r§7Contains a finite amount of bullets"),
                             new NbtString("§r§7Collect Gun Parts to refill"),

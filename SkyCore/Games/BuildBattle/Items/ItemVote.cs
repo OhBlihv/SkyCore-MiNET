@@ -47,7 +47,8 @@ namespace SkyCore.Games.BuildBattle.Items
 				{
 					new NbtCompound("display")
 					{
-						new NbtString("Name", $"§r§d§lVote:§r {voteName}§r"),
+						//new NbtString("Name", $"§r§d§lVote:§r {voteName}§r"),
+						new NbtString("Name", "§r"),
 						new NbtList("Lore")
 						{
 							new NbtString($"§r§7Hold this to vote §d{_votePlayer}'s§r"),
