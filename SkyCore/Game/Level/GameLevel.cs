@@ -130,7 +130,7 @@ namespace SkyCore.Game.Level
 		}
 
 		public override void Close()
-        {
+		{
             GameLevelTick.Dispose();
             GameLevelTickThread.Abort();
 

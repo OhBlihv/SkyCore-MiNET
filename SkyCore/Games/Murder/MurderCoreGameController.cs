@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SkyCore.Game;
 using SkyCore.Game.Level;
+using SkyCore.Game.State.Impl;
 using SkyCore.Games.Murder.Level;
 using SkyCore.Games.Murder.State;
 using SkyCore.Player;
@@ -23,7 +24,7 @@ namespace SkyCore.Games.Murder
     {
         
         public MurderCoreGameController(SkyCoreAPI plugin) : base(plugin, "murder", "Murder Mystery", 
-            new List<string>{"murder-library"/*, "murder-library-alternative"*/})
+            new List<string>{"murder-grandlibrary", "murder-funzone", "murder-sunsetresort"})
 		{
 			SkyCoreAPI.Instance.Context.PluginManager.LoadCommands(this);  //Initialize Location/Murder Commands
 		}
@@ -34,6 +35,11 @@ namespace SkyCore.Games.Murder
 
 	        return new MurderLevel(Plugin, GetNextGameId(), selelectedLevel, GetGameLevelInfo(selelectedLevel));
         }
+
+	    protected override GameLevel _initializeNewGame(string levelName)
+	    {
+			return new MurderLevel(Plugin, GetNextGameId(), levelName, GetGameLevelInfo(levelName));
+		}
 
 	    public override Type GetGameLevelInfoType()
 	    {
@@ -109,10 +115,14 @@ namespace SkyCore.Games.Murder
 
 			    PlayerLocation addedLocation = (PlayerLocation)player.KnownPosition.Clone();
 			    addedLocation.X = (float)(Math.Floor(addedLocation.X) + 0.5f);
-			    addedLocation.Y = (float)(Math.Floor(addedLocation.Y) + 0.5f);
+			    addedLocation.Y = (float) Math.Floor(addedLocation.Y);
 			    addedLocation.Z = (float)(Math.Floor(addedLocation.Z) + 0.5f);
 
-			    locationList.Add(addedLocation);
+			    addedLocation.HeadYaw = (float) Math.Floor(addedLocation.HeadYaw);
+			    addedLocation.HeadYaw = addedLocation.HeadYaw;
+				addedLocation.Pitch = (float)Math.Floor(addedLocation.Pitch);
+
+				locationList.Add(addedLocation);
 
 			    string fileName =
 					 $"C:\\Users\\Administrator\\Desktop\\worlds\\{RawName}\\{RawName}-{murderLevel.LevelName}.json";
@@ -183,7 +193,34 @@ namespace SkyCore.Games.Murder
 				    return;
 			    }
 
-			    ((MurderRunningState) murderLevel.CurrentState).EndTick = timeRemaining * 2;
+			    murderLevel.Tick = 0;
+				((MurderRunningState) murderLevel.CurrentState).EndTick = timeRemaining * 2;
+		    }
+		    else if (args[0].Equals("level"))
+		    {
+			    if (args.Length < 2)
+			    {
+					player.SendMessage("§c/gameedit level <levelname>");
+				    return;
+				}
+
+			    string fullyQualifiedName = $"C:\\Users\\Administrator\\Desktop\\worlds\\{RawName}\\{args[1]}";
+				GameLevel gameLevel;
+			    if (!LevelNames.Contains(fullyQualifiedName) || (gameLevel = InitializeNewGame(fullyQualifiedName)) == null)
+			    {
+				    player.SendMessage($"§cInvalid level name ({args[1]})");
+					player.SendMessage($"§cBad Args: \n§c- {string.Join("\n§c- ", LevelNames.Select(x => _removeQualification(x.ToString())).ToArray())}");
+				    return;
+			    }
+
+			    foreach (SkyPlayer gamePlayer in murderLevel.GetAllPlayers())
+			    {
+				    gameLevel.AddPlayer(gamePlayer);
+			    }
+			    
+			    murderLevel.UpdateGameState(new VoidGameState()); //'Close' the game eventually
+			    
+			    player.SendMessage($"§cUpdating game level to {args[1]}");
 		    }
 			else
 		    {
@@ -191,8 +228,18 @@ namespace SkyCore.Games.Murder
 			    player.SendMessage("§c/gameedit visualize");
 			    player.SendMessage("§c/gameedit timeleft");
 			    player.SendMessage("§c/gameedit tp");
-				player.SendMessage($"§cBad Args: {(string.Join(",", args.Select(x => x.ToString()).ToArray()))}");
+				player.SendMessage($"§cBad Args: {string.Join(",", args.Select(x => x.ToString()).ToArray())}");
 		    }
+		}
+
+	    private string _removeQualification(string fullyQualifiedName)
+	    {
+		    string levelName;
+		    {
+			    string[] split = fullyQualifiedName.Split('\\');
+			    levelName = split[split.Length - 1];
+		    }
+		    return levelName;
 		}
 
 	}

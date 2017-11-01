@@ -111,6 +111,11 @@ namespace SkyCore.Games.BuildBattle
 			return new BuildBattleLevel(Plugin, GetNextGameId(), selelectedLevel, GetGameLevelInfo(selelectedLevel), _themeList);
 		}
 
+		protected override GameLevel _initializeNewGame(string levelName)
+		{
+			return new BuildBattleLevel(Plugin, GetNextGameId(), levelName, GetGameLevelInfo(levelName), _themeList);
+		}
+
 		public override Type GetGameLevelInfoType()
 		{
 			return typeof(GameLevelInfo); //Nothing Custom

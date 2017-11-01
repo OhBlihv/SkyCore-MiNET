@@ -19,6 +19,11 @@ namespace SkyCore.Games.Murder.Level
         {
 			SkyUtil.log($"Initializing level '{LevelName}'");
 
+	        if (!(gameLevelInfo is MurderLevelInfo))
+	        {
+		        throw new Exception($"Could not load MurderLevelInfo for level {LevelName}");
+	        }
+
 	        foreach (PlayerLocation playerSpawnLocation in ((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations)
 	        {
 				playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground

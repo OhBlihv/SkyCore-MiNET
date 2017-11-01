@@ -67,6 +67,11 @@ namespace SkyCore.Games.Hub
 			return new HubLevel(Plugin, GetNextGameId(), selelectedLevel, GetGameLevelInfo(selelectedLevel));
 		}
 
+		protected override GameLevel _initializeNewGame(string levelName)
+		{
+			return new HubLevel(Plugin, GetNextGameId(), levelName, GetGameLevelInfo(levelName));
+		}
+
 		public override SortedSet<GameLevel> GetMostViableGames()
 		{
 			SortedSet<GameLevel> mostViableGames = new SortedSet<GameLevel>(_hubWorldRandomiser);

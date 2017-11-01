@@ -356,7 +356,26 @@ namespace SkyCore.Game
 			});
 		}
 
-        protected abstract GameLevel _initializeNewGame();
+	    public GameLevel InitializeNewGame(string levelName)
+	    {
+		    if (!LevelNames.Contains(levelName))
+		    {
+			    return null;
+		    }
+
+			GameLevel gameLevel = _initializeNewGame(levelName);
+
+		    if (gameLevel != null)
+		    {
+			    GameLevels.TryAdd(gameLevel.GameId, gameLevel);
+		    }
+
+		    return gameLevel;
+	    }
+
+	    protected abstract GameLevel _initializeNewGame();
+
+	    protected abstract GameLevel _initializeNewGame(string levelName);
 
         public virtual string GetRandomLevelName() //TODO: Override and select games fairly, to not use the same small pool of maps
         {
