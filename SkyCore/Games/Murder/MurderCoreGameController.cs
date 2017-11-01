@@ -11,6 +11,7 @@ using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Games.Murder.Level;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Games.Murder
 {
@@ -51,8 +52,8 @@ namespace SkyCore.Games.Murder
 			player.SendMessage("Alt should be detective");
 		    ((MurderLevel) altPlayer.Level).SetPlayerTeam(altPlayer, MurderTeam.Detective);
 		}*/
-	    
-	    private readonly IDictionary<string,>
+
+	    private readonly IDictionary<string, RunnableTask> _currentVisualizationTasks = new Dictionary<string, RunnableTask>();
 
 	    [Command(Name = "location")]
 	    [Authorize(Permission = CommandPermission.Normal)]
@@ -105,7 +106,7 @@ namespace SkyCore.Games.Murder
 
 			    if (locationList == null)
 			    {
-				    player.SendMessage($"§cAction invalid. Must be 'spawn' or 'gunpart', but was '{action}'");
+				    player.SendMessage($"§cAction invalid. Must be 'spawn' or 'gunpart', but was '{args[1]}'");
 				    return;
 			    }
 
@@ -129,11 +130,32 @@ namespace SkyCore.Games.Murder
 		    {
 				if (args.Length < 2)
 				{
-					player.SendMessage("§c/location add <spawn/gunpart>");
+					player.SendMessage("§c/location visualize <spawns/gunparts>");
 					player.SendMessage("§cNot Enough Arguments.");
 					return;
 				}
-			}
+
+				List<PlayerLocation> locationList = null;
+			    if (args[1].Equals("spawn"))
+			    {
+				    locationList = murderLevelInfo.PlayerSpawnLocations;
+			    }
+			    else if (args[1].Equals("gunpart"))
+			    {
+				    locationList = murderLevelInfo.GunPartLocations;
+			    }
+
+				if (locationList == null)
+				{
+					player.SendMessage($"§cAction invalid. Must be 'spawn' or 'gunpart', but was '{args[1]}'");
+					return;
+				}
+
+			    RunnableTask.RunTaskIndefinitely(() =>
+			    {
+
+			    }, 500);
+		    }
 	    }
 
 	}

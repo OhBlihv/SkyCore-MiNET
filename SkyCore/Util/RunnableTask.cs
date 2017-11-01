@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,23 +11,59 @@ namespace SkyCore.Util
 
 	public class RunnableTask
 	{
+		
+		public static ConcurrentDictionary<int, RunnableTask> ActiveRunnables = new ConcurrentDictionary<int, RunnableTask>();
+		
+		private static int _nextId = 1;
 
-		public static void RunTask(Action runnable)
+		private static volatile object _runnableIdLock = new object();
+		private static int GetNextId()
 		{
-			_RunTask(new RunnableTask(runnable), 0);
+			lock (_runnableIdLock)
+			{
+				return _nextId++;
+			}
+		}
+		
+		private static void CancelRunnable(RunnableTask runnable)
+		{
+			CancelRunnable(runnable.RunnableId);
 		}
 
-		public static void RunTaskLater(Action runnable, int delayMillis)
+		private static void CancelRunnable(int runnableId)
 		{
-			_RunTask(new RunnableTask(runnable), delayMillis);
+			if (ActiveRunnables.TryRemove(runnableId, out var runnableTask))
+			{
+				runnableTask.Cancelled = true;
+			}
+		}
+		
+		//
+
+		public static RunnableTask RunTask(Action runnable)
+		{
+			RunnableTask runnableTask = new RunnableTask(runnable);
+
+			_RunTask(runnableTask, 0);
+
+			return runnableTask;
 		}
 
-		public static void RunTaskIndefinitely(Action runnable, int timerMillis)
+		public static RunnableTask RunTaskLater(Action runnable, int delayMillis)
 		{
-			RunTaskTimer(runnable, timerMillis, -1);
+			RunnableTask runnableTask = new RunnableTask(runnable);
+
+			_RunTask(runnableTask, delayMillis);
+
+			return runnableTask;
 		}
 
-		public static void RunTaskTimer(Action runnable, int timerMillis, int executionCount)
+		public static RunnableTask RunTaskIndefinitely(Action runnable, int timerMillis)
+		{
+			return RunTaskTimer(runnable, timerMillis, -1);
+		}
+
+		public static RunnableTask RunTaskTimer(Action runnable, int timerMillis, int executionCount)
 		{
 			int executionTimes = -1;
 
@@ -44,10 +81,16 @@ namespace SkyCore.Util
 			};
 			
 			_RunTask(runnableTask, timerMillis);
+
+			return runnableTask;
 		}
 
 		private static void _RunTask(RunnableTask runnable, int delayMillis)
 		{
+			var runnableId = GetNextId();
+
+			runnable.RunnableId = runnableId;
+
 			if (delayMillis > 0)
 			{
 				//Dodgy Override.
@@ -60,8 +103,12 @@ namespace SkyCore.Util
 					}
 
 					internalRunnable.Invoke();
+
+					CancelRunnable(runnableId);
 				};
 			}
+			
+			ActiveRunnables.TryAdd(runnableId, runnable);
 			
 			ThreadPool.QueueUserWorkItem(runnable.ThreadPoolCallback);
 		}
@@ -70,6 +117,8 @@ namespace SkyCore.Util
 
 		protected Action Runnable;
 
+		public int RunnableId { get; protected set; }
+		
 		public bool Cancelled { get; set; }
 
 		public RunnableTask(Action runnable)
