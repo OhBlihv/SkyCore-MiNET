@@ -41,7 +41,7 @@ namespace SkyCore.Game.Level
         //Team -> Player(s) //TODO: Possibly remove due to complexity?
         protected readonly Dictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
 
-	    public GameLevelInfo GameLevelInfo { get; protected set; }
+	    public GameLevelInfo GameLevelInfo { get; set; }
 
         //
 
@@ -56,7 +56,7 @@ namespace SkyCore.Game.Level
         protected readonly Thread GameLevelTickThread;
         protected HighPrecisionTimer GameLevelTick;
 
-        public int Tick { get; private set; }
+        public int Tick { get; set; }
 
         //
 

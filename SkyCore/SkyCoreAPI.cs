@@ -243,6 +243,8 @@ namespace SkyCore
 					                  "§7Skytonia is currently rebooting, try joining again soon!");
 				}
 			}
+	        
+	        RunnableTask.CancelAllTasks();
 
 			PunishCore.Close();
 			StatisticsCore.Close();

@@ -27,13 +27,13 @@ namespace SkyCore.Games.Murder.State
     {
 
 	    //private const int MaxGameTime = 120;
-	    private const int MaxGameTime = 300 * 2;
-	    private const int PreStartTime = 10;
+	    public const int MaxGameTime = 300 * 2;
+	    public const int PreStartTime = 10;
 
-        private const int MaxGunParts = 5;
-	    private const int MaxGunAmmo = 5;
+	    public const int MaxGunParts = 5;
+		public const int MaxGunAmmo = 5;
 
-        private int _endTick = -1; //Default value
+        public int EndTick { get; set; } = -1; //Default value
 
         private static readonly List<PlayerLocation> GunPartLocations = new List<PlayerLocation>();
         private static readonly List<PlayerLocation> PlayerSpawnLocations = new List<PlayerLocation>();
@@ -58,7 +58,7 @@ namespace SkyCore.Games.Murder.State
                 PlayerSpawnLocations.Add(((MurderLevelInfo)((MurderLevel)gameLevel).GameLevelInfo).PlayerSpawnLocations[0]);
             }
 
-	        _endTick = gameLevel.Tick + MaxGameTime + PreStartTime;
+	        EndTick = gameLevel.Tick + MaxGameTime + PreStartTime;
 
             try
             {
@@ -268,7 +268,7 @@ namespace SkyCore.Games.Murder.State
         {
 	        base.OnTick(gameLevel, currentTick, out outTick);
 
-            int secondsLeft = (_endTick - currentTick) / 2;
+            int secondsLeft = (EndTick - currentTick) / 2;
 
 	        if (secondsLeft > (MaxGameTime / 2))
 	        {

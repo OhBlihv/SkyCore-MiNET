@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using MiNET.Net;
+using MiNET.Particles;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
 using Newtonsoft.Json;
@@ -10,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Games.Murder.Level;
+using SkyCore.Games.Murder.State;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -19,7 +23,7 @@ namespace SkyCore.Games.Murder
     {
         
         public MurderCoreGameController(SkyCoreAPI plugin) : base(plugin, "murder", "Murder Mystery", 
-            new List<string>{"murder-library", "murder-library-alternative"})
+            new List<string>{"murder-library"/*, "murder-library-alternative"*/})
 		{
 			SkyCoreAPI.Instance.Context.PluginManager.LoadCommands(this);  //Initialize Location/Murder Commands
 		}
@@ -55,20 +59,13 @@ namespace SkyCore.Games.Murder
 
 	    private readonly IDictionary<string, RunnableTask> _currentVisualizationTasks = new Dictionary<string, RunnableTask>();
 
-	    [Command(Name = "location")]
+	    [Command(Name = "gameedit")]
 	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandLocation(MiNET.Player player, string[] args)
+	    public void CommandGameEdit(MiNET.Player player, params string[] args)
 	    {
 		    if (player.CommandPermission < CommandPermission.Admin)
 		    {
 			    player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
-			    return;
-		    }
-
-			if (args.Length == 0 || !(args[0].Equals("add") || args[0].Equals("visualize")))
-		    {
-			    player.SendMessage("§c/location add <spawn/gunpart>");
-			    player.SendMessage("§c/location visualize");
 			    return;
 		    }
 
@@ -79,9 +76,9 @@ namespace SkyCore.Games.Murder
 		    }
 
 		    MurderLevel murderLevel = (MurderLevel) player.Level;
-		    if (!(SkyCoreAPI.Instance.GameModes["murder"].LoadGameLevelInfo(murderLevel.LevelName) is MurderLevelInfo murderLevelInfo))
+		    if (!(murderLevel.GameLevelInfo is MurderLevelInfo murderLevelInfo))
 		    {
-			    player.SendMessage("§cThe current level's information could not be loaded.");
+				player.SendMessage("§cThe current level's information could not be loaded.");
 			    return;
 		    }
 
@@ -112,51 +109,91 @@ namespace SkyCore.Games.Murder
 
 			    PlayerLocation addedLocation = (PlayerLocation)player.KnownPosition.Clone();
 			    addedLocation.X = (float)(Math.Floor(addedLocation.X) + 0.5f);
-			    addedLocation.X = (float)(Math.Floor(addedLocation.X) + 0.5f);
+			    addedLocation.Y = (float)(Math.Floor(addedLocation.Y) + 0.5f);
 			    addedLocation.Z = (float)(Math.Floor(addedLocation.Z) + 0.5f);
 
 			    locationList.Add(addedLocation);
 
 			    string fileName =
-				    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{murderLevel.GameType}-{murderLevel.LevelName}.json";
+					 $"C:\\Users\\Administrator\\Desktop\\worlds\\{RawName}\\{RawName}-{murderLevel.LevelName}.json";
 
-			    SkyUtil.log($"Saving as '{fileName}' -> {murderLevel.GameType} AND {murderLevel.LevelName}");
+				SkyUtil.log($"Saving as '{fileName}' -> {murderLevel.GameType} AND {murderLevel.LevelName}");
 
 			    File.WriteAllText(fileName, JsonConvert.SerializeObject(murderLevelInfo, Formatting.Indented));
 
 			    player.SendMessage($"§cUpdated {args[0]} location list ({locationList.Count}) with current location.");
-			}
+			    
+			    //Update current level info
+			    ((MurderLevel) player.Level).GameLevelInfo = murderLevelInfo;
+		    }
 		    else if (args[0].Equals("visualize"))
 		    {
-				if (args.Length < 2)
-				{
-					player.SendMessage("§c/location visualize <spawns/gunparts>");
-					player.SendMessage("§cNot Enough Arguments.");
-					return;
+			    if (_currentVisualizationTasks.ContainsKey(player.Username))
+			    {
+				    _currentVisualizationTasks[player.Username].Cancelled = true;
+
+				    _currentVisualizationTasks.Remove(player.Username);
+
+					player.SendMessage("§eCancelling Visualization Task");
 				}
-
-				List<PlayerLocation> locationList = null;
-			    if (args[1].Equals("spawn"))
-			    {
-				    locationList = murderLevelInfo.PlayerSpawnLocations;
-			    }
-			    else if (args[1].Equals("gunpart"))
-			    {
-				    locationList = murderLevelInfo.GunPartLocations;
-			    }
-
-				if (locationList == null)
+			    else
 				{
-					player.SendMessage($"§cAction invalid. Must be 'spawn' or 'gunpart', but was '{args[1]}'");
-					return;
+					player.SendMessage("§eVisualizing Gun Part and Player Spawn Locations...");
+
+					_currentVisualizationTasks.Add(player.Username, RunnableTask.RunTaskIndefinitely(() =>
+					{
+						foreach (PlayerLocation location in murderLevelInfo.GunPartLocations)
+						{
+							PlayerLocation displayLocation = (PlayerLocation)location.Clone();
+							displayLocation.Y += 0.5f;
+
+							Vector3 particleLocation = displayLocation.ToVector3();
+							
+							new FlameParticle(player.Level){Position = particleLocation}.Spawn(new[]{player});
+						}
+
+						foreach (PlayerLocation location in murderLevelInfo.PlayerSpawnLocations)
+						{
+							PlayerLocation displayLocation = (PlayerLocation)location.Clone();
+							displayLocation.Y += 0.5f;
+
+							Vector3 particleLocation = displayLocation.ToVector3();
+
+							new HeartParticle(player.Level) { Position = particleLocation }.Spawn(new[] { player });
+						}
+					}, 500));
 				}
-
-			    RunnableTask.RunTaskIndefinitely(() =>
-			    {
-
-			    }, 500);
 		    }
-	    }
+		    else if (args[0].Equals("tp"))
+		    {
+				player.SendMessage("§eTeleporting to a random spawn location");
+				player.Teleport(murderLevelInfo.PlayerSpawnLocations[Random.Next(murderLevelInfo.PlayerSpawnLocations.Count)]);
+		    }
+		    else if (args[0].Equals("timeleft"))
+		    {
+			    if (args.Length < 2)
+			    {
+					player.SendMessage("§c/gameedit timeleft <time>");
+				    return;
+			    }
+
+			    if (!int.TryParse(args[1], out var timeRemaining))
+			    {
+					player.SendMessage($"§cInvalid time remaining ({args[1]})");
+				    return;
+			    }
+
+			    ((MurderRunningState) murderLevel.CurrentState).EndTick = timeRemaining * 2;
+		    }
+			else
+		    {
+				player.SendMessage("§c/gameedit add <spawn/gunpart>");
+			    player.SendMessage("§c/gameedit visualize");
+			    player.SendMessage("§c/gameedit timeleft");
+			    player.SendMessage("§c/gameedit tp");
+				player.SendMessage($"§cBad Args: {(string.Join(",", args.Select(x => x.ToString()).ToArray()))}");
+		    }
+		}
 
 	}
 }

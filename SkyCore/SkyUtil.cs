@@ -9,9 +9,11 @@ namespace SkyCore
     public class SkyUtil
     {
 
-        public static void log(String line)
+        public static bool log(String line)
         {
             Console.WriteLine("[SkyCore] " + line);
+
+	        return true;
         }
         
     }
