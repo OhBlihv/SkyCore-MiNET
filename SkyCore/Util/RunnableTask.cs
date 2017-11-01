@@ -13,56 +13,80 @@ namespace SkyCore.Util
 
 		public static void RunTask(Action runnable)
 		{
-			_RunTask(runnable, 0);
+			_RunTask(new RunnableTask(runnable), 0);
 		}
 
 		public static void RunTaskLater(Action runnable, int delayMillis)
 		{
-			_RunTask(runnable, delayMillis);
+			_RunTask(new RunnableTask(runnable), delayMillis);
+		}
+
+		public static void RunTaskIndefinitely(Action runnable, int timerMillis)
+		{
+			RunTaskTimer(runnable, timerMillis, -1);
 		}
 
 		public static void RunTaskTimer(Action runnable, int timerMillis, int executionCount)
 		{
 			int executionTimes = -1;
 
-			_RunTask(() =>
+			RunnableTask runnableTask = new RunnableTask(null);
+
+			runnableTask.Runnable = () =>
 			{
-				while (++executionTimes < executionCount)
+				//Allow infinite executions with a count of -1
+				while (!runnableTask.Cancelled && (executionCount == -1 || ++executionTimes < executionCount))
 				{
 					Thread.Sleep(timerMillis);
 
 					runnable.Invoke();
 				}
-			}, timerMillis);
+			};
+			
+			_RunTask(runnableTask, timerMillis);
 		}
 
-		private static void _RunTask(Action runnable, int delayMillis)
+		private static void _RunTask(RunnableTask runnable, int delayMillis)
 		{
-			ThreadPool.QueueUserWorkItem(new RunnableTask(() =>
+			if (delayMillis > 0)
 			{
-				if (delayMillis > 0)
+				//Dodgy Override.
+				runnable.Runnable = () =>
 				{
-					Thread.Sleep(delayMillis);
-				}
+					Action internalRunnable = runnable.Runnable;
+					if (delayMillis > 0)
+					{
+						Thread.Sleep(delayMillis);
+					}
 
-				runnable.Invoke();
-			}).ThreadPoolCallback);
+					internalRunnable.Invoke();
+				};
+			}
+			
+			ThreadPool.QueueUserWorkItem(runnable.ThreadPoolCallback);
 		}
 
 		//
 
-		private readonly Action _runnable;
+		protected Action Runnable;
+
+		public bool Cancelled { get; set; }
 
 		public RunnableTask(Action runnable)
 		{
-			_runnable = runnable;
+			Runnable = runnable;
 		}
 
 		public void ThreadPoolCallback(Object threadContext)
 		{
 			try
 			{
-				_runnable.Invoke();
+				if (Cancelled)
+				{
+					return;
+				}
+				
+				Runnable.Invoke();
 			}
 			catch (Exception e)
 			{

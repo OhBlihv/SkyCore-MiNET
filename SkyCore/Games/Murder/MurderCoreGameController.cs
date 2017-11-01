@@ -51,10 +51,12 @@ namespace SkyCore.Games.Murder
 			player.SendMessage("Alt should be detective");
 		    ((MurderLevel) altPlayer.Level).SetPlayerTeam(altPlayer, MurderTeam.Detective);
 		}*/
+	    
+	    private readonly IDictionary<string,>
 
 	    [Command(Name = "location")]
 	    [Authorize(Permission = CommandPermission.Normal)]
-	    public void CommandLocation(MiNET.Player player, string action = "", string type = "")
+	    public void CommandLocation(MiNET.Player player, string[] args)
 	    {
 		    if (player.CommandPermission < CommandPermission.Admin)
 		    {
@@ -62,9 +64,10 @@ namespace SkyCore.Games.Murder
 			    return;
 		    }
 
-			if (action.Length == 0 || type.Length == 0)
+			if (args.Length == 0 || !(args[0].Equals("add") || args[0].Equals("visualize")))
 		    {
-			    player.SendMessage("§c/location <add> <spawn/gunpart>");
+			    player.SendMessage("§c/location add <spawn/gunpart>");
+			    player.SendMessage("§c/location visualize");
 			    return;
 		    }
 
@@ -81,37 +84,56 @@ namespace SkyCore.Games.Murder
 			    return;
 		    }
 
-			List<PlayerLocation> locationList = null;
-		    if (type.Equals("spawn"))
+		    if (args[0].Equals("add"))
 		    {
-			    locationList = murderLevelInfo.PlayerSpawnLocations;
-		    }
-		    else if(type.Equals("gunpart"))
+			    if (args.Length < 2)
+			    {
+					player.SendMessage("§c/location add <spawn/gunpart>");
+				    player.SendMessage("§cNot Enough Arguments.");
+				    return;
+			    }
+			    
+			    List<PlayerLocation> locationList = null;
+			    if (args[1].Equals("spawn"))
+			    {
+				    locationList = murderLevelInfo.PlayerSpawnLocations;
+			    }
+			    else if (args[1].Equals("gunpart"))
+			    {
+				    locationList = murderLevelInfo.GunPartLocations;
+			    }
+
+			    if (locationList == null)
+			    {
+				    player.SendMessage($"§cAction invalid. Must be 'spawn' or 'gunpart', but was '{action}'");
+				    return;
+			    }
+
+			    PlayerLocation addedLocation = (PlayerLocation)player.KnownPosition.Clone();
+			    addedLocation.X = (float)(Math.Floor(addedLocation.X) + 0.5f);
+			    addedLocation.X = (float)(Math.Floor(addedLocation.X) + 0.5f);
+			    addedLocation.Z = (float)(Math.Floor(addedLocation.Z) + 0.5f);
+
+			    locationList.Add(addedLocation);
+
+			    string fileName =
+				    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{murderLevel.GameType}-{murderLevel.LevelName}.json";
+
+			    SkyUtil.log($"Saving as '{fileName}' -> {murderLevel.GameType} AND {murderLevel.LevelName}");
+
+			    File.WriteAllText(fileName, JsonConvert.SerializeObject(murderLevelInfo, Formatting.Indented));
+
+			    player.SendMessage($"§cUpdated {args[0]} location list ({locationList.Count}) with current location.");
+			}
+		    else if (args[0].Equals("visualize"))
 		    {
-			    locationList = murderLevelInfo.GunPartLocations;
-		    }
-
-		    if (locationList == null)
-		    {
-			    player.SendMessage($"§cAction invalid. Must be 'spawn' or 'gunpart', but was '{action}'");
-			    return;
-		    }
-
-		    PlayerLocation addedLocation = (PlayerLocation) player.KnownPosition.Clone();
-		    addedLocation.X = (float) (Math.Floor(addedLocation.X) + 0.5f);
-		    addedLocation.X = (float) (Math.Floor(addedLocation.X) + 0.5f);
-		    addedLocation.Z = (float) (Math.Floor(addedLocation.Z) + 0.5f);
-
-			locationList.Add(addedLocation);
-
-		    string fileName =
-			    $"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{murderLevel.GameType}-{murderLevel.LevelName}.json";
-
-			SkyUtil.log($"Saving as '{fileName}' -> {murderLevel.GameType} AND {murderLevel.LevelName}");
-
-			File.WriteAllText(fileName, JsonConvert.SerializeObject(murderLevelInfo, Formatting.Indented));
-
-			player.SendMessage($"§cUpdated {action} location list ({locationList.Count}) with current location.");
+				if (args.Length < 2)
+				{
+					player.SendMessage("§c/location add <spawn/gunpart>");
+					player.SendMessage("§cNot Enough Arguments.");
+					return;
+				}
+			}
 	    }
 
 	}

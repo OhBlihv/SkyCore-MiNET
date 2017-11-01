@@ -68,6 +68,10 @@ namespace SkyCore.Entities
 			    SkyUtil.log($"Attempted to spawn NPCs on gameLevel == null");
 			    return;
 		    }
+		    if (gameLevel.CurrentlySpawnedNPCs == null)
+		    {
+				SkyUtil.log($"Attempted to spawn NPCs on gameLevel.CurrentlySpawnedNPCs == null");
+			}
 		    
 		    foreach (KeyValuePair<string, NPCSpawnTask> entry in GameNPCs)
 		    {

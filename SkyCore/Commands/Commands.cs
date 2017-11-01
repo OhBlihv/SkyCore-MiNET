@@ -1,6 +1,9 @@
 ﻿using System;
 using MiNET;
 using MiNET.Blocks;
+using MiNET.Entities;
+using MiNET.Entities.Hostile;
+using MiNET.Entities.Passive;
 using MiNET.Items;
 using MiNET.Net;
 using MiNET.Plugins.Attributes;
@@ -521,8 +524,8 @@ namespace SkyCore.Commands
 
         }
 
-        /*[Command(Name = "spawnmob")]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Command(Name = "spawnmob")]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandSpawnMob(MiNET.Player player, string entityName, string mobName = "", string mobScale = "")
         {
             entityName = entityName.ToLower();
@@ -692,7 +695,7 @@ namespace SkyCore.Commands
             mob.SpawnEntity();
 
             player.SendMessage($"§e§l(!) §r§eSpawned new {entityType}");
-        }*/
+        }
 
         /*[Command(Name = "world")]
         [Authorize(Permission = CommandPermission.Admin)]

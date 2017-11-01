@@ -35,11 +35,11 @@ namespace SkyCore.Games.Hub
 
 			//CurrentWorldTime = 22000; //Sunrise?
 			WorldTime = 22000; //Sunrise?
-			SkyUtil.log($"Set world time to {CurrentWorldTime}");
-			IsWorldTimeStarted = false; //Freeze Time
+			SkyUtil.log($"Set world time to {CurrentWorldCycleTime}");
+			DoDaylightcycle = false; //Freeze Time
 
 			McpeSetTime message = McpeSetTime.CreateObject();
-			message.time = (int) CurrentWorldTime;
+			message.time = (int) CurrentWorldCycleTime;
 			//message.started = level.IsWorldTimeStarted;
 
 			RelayBroadcast(message);

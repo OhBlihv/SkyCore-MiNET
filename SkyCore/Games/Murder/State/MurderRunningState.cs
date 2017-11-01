@@ -326,14 +326,11 @@ namespace SkyCore.Games.Murder.State
             gameLevel.DoForPlayersIn(player =>
             {
 	            int gunAmmo = GetPlayerAmmo((MurderLevel) gameLevel, player);
-	            if (gunAmmo > 0)
-	            {
-					player.BarHandler.AddMajorLine($"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerAmmo((MurderLevel) gameLevel, player)}/{MaxGunAmmo} §fBullets...", 2);
-				}
-	            else
-	            {
-					player.BarHandler.AddMajorLine($"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerGunParts((MurderLevel) gameLevel, player)}/{MaxGunParts} §fGun Parts...", 2);
-				}
+	            player.BarHandler.AddMajorLine(
+		            gunAmmo > 0
+			            ? $"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerAmmo((MurderLevel) gameLevel, player)}/{MaxGunAmmo} §fBullets..."
+			            : $"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerGunParts((MurderLevel) gameLevel, player)}/{MaxGunParts} §fGun Parts...",
+		            2);
             }, MurderTeam.Innocent);
 
             gameLevel.DoForPlayersIn(player =>
@@ -386,7 +383,7 @@ namespace SkyCore.Games.Murder.State
 			            //
 		            }
 
-		            if (rollCount == 5)
+		            if (rollCount == 10)
 		            {
 			            break; //No more spawn points available.
 		            }
@@ -419,14 +416,13 @@ namespace SkyCore.Games.Murder.State
 				player.Inventory.SetInventorySlot(0, new ItemMurderKnife()); //Update Knife
 			}
 			//Left click only (Right click charges up)
-            else if (/*interactId == 1 && */itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
+            else if (interactId != 2 && itemInHand is ItemInnocentGun && PlayerAmmoCounts[player.Username] > 0)
             {
 	            if (player.Experience > 0.05f)
 	            {
 		            return true;
 	            }
 
-				//var arrow = new Arrow(player, gameLevel)
 				var arrow = new GunProjectile(player, gameLevel)
 	            {
 		            Damage = 0,
@@ -535,7 +531,6 @@ namespace SkyCore.Games.Murder.State
 			}
 			else
 			{
-				SkyUtil.log("Player has died.");
 				player.SendTitle("§c§lYOU DIED§r");
 
 				player.SetAllowFly(true);
