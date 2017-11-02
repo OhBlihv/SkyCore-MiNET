@@ -46,19 +46,17 @@ namespace SkyCore.Games.Hub
 
 			instance.AddPendingTask(() =>
 			{
-				{
-					PlayerLocation portalInfoLocation = new PlayerLocation(256.5, 79.5, 276.5);
+				PlayerLocation portalInfoLocation = new PlayerLocation(256.5, 79.5, 276.5);
 
-					string hologramContent =
-						"  §d§lSkytonia§r §f§lNetwork§r" + "\n" +
-						" §7Enter the portal and§r" + "\n" +
-						"§7enjoy your adventure!§r" + "\n" +
-						"     §ewww.skytonia.com§r";
+				string hologramContent =
+					"  §d§lSkytonia§r §f§lNetwork§r" + "\n" +
+					" §7Enter the portal and§r" + "\n" +
+					"§7enjoy your adventure!§r" + "\n" +
+					"     §ewww.skytonia.com§r";
 
-					Hologram portalInfoHologram = new Hologram(hologramContent, this, portalInfoLocation);
+				Hologram portalInfoHologram = new Hologram(hologramContent, this, portalInfoLocation);
 
-					portalInfoHologram.SpawnEntity();
-				}
+				portalInfoHologram.SpawnEntity();
 			});
 		}
 
@@ -129,10 +127,7 @@ namespace SkyCore.Games.Hub
 
 		public override void GameTick(int tick)
 		{
-			if (tick % 2 == 0 && PlayerCount > 0)
-			{
-				PlayerNPC.SpawnAllHubNPCs(this);
-			}
+			
 		}
 
 		public override string GetEndOfGameContent(SkyPlayer player)

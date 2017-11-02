@@ -126,29 +126,6 @@ namespace SkyCore
 
 					_pendingTasks.Clear();
 				}
-
-				/*ThreadPool.QueueUserWorkItem(state =>
-				{
-					Thread.Sleep(1000);
-
-					try
-					{
-						//Add this player to any games if available and if this is the only game available
-						if (GameModes.Count == 1)
-						{
-							//Foreach, but only one value.
-							foreach (CoreGameController coreGameController in GameModes.Values)
-							{
-								coreGameController.QueuePlayer(player as SkyPlayer);
-								break;
-							}
-						}
-					}
-					catch (Exception e)
-					{
-						Console.WriteLine(e);
-					}
-				});*/
 			};
 
 			//Start RestartHandler
@@ -222,7 +199,7 @@ namespace SkyCore
         {
 	        IsDisabled = true;
 
-	        if (!GameType.Equals("hub")) //TODO: Support multiple hub servers
+	        if (!GameType.Equals("hub"))
 	        {
 				foreach (Level level in Context.LevelManager.Levels)
 		        {
@@ -239,7 +216,7 @@ namespace SkyCore
 			{
 				foreach (MiNET.Player player in level.Players.Values)
 				{
-					player.Disconnect("                     §d§lSkytonia §f§lNetwork§r\n" +
+					player.Disconnect("                      §d§lSkytonia §f§lNetwork§r\n" +
 					                  "§7Skytonia is currently rebooting, try joining again soon!");
 				}
 			}

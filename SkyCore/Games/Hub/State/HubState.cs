@@ -8,6 +8,7 @@ using MiNET.Effects;
 using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Utils;
+using SkyCore.Entities;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
@@ -21,7 +22,11 @@ namespace SkyCore.Games.Hub.State
 	{
 		public override void EnterState(GameLevel gameLevel)
 		{
-			//
+			gameLevel.AddPendingTask(() =>
+			{
+				SkyUtil.log("Spawning all NPCs for " + gameLevel.GameId);
+				PlayerNPC.SpawnAllHubNPCs(gameLevel as HubLevel);
+			});
 		}
 
 		public override void LeaveState(GameLevel gameLevel)
@@ -36,22 +41,28 @@ namespace SkyCore.Games.Hub.State
 
 		public override void InitializePlayer(GameLevel gameLevel, SkyPlayer player)
 		{
-			NightVision nightVision = new NightVision
+			if (!player.Effects.ContainsKey(EffectType.NightVision))
 			{
-				Duration = Int32.MaxValue,
-				Level = 0,
-				Particles = false
-			};
-			player.SetEffect(nightVision);
+				NightVision nightVision = new NightVision
+				{
+					Duration = int.MaxValue,
+					Level = 0,
+					Particles = false
+				};
+				player.SetEffect(nightVision);
+			}
 
-			player.Inventory.SetInventorySlot(4, new ItemNavigationCompass());
-
-			player.Inventory.SetHeldItemSlot(4);
-
-			RunnableTask.RunTaskLater(() =>
+			if (!(player.Inventory.Slots[4] is ItemNavigationCompass))
 			{
+				player.Inventory.SetInventorySlot(4, new ItemNavigationCompass());
+
 				player.Inventory.SetHeldItemSlot(4);
-			}, 2000);
+
+				RunnableTask.RunTaskLater(() =>
+				{
+					player.Inventory.SetHeldItemSlot(4);
+				}, 1000);
+			}
 		}
 
 		private const int ParticleEventCount = 10;

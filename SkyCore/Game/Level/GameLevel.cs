@@ -43,9 +43,31 @@ namespace SkyCore.Game.Level
 
 	    public GameLevelInfo GameLevelInfo { get; set; }
 
-        //
+		//
 
-        public SkyCoreAPI Plugin { get; }
+		private readonly List<SkyCoreAPI.PendingTask> _pendingTasks = new List<SkyCoreAPI.PendingTask>();
+	    public delegate void PendingTask();
+	    private bool _shouldSchedule = true;
+	    public void AddPendingTask(SkyCoreAPI.PendingTask pendingTask)
+	    {
+		    if (pendingTask == null)
+		    {
+			    throw new NullReferenceException("Null Task Provided");
+		    }
+
+		    if (!_shouldSchedule)
+		    {
+			    pendingTask.Invoke();
+		    }
+		    else
+		    {
+			    _pendingTasks.Add(pendingTask);
+		    }
+	    }
+
+		//
+
+		public SkyCoreAPI Plugin { get; }
 
 		public string GameType { get; }
 
@@ -280,6 +302,34 @@ namespace SkyCore.Game.Level
 	        gameRulesChanged.rules = GetGameRules();
 	        
 	        player.SendPackage(gameRulesChanged);
+
+			//
+
+	        if (_shouldSchedule)
+	        {
+		        _shouldSchedule = false;
+
+		        if (_pendingTasks.Count > 0)
+		        {
+			        foreach (SkyCoreAPI.PendingTask pendingTask in _pendingTasks)
+			        {
+				        RunnableTask.RunTaskLater(() =>
+				        {
+					        try
+					        {
+						        pendingTask.Invoke();
+					        }
+					        catch (Exception e)
+					        {
+						        Console.WriteLine(e);
+					        }
+
+				        }, 250); //Small delay for the level to initialize
+			        }
+
+			        _pendingTasks.Clear();
+		        }
+			}
 		}
         
         public new virtual void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
@@ -338,27 +388,34 @@ namespace SkyCore.Game.Level
                 throw new ArgumentException();
             }
 
-            GameTeam oldTeam = null;
+	        try
+	        {
+		        GameTeam oldTeam = null;
 
-            if (PlayerTeamDict.ContainsKey(player.Username))
-            {
-                oldTeam = PlayerTeamDict[player.Username];
+		        if (PlayerTeamDict.ContainsKey(player.Username))
+		        {
+			        oldTeam = PlayerTeamDict[player.Username];
 
-                if (team != null)
-                {
-                    PlayerTeamDict[player.Username] = team;
-                }
-            }
-            else if(team != null)
-            {
-                PlayerTeamDict.Add(player.Username, team);
-            }
+			        if (team != null)
+			        {
+				        PlayerTeamDict[player.Username] = team;
+			        }
+		        }
+		        else if (team != null)
+		        {
+			        PlayerTeamDict.Add(player.Username, team);
+		        }
 
-	        player.GameTeam = team; //Attach to the player
+		        player.GameTeam = team; //Attach to the player
 
-            SkyUtil.log($"Updating {player.Username}'s team from {(oldTeam == null ? "null" : oldTeam.DisplayName)} to {(team == null ? "null" : team.DisplayName)}");
+		        SkyUtil.log($"Updating {player.Username}'s team from {(oldTeam == null ? "null" : oldTeam.DisplayName)} to {(team == null ? "null" : team.DisplayName)}");
 
-            SetPlayerTeam(player, oldTeam, team);
+		        SetPlayerTeam(player, oldTeam, team);
+			}
+	        catch (Exception e)
+	        {
+		        Console.WriteLine(e);
+	        }
         }
 
         public virtual void SetPlayerTeam(SkyPlayer player, GameTeam oldTeam, GameTeam team)
