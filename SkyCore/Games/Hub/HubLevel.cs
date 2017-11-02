@@ -68,6 +68,28 @@ namespace SkyCore.Games.Hub
 			TeamPlayerDict.Add(HubTeam.Spectator, new List<SkyPlayer>());
 		}
 
+		public override void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
+		{
+			SkyUtil.log($"Attempting to remove {player.Username} from {GameId}");
+			if (((SkyPlayer)player).GameTeam == null)
+			{
+				return; //Shouldn't be in the/any game.
+			}
+
+			CurrentState.HandleLeave(this, (SkyPlayer)player);
+
+			PlayerTeamDict.TryGetValue(player.Username, out var gameTeam);
+
+			if (gameTeam != null)
+			{
+				PlayerTeamDict.Remove(player.Username);
+				TeamPlayerDict[gameTeam].Remove((SkyPlayer)player);
+			}
+
+			//Enforce removing the attached team
+			((SkyPlayer)player).GameTeam = null;
+		}
+
 		public override GameState GetInitialState()
 		{
 			return new HubState();
