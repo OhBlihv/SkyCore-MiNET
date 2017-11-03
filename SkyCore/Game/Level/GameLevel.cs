@@ -28,17 +28,18 @@ namespace SkyCore.Game.Level
 
 		public delegate void PlayerAction(SkyPlayer player);
 
+	    private const int IncomingPlayerTimeoutSeconds = 15;
 	    private readonly IDictionary<string, long> _incomingPlayers = new Dictionary<string, long>();
 
 	    public void AddIncomingPlayer(string username)
 	    {
-			_incomingPlayers.Add(username, DateTimeOffset.Now.ToUnixTimeSeconds() + 15);
+			_incomingPlayers.Add(username, DateTimeOffset.Now.ToUnixTimeSeconds() + IncomingPlayerTimeoutSeconds);
 	    }
 
 	    //Player -> Team
         public readonly Dictionary<string, GameTeam> PlayerTeamDict = new Dictionary<string, GameTeam>();
 
-        //Team -> Player(s) //TODO: Possibly remove due to complexity?
+        //Team -> Player(s)
         protected readonly Dictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
 
 	    public GameLevelInfo GameLevelInfo { get; set; }
@@ -99,10 +100,12 @@ namespace SkyCore.Game.Level
             GameId = gameId;
 	        GameType = gameType;
 	        GameLevelInfo = gameLevelInfo;
-
+	
+			//Override Time / Freeze Time 
 		    WorldTime = GameLevelInfo.WorldTime;
+		    DoDaylightcycle = false;
 
-	        EnableBlockTicking = false;
+			EnableBlockTicking = false;
             EnableChunkTicking = false;
 
             SkyUtil.log($"Initializing world {gameId}");
@@ -294,18 +297,26 @@ namespace SkyCore.Game.Level
 			SetPlayerTeam(player, defaultTeam);
             SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName} in game {GameId}");
 
-            player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false);
+	        //Only show the level transition screen to players changing games on this instance
+            player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
 
 			CurrentState.InitializePlayer(this, player);
 
+	        //Ensure game rules are updated for game players
 			McpeGameRulesChanged gameRulesChanged = McpeGameRulesChanged.CreateObject();
 	        gameRulesChanged.rules = GetGameRules();
-	        
 	        player.SendPackage(gameRulesChanged);
+
+	        //Update Time
+			McpeSetTime message = McpeSetTime.CreateObject();
+	        message.time = (int)WorldTime;
+	        RelayBroadcast(message);
 
 			//
 
-	        if (_shouldSchedule)
+	        //Pending Tasks
+	        //Attempts to execute tasks like spawning NPCs in once a single player has loaded the world
+			if (_shouldSchedule)
 	        {
 		        _shouldSchedule = false;
 
@@ -342,9 +353,7 @@ namespace SkyCore.Game.Level
 
 	        CurrentState.HandleLeave(this, (SkyPlayer)player);
 
-	        PlayerTeamDict.TryGetValue(player.Username, out var gameTeam);
-
-			if (gameTeam != null)
+			if (PlayerTeamDict.TryGetValue(player.Username, out var gameTeam))
 	        {
 		        PlayerTeamDict.Remove(player.Username);
 		        TeamPlayerDict[gameTeam].Remove((SkyPlayer) player);
