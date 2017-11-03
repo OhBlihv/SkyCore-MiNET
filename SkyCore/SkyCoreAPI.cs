@@ -71,46 +71,51 @@ namespace SkyCore
         public void OnEnable(PluginContext context)
         {
 			context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
-            context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
+	        context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
 
-            //Register listeners
-            context.Server.PlayerFactory.PlayerCreated += (sender, args) =>
-			{
-				_shouldSchedule = false; //Avoid scheduling pending tasks once a player has joined
+	        //Register listeners
+	        context.Server.PlayerFactory.PlayerCreated += (sender, args) =>
+	        {
+		        _shouldSchedule = false; //Avoid scheduling pending tasks once a player has joined
 
-                //SkyPlayer player = (SkyPlayer) args.Player;
-                MiNET.Player player = args.Player;
+		        MiNET.Player player = args.Player;
 
-				player.PlayerJoin += OnPlayerJoin;
-				player.PlayerLeave += OnPlayerLeave;
+		        player.PlayerJoin += OnPlayerJoin;
+		        player.PlayerLeave += OnPlayerLeave;
 
-				if (_pendingTasks.Count > 0)
-				{
-					foreach (PendingTask pendingTask in _pendingTasks)
-					{
-						RunnableTask.RunTaskLater(() =>
-						{
-							try
-							{
-								pendingTask.Invoke();
-							}
-							catch (Exception e)
-							{
-								Console.WriteLine(e);
-							}
-							
-						}, 5000);
-					}
+		        if (_pendingTasks.Count > 0)
+		        {
+			        foreach (PendingTask pendingTask in _pendingTasks)
+			        {
+				        RunnableTask.RunTaskLater(() =>
+				        {
+					        try
+					        {
+						        pendingTask.Invoke();
+					        }
+					        catch (Exception e)
+					        {
+						        Console.WriteLine(e);
+					        }
 
-					_pendingTasks.Clear();
-				}
-			};
+				        }, 5000);
+			        }
 
-			//Start RestartHandler
+			        _pendingTasks.Clear();
+		        }
+	        };
+
+	        //Trigger any post-launch tasks that cannot be run during startup
+	        foreach (CoreGameController coreGameController in GameModes.Values)
+	        {
+		        coreGameController.PostLaunchTask();
+	        }
+
+	        //Start RestartHandler for Automatic Reboots
 	        RestartHandler.Start();
 
-			SkyUtil.log("Initialized!");
-        }
+	        SkyUtil.log("Initialized!");
+		}
 
         private void _initializeCustomGame(CoreGameController coreGameController)
         {
@@ -120,20 +125,20 @@ namespace SkyCore
 
         public void Configure(MiNetServer server)
         {
-	        Server = server;
-	        
-            SkyUtil.log("Hooking into MiNET.");
+			Server = server;
+
+			SkyUtil.log("Hooking into MiNET.");
 
 			Instance = this;
-	        SkyUtil.log("SkyCore Initializing...");
+			SkyUtil.log("SkyCore Initializing...");
 
-	        ServerPath = Environment.CurrentDirectory;
-	        SkyUtil.log($"Registered Server Path at '{ServerPath}'");
+			ServerPath = Environment.CurrentDirectory;
+			SkyUtil.log($"Registered Server Path at '{ServerPath}'");
 
-	        CurrentIp = new WebClient().DownloadString("http://icanhazip.com").Replace("\n", "") + ":" + Config.GetProperty("port", "19132");
-	        SkyUtil.log($"Registered current IP as {CurrentIp}");
+			CurrentIp = new WebClient().DownloadString("http://icanhazip.com").Replace("\n", "") + ":" + Config.GetProperty("port", "19132");
+			SkyUtil.log($"Registered current IP as {CurrentIp}");
 
-	        ExternalGameHandler.CurrentHostAddress = CurrentIp;
+			ExternalGameHandler.CurrentHostAddress = CurrentIp;
 
 			server.LevelManager = new SkyLevelManager(this);
 
@@ -146,46 +151,60 @@ namespace SkyCore
 			GameType = serverGame;
 			try
 			{
+				Type gameControllerType = null;
+				string gameName = null;
+
 				switch (serverGame)
 				{
 					case "murder":
-					{
-						SkyUtil.log("Initializing Murder Mystery...");
-						_initializeCustomGame(new MurderCoreGameController(this));
-						break;
-					}
+						{
+							gameName = "Murder Mystery";
+							gameControllerType = typeof(MurderCoreGameController);
+							break;
+						}
 					case "build-battle":
-					{
-						SkyUtil.log("Initializing Build Battle...");
-						_initializeCustomGame(new BuildBattleCoreGameController(this));
-						break;
-					}
+						{
+							gameName = "Build Battle";
+							gameControllerType = typeof(BuildBattleCoreGameController);
+							break;
+						}
 					case "none":
-					{
-						SkyUtil.log("Initializing Pure Hub Handling...");
-							
-						//none -> hub
-						GameType = "hub";
+						{
+							gameName = "Pure Hub";
 
-						_initializeCustomGame(new HubCoreController(this));
+							//none -> hub
+							GameType = "hub";
 
-						break;
-					}
+							gameControllerType = typeof(HubCoreController);
+
+							break;
+						}
 				}
+
+				if (gameControllerType == null)
+				{
+					SkyUtil.log("No Game Loaded.");
+					return;
+				}
+
+				SkyUtil.log($"Initializing Game {gameName}...");
+				_initializeCustomGame(Activator.CreateInstance(gameControllerType, this) as CoreGameController);
+				Thread.Sleep(1000); //Pause the main thread for a second to ensure the levels are setup and avoid any CME
+				SkyUtil.log($"Finished Initializing {gameName}");
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e.StackTrace);
+				Console.WriteLine(e);
 				//TODO: Prevent players joining
 			}
 
 			//
 
 			Permissions = new SkyPermissions(this);
-            server.PlayerFactory = new SkyPlayerFactory { SkyCoreApi = this };
+			server.PlayerFactory = new SkyPlayerFactory { SkyCoreApi = this };
 
-            SkyUtil.log("Finished Hooks.");
-        }
+			SkyUtil.log("Finished Hooks.");
+		}
 
         public void OnDisable()
         {

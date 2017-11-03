@@ -75,13 +75,18 @@ namespace SkyCore.Game
 	        ExternalGameHandler.RegisterInternalGame(RawName);
 
 			GameTickThread = new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
+	        {
+		        Thread.CurrentThread.IsBackground = true;
 
-                GameTick = new HighPrecisionTimer(50, _CoreGameTick, true);
-            });
-            GameTickThread.Start();
-        }
+		        GameTick = new HighPrecisionTimer(50, _CoreGameTick, true);
+	        });
+	        GameTickThread.Start();
+		}
+
+	    public virtual void PostLaunchTask()
+	    {
+			
+		}
 
 	    public void Dispose()
 	    {
