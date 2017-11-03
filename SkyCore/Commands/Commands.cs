@@ -211,8 +211,8 @@ namespace SkyCore.Commands
 			}
 			
 		    SkyCoreAPI.Instance.OnDisable();
-		    SkyCoreAPI.Instance.Context.PluginManager.Plugins.Remove(SkyCoreAPI.Instance);
-		    SkyCoreAPI.Instance.Context.Server.StopServer();
+		    SkyCoreAPI.Instance.Server.PluginManager.Plugins.Remove(SkyCoreAPI.Instance);
+		    SkyCoreAPI.Instance.Server.StopServer();
 
 		    Environment.Exit(0);
 	    }
@@ -706,13 +706,13 @@ namespace SkyCore.Commands
                 new MurderCoreGameController(skyCoreApi).InitializeNewGame(); //initialize new level
             }
             
-            Level level = skyCoreApi.Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals(worldName, StringComparison.InvariantCultureIgnoreCase));
+            Level level = skyCoreApi.Server.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals(worldName, StringComparison.InvariantCultureIgnoreCase));
             if (level == null)
             {
                 player.SendMessage($"§c§l(!) §r§cUnable to find level {worldName}");
 
                 string worldNames = "";
-                foreach(Level levelLoop in skyCoreApi.Context.LevelManager.Levels)
+                foreach(Level levelLoop in skyCoreApi.Server.LevelManager.Levels)
                 {
                     worldNames += levelLoop.LevelName + "(" + levelLoop.LevelId + "), ";
                 }

@@ -13,6 +13,12 @@ namespace SkyCore.Game
 
 		public static void ShowGameList(SkyPlayer player)
 		{
+			if (player == null)
+			{
+				SkyUtil.log("Attempted to show GameList to a null player");
+				return;
+			}
+			
 			var simpleForm = new SimpleForm
 			{
 				Title = "Game list",

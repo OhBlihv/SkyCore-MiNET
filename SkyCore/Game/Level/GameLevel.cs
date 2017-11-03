@@ -5,16 +5,13 @@ using MiNET.Items;
 using MiNET.UI;
 using MiNET.Utils;
 using MiNET.Worlds;
-using Newtonsoft.Json;
 using SkyCore.Game.State;
 using SkyCore.Player;
 using SkyCore.Util;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using System.Threading;
 using MiNET.Net;
 using SkyCore.Entities;
@@ -47,7 +44,6 @@ namespace SkyCore.Game.Level
 		//
 
 		private readonly List<SkyCoreAPI.PendingTask> _pendingTasks = new List<SkyCoreAPI.PendingTask>();
-	    public delegate void PendingTask();
 	    private bool _shouldSchedule = true;
 	    public void AddPendingTask(SkyCoreAPI.PendingTask pendingTask)
 	    {
@@ -84,9 +80,9 @@ namespace SkyCore.Game.Level
         //
 
 	    protected GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, GameLevelInfo gameLevelInfo, bool modifiable = false)
-                : base(plugin.Context.LevelManager, gameId, 
-					AnvilProviderFactory.GetLevelProvider(plugin.Context.LevelManager, levelPath, modifiable, true, !modifiable),
-                    plugin.Context.LevelManager.EntityManager, GameMode.Creative)
+                : base(plugin.Server.LevelManager, gameId, 
+					AnvilProviderFactory.GetLevelProvider(plugin.Server.LevelManager, levelPath, modifiable, true, !modifiable),
+                    plugin.Server.LevelManager.EntityManager, GameMode.Creative)
 	    {
 	        string levelName;
 	        {
@@ -100,10 +96,8 @@ namespace SkyCore.Game.Level
             GameId = gameId;
 	        GameType = gameType;
 	        GameLevelInfo = gameLevelInfo;
-	
-			//Override Time / Freeze Time 
-		    WorldTime = GameLevelInfo.WorldTime;
-		    DoDaylightcycle = false;
+
+		    SpawnPoint = GameLevelInfo.LobbyLocation;
 
 			EnableBlockTicking = false;
             EnableChunkTicking = false;
@@ -111,10 +105,12 @@ namespace SkyCore.Game.Level
             SkyUtil.log($"Initializing world {gameId}");
             Initialize();
 
-            if (!plugin.Context.LevelManager.Levels.Contains(this))
+			SetupWorldTime();
+
+			if (!plugin.Server.LevelManager.Levels.Contains(this))
             {
                 SkyUtil.log($"Adding {gameId} to Main LevelManager");
-                plugin.Context.LevelManager.Levels.Add(this);
+                plugin.Server.LevelManager.Levels.Add(this);
             }
 
             InitializeTeamMap();
@@ -132,10 +128,23 @@ namespace SkyCore.Game.Level
 
 			BlockBreak += HandleBlockBreak;
 			BlockPlace += HandleBlockPlace;
-	        
-	        //Spawn Lobby NPC
-	        PlayerNPC.SpawnLobbyNPC(this, "§eChange Game", new PlayerLocation(260.5, 10, 252.5));
+		    
+		    PostRunTasks();
         }
+
+	    protected virtual void SetupWorldTime()
+	    {
+			//Override Time / Freeze Time 
+		    WorldTime = GameLevelInfo.WorldTime;
+		    SkyUtil.log($"Set world time to {WorldTime}");
+		    DoDaylightcycle = false; //Freeze Time
+		}
+
+	    protected virtual void PostRunTasks()
+	    {
+			//Spawn Lobby NPC
+		    PlayerNPC.SpawnLobbyNPC(this, "§eChange Game", new PlayerLocation(260.5, 10, 252.5));
+		}
 
 		protected virtual void HandleBlockPlace(object sender, BlockPlaceEventArgs e)
 		{
@@ -166,7 +175,7 @@ namespace SkyCore.Game.Level
 
 			base.Close();
 
-	        Plugin.Context.LevelManager.Levels.Remove(this);
+	        Plugin.Server.LevelManager.Levels.Remove(this);
         }
 
         public int GetPlayerCount()
@@ -282,9 +291,9 @@ namespace SkyCore.Game.Level
 
 		public void AddPlayer(SkyPlayer player)
         {
-	        if (player.Level != this && player.Level is GameLevel)
+	        if (player.Level != this && player.Level is GameLevel level)
 	        {
-		        player.Level.RemovePlayer(player); //Clear from old world
+		        level.RemovePlayer(player); //Clear from old world
 	        }
 	        
 	        if (_incomingPlayers.ContainsKey(player.Username))
@@ -297,20 +306,25 @@ namespace SkyCore.Game.Level
 			SetPlayerTeam(player, defaultTeam);
             SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName} in game {GameId}");
 
-	        //Only show the level transition screen to players changing games on this instance
-            player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
+	        if (player.Level != this)
+	        {
+				//Only show the level transition screen to players changing games on this instance
+		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
+			}
 
 			CurrentState.InitializePlayer(this, player);
 
-	        //Ensure game rules are updated for game players
+	        /*//Ensure game rules are updated for game players
 			McpeGameRulesChanged gameRulesChanged = McpeGameRulesChanged.CreateObject();
 	        gameRulesChanged.rules = GetGameRules();
-	        player.SendPackage(gameRulesChanged);
+	        player.SendPackage(gameRulesChanged);*/
 
 	        //Update Time
 			McpeSetTime message = McpeSetTime.CreateObject();
-	        message.time = (int)WorldTime;
-	        RelayBroadcast(message);
+	        message.time = GameLevelInfo.WorldTime;
+			player.SendPackage(message);
+
+	        SkyUtil.log($"Updating player time to {GameLevelInfo.WorldTime}");
 
 			//
 

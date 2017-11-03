@@ -14,6 +14,7 @@ using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
 using SkyCore.Games.Hub.State;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Games.Hub
 {
@@ -25,37 +26,43 @@ namespace SkyCore.Games.Hub
 		public HubLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo, bool modifiable = false) : 
 			base(plugin, "hub", gameId, levelPath, gameLevelInfo, modifiable)
 		{
-			SpawnPoint = new PlayerLocation(256.5, 78, 255);
-			GameLevelInfo.LobbyLocation = new PlayerLocation(256.5, 78, 255);
-
-			SkyCoreAPI instance = SkyCoreAPI.Instance;
-
-			BlockBreak += instance.LevelOnBlockBreak;
-			BlockPlace += instance.LevelOnBlockPlace;
-
-			//CurrentWorldTime = 22000; //Sunrise?
-			WorldTime = 22000; //Sunrise?
-			SkyUtil.log($"Set world time to {WorldTime}");
-			DoDaylightcycle = false; //Freeze Time
-
-			McpeSetTime message = McpeSetTime.CreateObject();
-			message.time = (int)WorldTime;
-			RelayBroadcast(message);
-
-			instance.AddPendingTask(() =>
+			AddPendingTask(() =>
 			{
 				PlayerLocation portalInfoLocation = new PlayerLocation(256.5, 79.5, 276.5);
 
-				string hologramContent =
-					"  §d§lSkytonia§r §f§lNetwork§r" + "\n" +
-					" §7Enter the portal and§r" + "\n" +
-					"§7enjoy your adventure!§r" + "\n" +
-					"     §ewww.skytonia.com§r";
+				const string hologramContent = "  §d§lSkytonia§r §f§lNetwork§r" + "\n" +
+				                               " §7Enter the portal and§r" + "\n" +
+				                               "§7enjoy your adventure!§r" + "\n" +
+				                               "     §ewww.skytonia.com§r";
 
-				Hologram portalInfoHologram = new Hologram(hologramContent, this, portalInfoLocation);
+				new Hologram(hologramContent, this, portalInfoLocation).SpawnEntity();
 
-				portalInfoHologram.SpawnEntity();
+				RunnableTask.RunTaskLater(() =>
+				{
+					try
+					{
+						SkyUtil.log("Spawning all NPCs for " + GameId);
+						PlayerNPC.SpawnAllHubNPCs(this);
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine(e);
+					}
+				}, 250);
+				
 			});
+		}
+
+		protected override void SetupWorldTime()
+		{
+			WorldTime = 22000; //Sunrise?
+			SkyUtil.log($"Set world time to {WorldTime}");
+			DoDaylightcycle = false; //Freeze Time
+		}
+
+		protected override void PostRunTasks()
+		{
+			//Avoid spawning the Lobby NPC
 		}
 
 		protected override void InitializeTeamMap()

@@ -38,7 +38,7 @@ namespace SkyCore
         
         public static string ServerPath { get; private set; }
 
-        public PluginContext Context;
+        public MiNetServer Server;
 
 		public string CurrentIp { get; private set; }
 
@@ -70,22 +70,7 @@ namespace SkyCore
 
         public void OnEnable(PluginContext context)
         {
-            Instance = this;
-            SkyUtil.log("SkyCore Initializing...");
-
-            ServerPath = Environment.CurrentDirectory;
-            SkyUtil.log($"Registered Server Path at '{ServerPath}'");
-
-			CurrentIp = new WebClient().DownloadString("http://icanhazip.com").Replace("\n", "") + ":" + Config.GetProperty("port", "19132");
-			SkyUtil.log($"Registered current IP as {CurrentIp}");
-
-	        ExternalGameHandler.CurrentHostAddress = CurrentIp;
-
-			Context = context;
-
-            //
-
-            context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
+			context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
             context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
 
             //Register listeners
@@ -96,14 +81,7 @@ namespace SkyCore
                 //SkyPlayer player = (SkyPlayer) args.Player;
                 MiNET.Player player = args.Player;
 
-				//Disable inventory editing
-				//player.Inventory.InventoryChange
-
-				//Only add this join listener for hubs
-				if (GameModes.Count == 0)
-				{
-					player.PlayerJoin += OnPlayerJoin;
-				}
+				player.PlayerJoin += OnPlayerJoin;
 				player.PlayerLeave += OnPlayerLeave;
 
 				if (_pendingTasks.Count > 0)
@@ -132,51 +110,6 @@ namespace SkyCore
 	        RestartHandler.Start();
 
 			SkyUtil.log("Initialized!");
-
-            ThreadPool.QueueUserWorkItem(state =>
-            {
-                Thread.Sleep(1000);
-
-				ExternalGameHandler.Init(); //Start listening for game servers
-
-				string serverGame = Config.GetProperty("game-type", "none");
-				SkyUtil.log($"Setting up Custom Game {serverGame}...");
-	            GameType = serverGame;
-				try
-				{
-					switch (serverGame)
-					{
-						case "murder":
-						{
-							SkyUtil.log("Initializing Murder Mystery...");
-							_initializeCustomGame(new MurderCoreGameController(this));
-							break;
-						}
-						case "build-battle":
-						{
-							SkyUtil.log("Initializing Build Battle...");
-							_initializeCustomGame(new BuildBattleCoreGameController(this));
-							break;
-						}
-						case "none":
-						{
-							SkyUtil.log("Initializing Pure Hub Handling...");
-
-							//none -> hub
-							GameType = "hub";
-
-							_initializeCustomGame(new HubCoreController(this));
-							
-							break;
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e.StackTrace);
-					//TODO: Prevent players joining
-				}
-			});
         }
 
         private void _initializeCustomGame(CoreGameController coreGameController)
@@ -187,12 +120,71 @@ namespace SkyCore
 
         public void Configure(MiNetServer server)
         {
-            SkyUtil.log("Startup begun.");
+	        Server = server;
+	        
+            SkyUtil.log("Hooking into MiNET.");
 
-            Permissions = new SkyPermissions(this);
+			Instance = this;
+	        SkyUtil.log("SkyCore Initializing...");
+
+	        ServerPath = Environment.CurrentDirectory;
+	        SkyUtil.log($"Registered Server Path at '{ServerPath}'");
+
+	        CurrentIp = new WebClient().DownloadString("http://icanhazip.com").Replace("\n", "") + ":" + Config.GetProperty("port", "19132");
+	        SkyUtil.log($"Registered current IP as {CurrentIp}");
+
+	        ExternalGameHandler.CurrentHostAddress = CurrentIp;
+
+			server.LevelManager = new SkyLevelManager(this);
+
+			//Create Games once the LevelManager has been initialized to avoid launching without any levels
+
+			ExternalGameHandler.Init(server); //Start listening for game servers
+
+			string serverGame = Config.GetProperty("game-type", "none");
+			SkyUtil.log($"Setting up Custom Game {serverGame}...");
+			GameType = serverGame;
+			try
+			{
+				switch (serverGame)
+				{
+					case "murder":
+					{
+						SkyUtil.log("Initializing Murder Mystery...");
+						_initializeCustomGame(new MurderCoreGameController(this));
+						break;
+					}
+					case "build-battle":
+					{
+						SkyUtil.log("Initializing Build Battle...");
+						_initializeCustomGame(new BuildBattleCoreGameController(this));
+						break;
+					}
+					case "none":
+					{
+						SkyUtil.log("Initializing Pure Hub Handling...");
+							
+						//none -> hub
+						GameType = "hub";
+
+						_initializeCustomGame(new HubCoreController(this));
+
+						break;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.StackTrace);
+				//TODO: Prevent players joining
+			}
+
+			//
+
+			Permissions = new SkyPermissions(this);
             server.PlayerFactory = new SkyPlayerFactory { SkyCoreApi = this };
 
-            SkyUtil.log("Startup complete.");
+            SkyUtil.log("Finished Hooks.");
         }
 
         public void OnDisable()
@@ -201,7 +193,7 @@ namespace SkyCore
 
 	        if (!GameType.Equals("hub"))
 	        {
-				foreach (Level level in Context.LevelManager.Levels)
+				foreach (Level level in Server.LevelManager.Levels)
 		        {
 			        foreach (MiNET.Player player in level.Players.Values)
 			        {
@@ -212,7 +204,7 @@ namespace SkyCore
 		        Thread.Sleep(1000);
 			}
 
-			foreach (Level level in Context.LevelManager.Levels)
+			foreach (Level level in Server.LevelManager.Levels)
 			{
 				foreach (MiNET.Player player in level.Players.Values)
 				{
@@ -227,22 +219,6 @@ namespace SkyCore
 			StatisticsCore.Close();
         }
 
-        public void LevelOnBlockBreak(object sender, BlockBreakEventArgs e)
-        {
-            if (!((SkyPlayer) e.Player).PlayerGroup.IsAtLeast(PlayerGroup.Admin))
-            {
-                e.Cancel = true;
-            }
-        }
-
-	    public void LevelOnBlockPlace(object sender, BlockPlaceEventArgs e)
-        {
-            if (!((SkyPlayer)e.Player).PlayerGroup.IsAtLeast(PlayerGroup.Admin))
-            {
-                e.Cancel = true;
-            }
-        }
-
         private void OnPlayerJoin(object o, PlayerEventArgs eventArgs)
         {
             Console.Write("Processing join");
@@ -253,30 +229,19 @@ namespace SkyCore
             if (player == null) throw new ArgumentNullException(nameof(eventArgs.Player));
             Console.Write(" for " + player.Username + "\n");
 
-            player.Inventory.Slots[4] = new ItemCompass() {Count = 1};
+            player.Inventory.Slots[4] = new ItemCompass {Count = 1};
 
             player.SendPlayerInventory();
 
-	        int i = 0;
-
-            ThreadPool.QueueUserWorkItem(state =>
-            {
-	            player.SendTitle("§f", TitleType.Clear);
-	            player.SendTitle("§f", TitleType.AnimationTimes, 6, 6, 20 * 10);
-	            player.SendTitle("§f", TitleType.ActionBar, 6, 6, 20 * 10);
-	            player.SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
-	            player.SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
-
-				Thread.Sleep(2000);
-
-                //Group isn't initialized yet - wait.
-                SkyUtil.log($"{++i} Group for {player.Username} == {player.PlayerGroup} vs {PlayerGroup.Youtuber} == {((Enumeration) player.PlayerGroup).CompareTo(PlayerGroup.Youtuber)}");
-
-                //player.SendTitle($"{ChatColors.Gold}Welcome {player.Username}\n{ChatColors.LightPurple}~ To the Skytonia Network ~", TitleType.ActionBar);
-                Console.WriteLine(" (Joined!)");
-            });
-        
-        }
+	        RunnableTask.RunTaskLater(() =>
+	        {
+		        player.SendTitle("§f", TitleType.Clear);
+		        player.SendTitle("§f", TitleType.AnimationTimes, 6, 6, 20 * 10);
+		        player.SendTitle("§f", TitleType.ActionBar, 6, 6, 20 * 10);
+		        player.SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
+		        player.SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
+			}, 500);
+		}
 
         private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
         {
@@ -345,14 +310,14 @@ namespace SkyCore
 
 	    public Level GetHubLevel()
 	    {
-		    Level level = Context.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
+		    Level level = Server.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
 
 		    if (level == null)
 		    {
-			    if (Context.LevelManager.Levels.Count > 0)
+			    if (Server.LevelManager.Levels.Count > 0)
 			    {
 					Console.WriteLine("§c§l(!) §r§cUnable to find level Overworld/world. Returning 0th level.");
-				    return Context.LevelManager.Levels[0];
+				    return Server.LevelManager.Levels[0];
 				}
 
 			    return null;
@@ -366,7 +331,7 @@ namespace SkyCore
             username = username.ToLower();
             
             MiNET.Player foundPlayer = null;
-            foreach (Level level in Context.LevelManager.Levels)
+            foreach (Level level in Server.LevelManager.Levels)
             {
                 foreach (MiNET.Player player in level.Players.Values)
                 {
@@ -383,7 +348,7 @@ namespace SkyCore
 	    public ISet<SkyPlayer> GetAllOnlinePlayers()
 	    {
 			ISet<SkyPlayer> players = new HashSet<SkyPlayer>();
-			foreach (Level level in Context.LevelManager.Levels)
+			foreach (Level level in Server.LevelManager.Levels)
 			{
 				foreach (MiNET.Player player in level.Players.Values)
 				{

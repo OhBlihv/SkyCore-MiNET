@@ -45,26 +45,36 @@ namespace SkyCore.Game
             
             GameName = neatName;
             RawName = gameName;
-
-	        RedisGameIdKey = $"next_game_id_{GameName}";
-
-			ExternalGameHandler.RegisterInternalGame(RawName);
             
             foreach(var levelName in levelNames)
             {
                 string fullLevelPath = "C:\\Users\\Administrator\\Desktop\\worlds\\" + gameName + "\\" + levelName;
+	            if (File.Exists(fullLevelPath))
+	            {
+					SkyUtil.log($"Unable to find world at ({fullLevelPath})");
+				}
+	            else
+	            {
+					LevelNames.Add(fullLevelPath);
 
-                LevelNames.Add(fullLevelPath);
+		            SkyUtil.log($"Added world at ({fullLevelPath})");
 
-                SkyUtil.log($"Added world at {fullLevelPath}");
+		            //Pre-load GameLevelInfo
+		            LoadGameLevelInfo(levelName);
+	            }
             }
 
 			if (LevelNames.Count == 0)
 			{
 				SkyUtil.log($"No Levels configured for {gameName}");
+				return;
 			}
 
-            GameTickThread = new Thread(() =>
+			RedisGameIdKey = $"next_game_id_{GameName}";
+
+	        ExternalGameHandler.RegisterInternalGame(RawName);
+
+			GameTickThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
 
@@ -197,18 +207,13 @@ namespace SkyCore.Game
 			    }
 
 			    string levelInfoFilename =
-				    //$"{Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}\\config\\{RawName}-{shortLevelName}.json";
 				    $"C:\\Users\\Administrator\\Desktop\\worlds\\{RawName}\\{RawName}-{shortLevelName}.json";
 
 				if (File.Exists(levelInfoFilename))
 			    {
 				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
 
-				    GameLevelInfo gameLevelInfo = (GameLevelInfo)JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), GetGameLevelInfoType());
-
-				    SkyUtil.log("Returning of type " + gameLevelInfo.GetType());
-
-				    return gameLevelInfo;
+				    return (GameLevelInfo) JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), GetGameLevelInfoType(), new GameLevelInfoJsonConverter());
 			    }
 
 				SkyUtil.log($"Could not find '{levelInfoFilename} for level. Not loading.");
@@ -239,8 +244,24 @@ namespace SkyCore.Game
 		    return mostViableGames;
 	    }
 
-	    public virtual void InstantQueuePlayer(SkyPlayer player)
+		private bool _isFirstLevelRetrieve = true;
+
+	    public virtual GameLevel InstantQueuePlayer(SkyPlayer player, bool join = true)
 	    {
+		    if (player == null)
+		    {
+			    if (_isFirstLevelRetrieve)
+			    {
+				    _isFirstLevelRetrieve = false;
+
+				    //Get Next. Should be used for join.
+					return GameLevels.Values.GetEnumerator().Current; 
+				}
+			    
+			    SkyUtil.log("Attempted to pass null SkyPlayer to InstantQueuePlayer. Bad Join?");
+			    return null;
+		    }
+		    
 			SkyUtil.log($"Trying to add {player.Username} player to {GameLevels.Count} games");
 		    lock (GameLevels)
 		    {
@@ -248,16 +269,23 @@ namespace SkyCore.Game
 			    {
 				    if (!gameLevel.CurrentState.CanAddPlayer(gameLevel))
 				    {
-						QueuePlayer(player);
-					    break; //Cannot add any more players
+					    //Player shouldn't be here if no games are accessible
+						ExternalGameHandler.AddPlayer(player, "hub");
+					    return null;
 				    }
 
-				    SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
-				    gameLevel.AddPlayer(player);
-				    break;
+				    if (join)
+				    {
+						SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
+						gameLevel.AddPlayer(player);
+					}
+
+				    return gameLevel;
 			    }
 		    }
-		}
+
+		    return null;
+	    }
 
 		public virtual bool InstantQueuePlayer(SkyPlayer player, GameInfo gameInfo)
 		{

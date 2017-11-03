@@ -63,34 +63,46 @@ namespace SkyCore.Entities
 
 	    public static void SpawnAllHubNPCs(HubLevel gameLevel)
 	    {
-		    if (gameLevel == null)
+		    try
 		    {
-			    SkyUtil.log($"Attempted to spawn NPCs on gameLevel == null");
-			    return;
-		    }
-		    if (gameLevel.CurrentlySpawnedNPCs == null)
-		    {
-				SkyUtil.log($"Attempted to spawn NPCs on gameLevel.CurrentlySpawnedNPCs == null");
-			    return;
-		    }
-		    
-		    foreach (KeyValuePair<string, NPCSpawnTask> entry in GameNPCs)
-		    {
-			    if (entry.Key == null || entry.Value == null)
+			    if (gameLevel == null)
 			    {
-				    SkyUtil.log(
-					    $"NPC Spawn Key {(entry.Key == null ? "is null" : "is not null")} Value {(entry.Value == null ? "is null" : "is not null")}");
-				    continue;
+				    SkyUtil.log($"Attempted to spawn NPCs on gameLevel == null");
+				    return;
 			    }
-			    
-			    //Only spawn NPCs which have not been spawned yet
-			    if (gameLevel.CurrentlySpawnedNPCs.Contains(entry.Key))
+			    if (gameLevel.CurrentlySpawnedNPCs == null)
 			    {
-				    continue;
+				    SkyUtil.log($"Attempted to spawn NPCs on gameLevel.CurrentlySpawnedNPCs == null");
+				    return;
 			    }
-			    
-			    entry.Value.Invoke(gameLevel);
-			    gameLevel.CurrentlySpawnedNPCs.Add(entry.Key);
+
+			    foreach (KeyValuePair<string, NPCSpawnTask> entry in GameNPCs)
+				{
+				    if (entry.Key == null || entry.Value == null)
+				    {
+					    SkyUtil.log(
+						    $"NPC Spawn Key {(entry.Key == null ? "is null" : "is not null")} Value {(entry.Value == null ? "is null" : "is not null")}");
+					    continue;
+				    }
+
+					SkyUtil.log($"Spawning NPC {entry.Key}");
+
+				    //Only spawn NPCs which have not been spawned yet
+				    if (gameLevel.CurrentlySpawnedNPCs.Contains(entry.Key))
+				    {
+					    continue;
+				    }
+
+				    entry.Value.Invoke(gameLevel);
+				    gameLevel.CurrentlySpawnedNPCs.Add(entry.Key);
+			    }
+
+			    SkyUtil.log($"Finished spawning {GameNPCs.Count} NPCs");
+		    }
+		    catch (Exception e)
+		    {
+			    Console.WriteLine(e);
+			    throw;
 		    }
 	    }
 
@@ -191,18 +203,18 @@ namespace SkyCore.Entities
 				}
 			};
 
-	        if (level != null)
+			if (String.IsNullOrWhiteSpace(command))
+			{
+				SkyUtil.log("Found null command as key. Using npc game name instead.");
+				command = npcName;
+			}
+
+			GameNPCs.Add(command, spawnTask);
+
+			if (level != null)
 	        {
 				spawnTask.Invoke(level);
 			}
-
-	        if (String.IsNullOrWhiteSpace(command))
-	        {
-		        SkyUtil.log("Found null command as key. Using npc game name instead.");
-		        command = npcName;
-	        }
-	        
-	        GameNPCs.Add(command, spawnTask);
         }
 
 		public static void SpawnLobbyNPC(GameLevel level, string npcName, PlayerLocation spawnLocation)

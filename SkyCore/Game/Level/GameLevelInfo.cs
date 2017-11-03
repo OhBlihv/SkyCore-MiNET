@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MiNET.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SkyCore.Games.Murder.Level;
 
 namespace SkyCore.Game.Level
 {
+
+	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 	public class GameLevelInfo : ICloneable
 	{
 
-		public string GameType { get; }
+		public string GameType { get; set; }
 
-		public string LevelName { get; }
+		public string LevelName { get; set; }
 		
-		public int WorldTime { get; }
+		public int WorldTime { get; set; }
 
 		public PlayerLocation LobbyLocation { get; set; }
 
@@ -41,57 +45,29 @@ namespace SkyCore.Game.Level
 
 	}
 
-	public class GameLevelInfoConverter : JsonConverter
+	public class GameLevelInfoJsonConverter : JsonConverter
 	{
-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		public override bool CanConvert(Type objectType)
 		{
-			//TODO?
-			throw new NotImplementedException();
+			return typeof(GameLevelInfo).IsAssignableFrom(objectType);
 		}
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			JObject item = JObject.Load(reader);
+			var item = JObject.Load(reader);
+			
+			var newItem = Activator.CreateInstance(objectType);
 
-			Type newObjectType = null;
-			if (item.TryGetValue("GameType", out var serialisedGameType))
-			{
-				if (SkyCoreAPI.Instance.GameModes.ContainsKey(serialisedGameType.Value<string>()))
-				{
-					SkyUtil.log($"Attempting to load GameInfo of type {serialisedGameType.Value<string>()}");
-					newObjectType = SkyCoreAPI.Instance.GameModes[serialisedGameType.Value<string>()].GetGameLevelInfoType();
-				}
-				else
-				{
-					SkyUtil.log($"GameType {serialisedGameType.Value<string>()} not found/loaded.");
-					return null;
-				}
-			}
+			serializer.Populate(item.CreateReader(), newItem);
 
-			if (newObjectType == null)
-			{
-				SkyUtil.log("Could not find gametype in json object.");
-				return null;
-			}
-
-			//existingValue = Convert.ChangeType(existingValue, newObjectType);
-			existingValue = Activator.CreateInstance(newObjectType);
-
-			serializer.Populate(item.CreateReader(), existingValue);
-
-			SkyUtil.log($"Loaded as {newObjectType} ({existingValue.GetType()}");
-
-			return existingValue;
+			return newItem;
 		}
 
-		public override bool CanRead => true;
-
-		public override bool CanConvert(Type objectType)
+		public override void WriteJson(JsonWriter writer,
+			object value, JsonSerializer serializer)
 		{
-			SkyUtil.log($"Is {typeof(GameLevelInfo)} assignable from {objectType} == {typeof(GameLevelInfo).IsAssignableFrom(objectType)}");
-			return typeof(GameLevelInfo).IsAssignableFrom(objectType);
+			throw new NotImplementedException();
 		}
-
 	}
 
 }

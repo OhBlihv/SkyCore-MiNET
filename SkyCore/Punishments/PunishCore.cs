@@ -283,7 +283,7 @@ namespace SkyCore.Punishments
 
 		static PunishCore()
 		{
-			SkyCoreAPI.Instance.Context.PluginManager.LoadCommands(new PunishmentCommands());  //Initialize Punishment Commands
+			SkyCoreAPI.Instance.Server.PluginManager.LoadCommands(new PunishmentCommands());  //Initialize Punishment Commands
 
 			RunnableTask.RunTask(() =>
 			{

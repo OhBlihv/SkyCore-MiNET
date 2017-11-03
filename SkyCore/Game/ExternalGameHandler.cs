@@ -31,9 +31,9 @@ namespace SkyCore.Game
 			RedisPool.PreserveAsyncOrder = false; //Allow Concurrency
 		}
 
-		public static void Init()
+		public static void Init(MiNetServer server)
 		{
-			SkyCoreAPI.Instance.Context.Server.MotdProvider = new SkyMotdProvider();
+			server.MotdProvider = new SkyMotdProvider();
 			new Thread(() =>
 			{
 
@@ -138,10 +138,14 @@ namespace SkyCore.Game
 
 			if (!gameName.Equals("hub"))
 			{
-				SkyCoreAPI.Instance.AddPendingTask(() =>
+				try
 				{
 					PlayerNPC.SpawnHubNPC(null, neatName, npcLocation, $"GID:{gameName}");
-				});
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
 			}
 
 			{

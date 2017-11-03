@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,8 @@ using SkyCore.Game.Level;
 
 namespace SkyCore.Games.Murder.Level
 {
+
+	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 	public class MurderLevelInfo : GameLevelInfo
 	{
 

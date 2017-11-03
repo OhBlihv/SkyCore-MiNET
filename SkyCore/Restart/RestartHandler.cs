@@ -128,8 +128,8 @@ namespace SkyCore.Restart
 			//Start Actual Shutdown
 
 			SkyCoreAPI.Instance.OnDisable();
-			SkyCoreAPI.Instance.Context.PluginManager.Plugins.Remove(SkyCoreAPI.Instance);
-			SkyCoreAPI.Instance.Context.Server.StopServer();
+			SkyCoreAPI.Instance.Server.PluginManager.Plugins.Remove(SkyCoreAPI.Instance);
+			SkyCoreAPI.Instance.Server.StopServer();
 
 			Environment.Exit(0);
 		}

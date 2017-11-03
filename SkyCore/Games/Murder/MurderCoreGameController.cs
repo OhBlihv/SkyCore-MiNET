@@ -26,7 +26,7 @@ namespace SkyCore.Games.Murder
         public MurderCoreGameController(SkyCoreAPI plugin) : base(plugin, "murder", "Murder Mystery", 
             new List<string>{"murder-grandlibrary", "murder-funzone", "murder-sunsetresort"})
 		{
-			SkyCoreAPI.Instance.Context.PluginManager.LoadCommands(this);  //Initialize Location/Murder Commands
+			SkyCoreAPI.Instance.Server.PluginManager.LoadCommands(this);  //Initialize Location/Murder Commands
 		}
 
         protected override GameLevel _initializeNewGame()

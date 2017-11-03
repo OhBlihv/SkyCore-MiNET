@@ -117,6 +117,7 @@
     <Compile Include="Game\GameUtil.cs" />
     <Compile Include="Game\Items\ItemEndNav.cs" />
     <Compile Include="Game\Level\GameLevelInfo.cs" />
+    <Compile Include="Game\Level\SkyLevelManager.cs" />
     <Compile Include="Game\SkyMotdProvider.cs" />
     <Compile Include="Game\State\GameTeam.cs" />
     <Compile Include="Game\State\Impl\VoidGameState.cs" />

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using MiNET.Blocks;
 using MiNET.Effects;
+using MiNET.Items;
 using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Utils;
@@ -13,6 +15,7 @@ using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Games.Hub.Items;
+using SkyCore.Permissions;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -22,11 +25,7 @@ namespace SkyCore.Games.Hub.State
 	{
 		public override void EnterState(GameLevel gameLevel)
 		{
-			gameLevel.AddPendingTask(() =>
-			{
-				SkyUtil.log("Spawning all NPCs for " + gameLevel.GameId);
-				PlayerNPC.SpawnAllHubNPCs(gameLevel as HubLevel);
-			});
+			
 		}
 
 		public override void LeaveState(GameLevel gameLevel)
@@ -166,5 +165,16 @@ namespace SkyCore.Games.Hub.State
 
 			return false;
 		}
+
+		public override bool HandleBlockBreak(GameLevel gameLevel, SkyPlayer player, Block block, List<Item> drops)
+		{
+			return !player.PlayerGroup.IsAtLeast(PlayerGroup.Admin);
+		}
+
+		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
+		{
+			return !player.PlayerGroup.IsAtLeast(PlayerGroup.Admin);
+		}
+
 	}
 }

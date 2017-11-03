@@ -22,7 +22,7 @@ namespace SkyCore.Player
     public class SkyPlayer : MiNET.Player
     {
 
-        public SkyCoreAPI SkyCoreApi;
+        public readonly SkyCoreAPI SkyCoreApi;
 
         public PlayerGroup PlayerGroup { get; set; }
 
@@ -57,7 +57,7 @@ namespace SkyCore.Player
             //Initialize Player UserPermission level for commands
             CommandPermission = playerGroup.PermissionLevel;
 
-	        this.SetHideNameTag(false);
+	        SetHideNameTag(false);
 			UpdatePlayerName();
 		}
 
@@ -208,27 +208,22 @@ namespace SkyCore.Player
 
                 IsSpawned = true;
 
-	            SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
-				//Add this player to any games if available and if this is the only game available
-	            if (SkyCoreAPI.Instance.GameModes.Count == 1)
+	            //Should already be in a 'GameLevel'.
+				//Check and force-spawn them in if they're missing.
+	            if (Level is GameLevel level)
 	            {
-		            GameInfo targetedGame = ExternalGameHandler.GetGameForIncomingPlayer(Username);
-		            
-		            //Foreach, but only one value.
-		            foreach (CoreGameController coreGameController in SkyCoreAPI.Instance.GameModes.Values)
+		            if (!level.PlayerTeamDict.ContainsKey(Username))
 		            {
-			            //SkyUtil.log("Queueing for " + coreGameController.GameName + " In " + (targetedGame == null ? "nothing specific" : $"GameId:{targetedGame.GameId}"));
-						if (targetedGame != null)
-						{
-							coreGameController.InstantQueuePlayer(this, targetedGame);
-						}
-						else
-						{
-							coreGameController.InstantQueuePlayer(this);
-						}
-			            break;
+			            level.AddPlayer(this);
 		            }
 	            }
+
+	            GameInfo targetedGame = ExternalGameHandler.GetGameForIncomingPlayer(Username);
+	            if (targetedGame != null)
+	            {
+					SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
+		            SkyCoreApi.GameModes[SkyCoreApi.GameType].InstantQueuePlayer(this, targetedGame);
+				}
 			}
             catch (Exception e)
             {
