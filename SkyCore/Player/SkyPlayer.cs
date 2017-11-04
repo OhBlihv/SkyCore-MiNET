@@ -198,9 +198,7 @@ namespace SkyCore.Player
 						})
 					);
 				});
-
-                //SkyUtil.log($"Pre-Initialized as {PlayerGroup.GroupName}({CommandPermission})");
-
+	            
 				//Initialize once we've loaded the group etc.
 	            base.InitializePlayer();
 
@@ -219,7 +217,7 @@ namespace SkyCore.Player
 	            }
 
 	            GameInfo targetedGame = ExternalGameHandler.GetGameForIncomingPlayer(Username);
-	            if (targetedGame != null)
+	            if (targetedGame != null && (!(Level is GameLevel) || !((GameLevel) Level).GameId.Equals(targetedGame.GameId)))
 	            {
 					SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
 		            SkyCoreApi.GameModes[SkyCoreApi.GameType].InstantQueuePlayer(this, targetedGame);

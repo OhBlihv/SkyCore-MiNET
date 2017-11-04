@@ -97,13 +97,14 @@ namespace SkyCore.Game.Level
 	        GameType = gameType;
 	        GameLevelInfo = gameLevelInfo;
 
-		    SpawnPoint = GameLevelInfo.LobbyLocation;
-
 			EnableBlockTicking = false;
             EnableChunkTicking = false;
 
             SkyUtil.log($"Initializing world {gameId}");
             Initialize();
+
+			SpawnPoint = GameLevelInfo.LobbyLocation;
+		    SkyUtil.log($"Spawn Point Initialized As {SpawnPoint}");
 
 			SetupWorldTime();
 
@@ -308,23 +309,22 @@ namespace SkyCore.Game.Level
 
 	        if (player.Level != this)
 	        {
+		        SkyUtil.log("Spawning in");
 				//Only show the level transition screen to players changing games on this instance
 		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
 			}
+	        else //Still teleport the player to the spawn location
+	        {
+		        SkyUtil.log("Teleporting");
+		        player.Teleport(GameLevelInfo.LobbyLocation);
+	        }
 
 			CurrentState.InitializePlayer(this, player);
-
-	        /*//Ensure game rules are updated for game players
-			McpeGameRulesChanged gameRulesChanged = McpeGameRulesChanged.CreateObject();
-	        gameRulesChanged.rules = GetGameRules();
-	        player.SendPackage(gameRulesChanged);*/
 
 	        //Update Time
 			McpeSetTime message = McpeSetTime.CreateObject();
 	        message.time = GameLevelInfo.WorldTime;
 			player.SendPackage(message);
-
-	        SkyUtil.log($"Updating player time to {GameLevelInfo.WorldTime}");
 
 			//
 
