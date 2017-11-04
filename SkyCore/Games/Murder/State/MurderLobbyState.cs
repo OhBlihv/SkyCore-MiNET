@@ -21,16 +21,6 @@ namespace SkyCore.Games.Murder.State
             }
         }
 
-	    public override void InitializePlayer(GameLevel gameLevel, SkyPlayer player)
-	    {
-		    base.InitializePlayer(gameLevel, player);
-
-			RunnableTask.RunTaskLater(() =>
-		    {
-				SkyCommands.Instance.Video2X(player);
-		    }, 2000);
-	    }
-
 	    public override GameState GetNextGameState(GameLevel gameController)
         {
             return new MurderRunningState();

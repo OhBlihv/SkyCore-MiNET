@@ -2,8 +2,10 @@
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
+using SkyCore.Commands;
 using SkyCore.Game.Level;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Game.State.Impl
 {
@@ -16,7 +18,10 @@ namespace SkyCore.Game.State.Impl
 			{
 				player.RemoveAllEffects();
 			});
-        }
+
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\TestImage.bmp", 7, 4, gameLevel,
+				new BlockCoordinates(252, 10, 249));
+		}
 
         public override void LeaveState(GameLevel gameController)
         {
