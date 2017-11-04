@@ -51,12 +51,12 @@ namespace SkyCore.Game.State
 
 	    public virtual bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
 	    {
-		    return true;
+		    return false; //TODO: Re-enable
 	    }
 
 	    public virtual bool HandleBlockBreak(GameLevel gameLevel, SkyPlayer player, Block block, List<Item> drops)
 	    {
-		    return true;
+		    return false; //TODO - Re-enable
 	    }
 
 		public bool IsActiveState(GameLevel gameController)

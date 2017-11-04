@@ -1,9 +1,11 @@
 ﻿using MiNET.Worlds;
+using SkyCore.Commands;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Games.Murder.State
 {
@@ -19,7 +21,17 @@ namespace SkyCore.Games.Murder.State
             }
         }
 
-        public override GameState GetNextGameState(GameLevel gameController)
+	    public override void InitializePlayer(GameLevel gameLevel, SkyPlayer player)
+	    {
+		    base.InitializePlayer(gameLevel, player);
+
+			RunnableTask.RunTaskLater(() =>
+		    {
+				SkyCommands.Instance.Video2X(player);
+		    }, 2000);
+	    }
+
+	    public override GameState GetNextGameState(GameLevel gameController)
         {
             return new MurderRunningState();
         }
@@ -27,7 +39,7 @@ namespace SkyCore.Games.Murder.State
         public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
         {
             //No Handling
-            return true;
+            return false;
         }
     }
 }
