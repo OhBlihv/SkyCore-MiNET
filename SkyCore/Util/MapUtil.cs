@@ -1,9 +1,11 @@
-﻿using System;
+﻿
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Numerics;
-using System.Threading.Tasks;
 using MiNET;
 using MiNET.BlockEntities;
 using MiNET.Blocks;
@@ -16,24 +18,56 @@ using MiNET.Worlds;
 
 namespace SkyCore.Util
 {
+
+	class CachedMap
+	{
+		
+		public Bitmap CachedImage { get; }
+
+		public IDictionary<Tuple<int, int>, byte[]> CachedBitmaps { get; }
+
+		public bool IsBuilding { get; set; } = true;
+
+		public CachedMap(Bitmap cachedImage) : this(cachedImage, null)
+		{
+			CachedBitmaps = new Dictionary<Tuple<int, int>, byte[]>();
+		}
+
+		public CachedMap(Bitmap cachedImage, IDictionary<Tuple<int, int>, byte[]> cachedBitmaps)
+		{
+			CachedImage = cachedImage;
+			CachedBitmaps = cachedBitmaps;
+		}
+
+	}
+
 	public class MapUtil
 	{
+
+		private static readonly ConcurrentDictionary<string, CachedMap> CachedMaps = new ConcurrentDictionary<string, CachedMap>();
 
 		/**
 		 * Credit to @gurun, as what is below is based on his work.
 		 */
 		public static void SpawnMapImage(string imageLocation, int width, int height, Level level, BlockCoordinates spawnLocation)
 		{
-			Task.Run(delegate
+			RunnableTask.RunTask(() =>
 			{
 				try
 				{
-					if (!File.Exists(imageLocation))
+					Bitmap image = null;
+					if (!CachedMaps.TryGetValue(imageLocation, out var cachedMap))
 					{
-						return;
-					}
+						if (!File.Exists(imageLocation))
+						{
+							return;
+						}
 
-					Bitmap image = new Bitmap((Bitmap)Image.FromFile(imageLocation), width * 128, height * 128);
+						image = new Bitmap((Bitmap)Image.FromFile(imageLocation), width * 128, height * 128);
+						cachedMap = new CachedMap(image);
+
+						CachedMaps.TryAdd(imageLocation, cachedMap);
+					}
 
 					BlockCoordinates center = spawnLocation;
 
@@ -42,12 +76,22 @@ namespace SkyCore.Util
 						int xSpawnLoc = center.X + x;
 						for (int y = 0; y < height; y++)
 						{
-							var croppedImage = CropImage(image, new Rectangle(new Point(x * 128, y * 128), new Size(128, 128)));
-							byte[] bitmapToBytes = BitmapToBytes(croppedImage, true);
-
-							if (bitmapToBytes.Length != 128 * 128 * 4)
+							byte[] bitmapToBytes;
+							if (cachedMap.IsBuilding)
 							{
-								return;
+								var croppedImage = CropImage(image, new Rectangle(new Point(x * 128, y * 128), new Size(128, 128)));
+								bitmapToBytes = BitmapToBytes(croppedImage, true);
+
+								if (bitmapToBytes.Length != 128 * 128 * 4)
+								{
+									return; //TODO: Throw Exception/Alert Log?
+								}
+
+								cachedMap.CachedBitmaps.Add(new Tuple<int, int>(x, y), bitmapToBytes);
+							}
+							else
+							{
+								bitmapToBytes = cachedMap.CachedBitmaps[new Tuple<int, int>(x, y)];
 							}
 
 							MapEntity frame = new MapEntity(level);
