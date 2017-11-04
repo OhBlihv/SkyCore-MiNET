@@ -56,14 +56,20 @@ namespace SkyCore.Util
 				try
 				{
 					Bitmap image = null;
-					if (!CachedMaps.TryGetValue(imageLocation, out var cachedMap))
+					CachedMap cachedMap;
+
+					if (CachedMaps.ContainsKey(imageLocation))
+					{
+						cachedMap = CachedMaps[imageLocation];
+					}
+					else
 					{
 						if (!File.Exists(imageLocation))
 						{
 							return;
 						}
 
-						image = new Bitmap((Bitmap)Image.FromFile(imageLocation), width * 128, height * 128);
+						image = new Bitmap((Bitmap) Image.FromFile(imageLocation), width * 128, height * 128);
 						cachedMap = new CachedMap(image);
 
 						CachedMaps.TryAdd(imageLocation, cachedMap);
@@ -114,6 +120,8 @@ namespace SkyCore.Util
 							level.SetBlockEntity(itemFrameBlockEntity);
 						}
 					}
+
+					cachedMap.IsBuilding = false; //Completely Cached
 				}
 				catch (Exception e)
 				{
