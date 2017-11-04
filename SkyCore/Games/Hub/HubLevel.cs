@@ -60,11 +60,6 @@ namespace SkyCore.Games.Hub
 			DoDaylightcycle = false; //Freeze Time
 		}
 
-		protected override void PostRunTasks()
-		{
-			//Avoid spawning the Lobby NPC
-		}
-
 		protected override void InitializeTeamMap()
 		{
 			TeamPlayerDict.Add(HubTeam.Player, new List<SkyPlayer>());

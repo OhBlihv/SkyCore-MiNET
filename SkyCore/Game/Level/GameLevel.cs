@@ -129,8 +129,6 @@ namespace SkyCore.Game.Level
 
 			BlockBreak += HandleBlockBreak;
 			BlockPlace += HandleBlockPlace;
-		    
-		    PostRunTasks();
         }
 
 	    protected virtual void SetupWorldTime()
@@ -139,12 +137,6 @@ namespace SkyCore.Game.Level
 		    WorldTime = GameLevelInfo.WorldTime;
 		    SkyUtil.log($"Set world time to {WorldTime}");
 		    DoDaylightcycle = false; //Freeze Time
-		}
-
-	    protected virtual void PostRunTasks()
-	    {
-			//Spawn Lobby NPC
-		    PlayerNPC.SpawnLobbyNPC(this, "§eChange Game", new PlayerLocation(260.5, 10, 252.5));
 		}
 
 		protected virtual void HandleBlockPlace(object sender, BlockPlaceEventArgs e)
