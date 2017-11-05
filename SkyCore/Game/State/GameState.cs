@@ -42,7 +42,7 @@ namespace SkyCore.Game.State
 
 	    public virtual bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 	    {
-		    return false;
+		    return true;
 	    }
 
 	    public virtual bool HandleInventoryModification(SkyPlayer player, GameLevel gameLevel, TransactionRecord message)

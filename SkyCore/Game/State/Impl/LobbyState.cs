@@ -46,9 +46,6 @@ namespace SkyCore.Game.State.Impl
 				});
 			});
 
-			//TODO: Remove - Used to test inventory tracking
-	        player.Inventory.Slots[4] = new ItemCompass { Count = 1 };
-
 	        player.SendPlayerInventory();
 		}
 

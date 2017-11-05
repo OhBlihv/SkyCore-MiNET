@@ -100,6 +100,11 @@ namespace SkyCore.Games.Hub.State
 			{
 				foreach (SkyPlayer player in gameLevel.Players.Values)
 				{
+					if (player == null || !player.IsConnected)
+					{
+						continue;
+					}
+
 					if (IsInPortal(player.KnownPosition))
 					{
 						PlayerLocation teleportLocation = player.KnownPosition;

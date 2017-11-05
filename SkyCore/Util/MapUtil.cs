@@ -61,6 +61,7 @@ namespace SkyCore.Util
 					if (CachedMaps.ContainsKey(imageLocation))
 					{
 						cachedMap = CachedMaps[imageLocation];
+						SkyUtil.log("Using Cached Map Image");
 					}
 					else
 					{
@@ -73,6 +74,8 @@ namespace SkyCore.Util
 						cachedMap = new CachedMap(image);
 
 						CachedMaps.TryAdd(imageLocation, cachedMap);
+
+						SkyUtil.log("Creating/Loading new Cached Map Image");
 					}
 
 					BlockCoordinates center = spawnLocation;
@@ -226,6 +229,9 @@ namespace SkyCore.Util
 	{
 		public CustomItemFrame(MapEntity frame, ItemFrameBlockEntity itemFrameBlockEntity, Level level)
 		{
+			IsTransparent = true;
+			LightLevel = 15; //Full Bright
+
 			ItemMap map = new ItemMap(frame.EntityId);
 
 			ItemFrameBlockEntity blockEntity = itemFrameBlockEntity;
