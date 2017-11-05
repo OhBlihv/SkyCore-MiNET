@@ -432,15 +432,37 @@ namespace SkyCore.Game
 			if (_gameInstances.ContainsKey("local"))
 			{
 				InstanceInfo instanceInfo = _gameInstances["local"];
+
+				string currentGameId = null;
+				if (player.Level is GameLevel level)
+				{
+					currentGameId = level.GameId;
+				}
+
+				GameInfo nextBestGame = null;
 				foreach (GameInfo gameInfo in instanceInfo.AvailableGames)
 				{
 					SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");
-					if (bestAvailableGame == null || gameInfo.CurrentPlayers > bestAvailableGame.CurrentPlayers)
+					if ((bestAvailableGame == null || gameInfo.CurrentPlayers > bestAvailableGame.CurrentPlayers))
 					{
+						//Try to avoid placing the player in the game they just came from.
+						//Use this game as a fallback to avoid moving players off this instance.
+						if (currentGameId != null && currentGameId.Equals(gameInfo.GameId))
+						{
+							bestGameInstance = instanceInfo;
+							nextBestGame = gameInfo;
+							continue;
+						}
+
 						SkyUtil.log("Found best game!");
 						bestGameInstance = instanceInfo;
 						bestAvailableGame = gameInfo;
 					}
+				}
+
+				if (bestAvailableGame == null)
+				{
+					bestAvailableGame = nextBestGame;
 				}
 			}
 
@@ -464,7 +486,6 @@ namespace SkyCore.Game
 
 			if (bestAvailableGame == null)
 			{
-				//player.SendMessage($"§cWe were unable to move you to another game of {GameName}.");
 				if (GetCurrentPlayers() > 0) //
 				{
 					TitleUtil.SendCenteredSubtitle(player, "  §c§lGAME FULL§r" + "\n" + "§7Try joining again soon!", false);
@@ -480,6 +501,12 @@ namespace SkyCore.Game
 			{
 				if (player.Level is GameLevel level)
 				{
+					if (player.Level.LevelId.Equals(bestAvailableGame.GameId))
+					{
+						return; //Cannot change game into current game.
+					}
+					
+					//Remove player from level to avoid issues
 					level.RemovePlayer(player);
 				}
 
