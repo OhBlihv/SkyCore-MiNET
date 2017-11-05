@@ -86,7 +86,7 @@
     <Compile Include="Entities\Holograms\PlayerCountHologram.cs" />
     <Compile Include="Entities\Holograms\TickingHologram.cs" />
     <Compile Include="Entities\PlayerNPC.cs" />
-    <Compile Include="Games\BuildBattle\BuildBattleCoreGameController.cs" />
+    <Compile Include="Games\BuildBattle\BuildBattleGameController.cs" />
     <Compile Include="Games\BuildBattle\BuildBattleLevel.cs" />
     <Compile Include="Games\BuildBattle\BuildBattleTeam.cs" />
     <Compile Include="Games\BuildBattle\Items\ItemVote.cs" />
@@ -95,7 +95,7 @@
     <Compile Include="Games\BuildBattle\State\BuildBattlePodiumState.cs" />
     <Compile Include="Games\BuildBattle\State\BuildBattleLobbyState.cs" />
     <Compile Include="Games\BuildBattle\State\BuildBattleVoteState.cs" />
-    <Compile Include="Games\Hub\HubCoreController.cs" />
+    <Compile Include="Games\Hub\HubController.cs" />
     <Compile Include="Games\Hub\HubLevel.cs" />
     <Compile Include="Games\Hub\HubTeam.cs" />
     <Compile Include="Games\Hub\Items\ItemNavigationCompass.cs" />
@@ -106,7 +106,7 @@
     <Compile Include="Games\Murder\Items\ItemInnocentGun.cs" />
     <Compile Include="Games\Murder\Items\ItemMurderKnife.cs" />
     <Compile Include="Games\Murder\Level\MurderLevelInfo.cs" />
-    <Compile Include="Games\Murder\MurderCoreGameController.cs" />
+    <Compile Include="Games\Murder\MurderGameController.cs" />
     <Compile Include="Games\Murder\Level\MurderLevel.cs" />
     <Compile Include="Games\Murder\MurderTeam.cs" />
     <Compile Include="Games\Murder\MurderVictoryType.cs" />
@@ -123,7 +123,7 @@
     <Compile Include="Game\State\Impl\VoidGameState.cs" />
     <Compile Include="Game\State\Impl\EndGameState.cs" />
     <Compile Include="Game\State\Impl\LobbyState.cs" />
-    <Compile Include="Game\CoreGameController.cs" />
+    <Compile Include="Game\GameController.cs" />
     <Compile Include="Game\Level\GameLevel.cs" />
     <Compile Include="Game\State\GameState.cs" />
     <Compile Include="Game\State\Impl\RunningState.cs" />

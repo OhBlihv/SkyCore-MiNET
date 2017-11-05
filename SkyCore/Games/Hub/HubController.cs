@@ -32,7 +32,7 @@ namespace SkyCore.Games.Hub
 		}
 	}
 
-	public class HubCoreController : CoreGameController
+	public class HubController : GameController
 	{
 		public const int MaxHubCount = 5;
 		
@@ -40,7 +40,7 @@ namespace SkyCore.Games.Hub
 
 		public int NextGameId;
 
-		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>{"hub"})
+		public HubController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>{"hub"})
 		{
 			Tick = 1;
 			

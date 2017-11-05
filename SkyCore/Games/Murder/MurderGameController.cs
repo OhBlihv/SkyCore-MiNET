@@ -20,10 +20,10 @@ using SkyCore.Util;
 
 namespace SkyCore.Games.Murder
 {
-    public class MurderCoreGameController : CoreGameController
+    public class MurderGameController : GameController
     {
         
-        public MurderCoreGameController(SkyCoreAPI plugin) : base(plugin, "murder", "Murder Mystery", 
+        public MurderGameController(SkyCoreAPI plugin) : base(plugin, "murder", "Murder Mystery", 
             new List<string>{"murder-grandlibrary", "murder-funzone", "murder-sunsetresort"})
 		{
 			

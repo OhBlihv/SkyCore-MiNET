@@ -74,7 +74,7 @@ namespace SkyCore.Commands
 
 				string hubNum = hub.ToString();
 
-				CoreGameController gameController = _skyCoreApi.GameModes["hub"];
+				GameController gameController = _skyCoreApi.GameModes["hub"];
 				foreach (GameLevel hubLevel in gameController.GameLevels.Values)
 				{
 					if (hubLevel.GameId.Replace("hub", "").Equals(hubNum))

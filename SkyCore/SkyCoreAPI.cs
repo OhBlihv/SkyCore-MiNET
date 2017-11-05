@@ -46,7 +46,7 @@ namespace SkyCore
 
 		public string GameType { get; private set; }
 
-        public readonly ConcurrentDictionary<string, CoreGameController> GameModes = new ConcurrentDictionary<string, CoreGameController>();
+        public readonly ConcurrentDictionary<string, GameController> GameModes = new ConcurrentDictionary<string, GameController>();
 
 		private readonly List<PendingTask> _pendingTasks = new List<PendingTask>();
 		public delegate void PendingTask();
@@ -106,7 +106,7 @@ namespace SkyCore
 	        };
 
 	        //Trigger any post-launch tasks that cannot be run during startup
-	        foreach (CoreGameController coreGameController in GameModes.Values)
+	        foreach (GameController coreGameController in GameModes.Values)
 	        {
 		        coreGameController.PostLaunchTask();
 	        }
@@ -117,7 +117,7 @@ namespace SkyCore
 	        SkyUtil.log("Initialized!");
 		}
 
-        private void _initializeCustomGame(CoreGameController coreGameController)
+        private void _initializeCustomGame(GameController coreGameController)
         {
             GameModes.TryAdd(coreGameController.RawName, coreGameController);
             SkyUtil.log($"Initialized {coreGameController.GameName} Controller.");
@@ -159,13 +159,13 @@ namespace SkyCore
 					case "murder":
 					{
 						gameName = "Murder Mystery";
-						gameControllerType = typeof(MurderCoreGameController);
+						gameControllerType = typeof(MurderGameController);
 						break;
 					}
 					case "build-battle":
 					{
 						gameName = "Build Battle";
-						gameControllerType = typeof(BuildBattleCoreGameController);
+						gameControllerType = typeof(BuildBattleGameController);
 						break;
 					}
 					case "none":
@@ -175,7 +175,7 @@ namespace SkyCore
 						//none -> hub
 						GameType = "hub";
 
-						gameControllerType = typeof(HubCoreController);
+						gameControllerType = typeof(HubController);
 
 						break;
 					}
@@ -188,7 +188,7 @@ namespace SkyCore
 				}
 
 				SkyUtil.log($"Initializing Game {gameName}...");
-				_initializeCustomGame(Activator.CreateInstance(gameControllerType, this) as CoreGameController);
+				_initializeCustomGame(Activator.CreateInstance(gameControllerType, this) as GameController);
 				Thread.Sleep(1000); //Pause the main thread for a second to ensure the levels are setup and avoid any CME
 				SkyUtil.log($"Finished Initializing {gameName}");
 

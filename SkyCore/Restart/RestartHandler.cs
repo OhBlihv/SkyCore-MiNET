@@ -84,7 +84,7 @@ namespace SkyCore.Restart
 			{
 				SkyCoreAPI.IsRebootQueued = true;
 
-				if (SkyCoreAPI.Instance.GameModes.TryGetValue(gameType, out CoreGameController localGameController) && 
+				if (SkyCoreAPI.Instance.GameModes.TryGetValue(gameType, out GameController localGameController) && 
 				    !localGameController.GameLevels.IsEmpty)
 				{
 					ICollection<GameLevel> gameLevels = localGameController.GameLevels.Values;

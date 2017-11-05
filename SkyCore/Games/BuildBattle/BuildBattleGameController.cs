@@ -57,12 +57,12 @@ namespace SkyCore.Games.BuildBattle
 		
 	}
 	
-	public class BuildBattleCoreGameController : CoreGameController
+	public class BuildBattleGameController : GameController
 	{
 
 		private readonly List<BuildBattleTheme> _themeList;
 		
-		public BuildBattleCoreGameController(SkyCoreAPI plugin) : base(plugin, "build-battle", "Build Battle", 
+		public BuildBattleGameController(SkyCoreAPI plugin) : base(plugin, "build-battle", "Build Battle", 
 			new List<string>{"build-battle-template"})
 		{
 			string themeFilePath =

@@ -15,7 +15,7 @@ using StackExchange.Redis;
 
 namespace SkyCore.Game
 {
-    public abstract class CoreGameController : IDisposable
+    public abstract class GameController : IDisposable
     {
 
 	    public const int MaxGames = 30;
@@ -39,7 +39,7 @@ namespace SkyCore.Game
 
 	    private string RedisGameIdKey { get; }
 
-	    protected CoreGameController(SkyCoreAPI plugin, string gameName, string neatName, List<string> levelNames)
+	    protected GameController(SkyCoreAPI plugin, string gameName, string neatName, List<string> levelNames)
         {
             Plugin = plugin;
             
