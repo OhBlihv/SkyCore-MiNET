@@ -258,8 +258,11 @@ namespace SkyCore.Player
 				case McpeInventoryTransaction.ItemUseOnEntityAction.Attack:
 					
 				    Entity target = Level.GetEntity(transaction.EntityId);
-				    
-					HandleInteract((byte) transaction.ActionType, target);
+
+				    if (HandleInteract((byte) transaction.ActionType, target))
+				    {
+					    return; 
+				    }
 					break;
 		    }
 
@@ -307,16 +310,19 @@ namespace SkyCore.Player
 
 	    protected override void HandleTransactionItemUse(Transaction transaction)
 	    {
-		    HandleInteract(2, null); //'Right Click'
+		    if(HandleInteract(2, null)) //'Right Click'
+			{
+			    return;
+		    }
 
 		    base.HandleTransactionItemUse(transaction);
 	    }
 
-		public virtual void HandleInteract(byte actionId, Entity target)
+		public bool HandleInteract(byte actionId, Entity target)
         {
             if (actionId == 4)
             {
-                return;
+                return false;
             }
 
             SkyUtil.log($"Interact Id:{actionId} ({Username})");
@@ -327,18 +333,18 @@ namespace SkyCore.Player
                 {
                     //SkyUtil.log($"Processing NPC Interact as {Username}");
                     npc.OnInteract(this);
+	                return true;
                 }
             }
             else
             {
                 if (Level is GameLevel level)
                 {
-	                if (level.DoInteract(actionId, this, (SkyPlayer) target))
-	                {
-						//return; //Avoid default handling
-					}
-				}
+	                return level.DoInteract(actionId, this, (SkyPlayer) target);
+                }
             }
+
+	        return false;
         }
 
 	    public virtual void UpdateGameMode(GameMode gameMode, bool allowBreakingIfCreative = false)
