@@ -7,6 +7,7 @@ using MiNET;
 using MiNET.Blocks;
 using MiNET.Entities;
 using MiNET.Items;
+using MiNET.Net;
 using MiNET.Utils;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -44,6 +45,11 @@ namespace SkyCore.Game.State
 		    return false;
 	    }
 
+	    public virtual bool HandleInventoryModification(SkyPlayer player, GameLevel gameLevel, TransactionRecord message)
+	    {
+		    return true;
+	    }
+
 	    public virtual void HandleDamage(GameLevel gameLevel, Entity source, Entity target, Item item, int damage, DamageCause damageCause)
 	    {
 		    
@@ -51,12 +57,12 @@ namespace SkyCore.Game.State
 
 	    public virtual bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
 	    {
-		    return false; //TODO: Re-enable
+		    return true;
 	    }
 
 	    public virtual bool HandleBlockBreak(GameLevel gameLevel, SkyPlayer player, Block block, List<Item> drops)
 	    {
-		    return false; //TODO - Re-enable
+		    return true;
 	    }
 
 		public bool IsActiveState(GameLevel gameController)

@@ -48,7 +48,12 @@ namespace SkyCore.Game.State.Impl
 					gamePlayer.BarHandler.AddMinorLine($"§e{player.PlayerGroup.Prefix} {player.Username}§r §7entered the game!");
 				});
 			});
-        }
+
+			//TODO: Remove - Used to test inventory tracking
+	        player.Inventory.Slots[4] = new ItemCompass { Count = 1 };
+
+	        player.SendPlayerInventory();
+		}
 
         public override void HandleLeave(GameLevel gameController, SkyPlayer player)
         {

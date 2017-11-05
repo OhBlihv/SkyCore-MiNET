@@ -229,28 +229,28 @@ namespace SkyCore.Player
             }
         }
 
-        public override void HandleMcpeAnimate(McpeAnimate message)
-        {
-			if (message.actionId != 1)
-            {
-                base.HandleMcpeAnimate(message);
-                return;
-            }
+	    public override void HandleMcpeAnimate(McpeAnimate message)
+	    {
+		    if (message.actionId != 1)
+		    {
+			    base.HandleMcpeAnimate(message);
+			    return;
+		    }
 
-			//SkyUtil.log($"Animate Id:{message.actionId} ({Username})");
+		    //SkyUtil.log($"Animate Id:{message.actionId} ({Username})");
 
-			if (Level is GameLevel level)
-			{
-				if (level.DoInteract(message.actionId, this, null))
-				{
-					//return; //Avoid default handling
-				}
-			}
+		    if (Level is GameLevel level)
+		    {
+			    if (level.DoInteract(message.actionId, this, null))
+			    {
+				    //return; //Avoid default handling
+			    }
+		    }
 
-			base.HandleMcpeAnimate(message);
-        }
+		    base.HandleMcpeAnimate(message);
+	    }
 
-		protected override void HandleTransactionItemUseOnEntity(Transaction transaction)
+	    protected override void HandleTransactionItemUseOnEntity(Transaction transaction)
 	    {
 			switch ((McpeInventoryTransaction.ItemUseOnEntityAction)transaction.ActionType)
 		    {
@@ -270,7 +270,18 @@ namespace SkyCore.Player
 	    {
 		    foreach (var record in transaction.Transactions)
 		    {
-			    if (record is WorldInteractionTransactionRecord)
+			    if (record is ContainerTransactionRecord)
+			    {
+				    if (Level is GameLevel level)
+				    {
+					    if (level.CurrentState.HandleInventoryModification(this, level, record))
+					    {
+							SendPlayerInventory(); //Reset their inventory to what we have tracked
+						    return;
+					    }
+				    }
+			    }
+			    else if (record is WorldInteractionTransactionRecord)
 			    {
 				    //Drop
 				    if (record.Slot == 0)
