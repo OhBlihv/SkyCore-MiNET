@@ -29,32 +29,35 @@ namespace SkyCore.Games.BuildBattle.State
 				player.Inventory.Clear();
 			});
 
-			List<KeyValuePair<SkyPlayer, int>> topPlayers = new List<KeyValuePair<SkyPlayer, int>>();
-			foreach (SkyPlayer player in _voteTally.Keys)
-			{
-				topPlayers.Add(new KeyValuePair<SkyPlayer, int>(player, _voteTally[player]));
-			}
-
-			topPlayers.Sort((x, y) => 0 - x.Value.CompareTo(y.Value));
-
 			SkyPlayer winningPlayer = null;
-
-			int i = 0;
-			foreach (KeyValuePair<SkyPlayer, int> topPlayer in topPlayers)
+			List<KeyValuePair<SkyPlayer, int>> topPlayers = null;
+			if (_voteTally != null)
 			{
-				if (++i > 1) //Top 1 Player for now
+				topPlayers = new List<KeyValuePair<SkyPlayer, int>>();
+				foreach (SkyPlayer player in _voteTally.Keys)
 				{
-					break;
+					topPlayers.Add(new KeyValuePair<SkyPlayer, int>(player, _voteTally[player]));
 				}
 
-				//If the player has left, skip them.
-				if (!gameLevel.PlayerTeamDict.ContainsKey(topPlayer.Key.Username))
+				topPlayers.Sort((x, y) => 0 - x.Value.CompareTo(y.Value));
+
+				int i = 0;
+				foreach (KeyValuePair<SkyPlayer, int> topPlayer in topPlayers)
 				{
-					i = 0;
-				}
-				else
-				{
-					winningPlayer = topPlayer.Key;
+					if (++i > 1) //Top 1 Player for now
+					{
+						break;
+					}
+
+					//If the player has left, skip them.
+					if (!gameLevel.PlayerTeamDict.ContainsKey(topPlayer.Key.Username))
+					{
+						i = 0;
+					}
+					else
+					{
+						winningPlayer = topPlayer.Key;
+					}
 				}
 			}
 
@@ -63,8 +66,20 @@ namespace SkyCore.Games.BuildBattle.State
 			List<PlayerLocation> podiumLocations;
 			if (winningPlayer == null)
 			{
-				//Pick a random player
-				podiumLocations = ((BuildBattleLevel)gameLevel).GetVoteLocations((BuildBattleTeam)topPlayers[0].Key.GameTeam);
+				BuildBattleTeam podiumCentre;
+				if (topPlayers == null)
+				{
+					//Pick a random team
+					podiumCentre = ((BuildBattleLevel) gameLevel).BuildTeams[0];
+					
+				}
+				else
+				{
+					//Pick a random player
+					podiumCentre = (BuildBattleTeam) topPlayers[0].Key.GameTeam;
+				}
+
+				podiumLocations = ((BuildBattleLevel)gameLevel).GetVoteLocations(podiumCentre);
 			}
 			else
 			{

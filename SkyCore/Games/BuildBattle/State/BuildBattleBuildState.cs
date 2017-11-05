@@ -104,6 +104,15 @@ namespace SkyCore.Games.BuildBattle.State
 			});
 		}
 
+		public override void HandleLeave(GameLevel gameLevel, SkyPlayer player)
+		{
+			if (gameLevel.GetGamePlayerCount() <= 2)
+			{
+				//Not enough players for the game to continue!
+				gameLevel.UpdateGameState(new BuildBattlePodiumState(null));
+			}
+		}
+
 		public override GameState GetNextGameState(GameLevel gameLevel)
 		{
 			return new BuildBattleVoteState();
