@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using MiNET.Utils;
-using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
-using SkyCore.Games.Murder;
-using SkyCore.Games.Murder.State;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -55,7 +47,15 @@ namespace SkyCore.Games.BuildBattle.State
 					break;
 				}
 
-				winningPlayer = topPlayer.Key;
+				//If the player has left, skip them.
+				if (!gameLevel.PlayerTeamDict.ContainsKey(topPlayer.Key.Username))
+				{
+					i = 0;
+				}
+				else
+				{
+					winningPlayer = topPlayer.Key;
+				}
 			}
 
 			string winningPlayerName = winningPlayer == null ? "NO-ONE" : winningPlayer.Username;

@@ -1,8 +1,5 @@
-﻿using MiNET;
-using MiNET.Entities;
-using MiNET.Items;
+﻿using MiNET.Items;
 using MiNET.Utils;
-using SkyCore.Commands;
 using SkyCore.Entities;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -27,7 +24,12 @@ namespace SkyCore.Game.State.Impl
 				new BlockCoordinates(252, 10, 249));
 		}
 
-        public override bool CanAddPlayer(GameLevel gameLevel)
+	    public override void LeaveState(GameLevel gameLevel)
+	    {
+		    //
+	    }
+
+		public override bool CanAddPlayer(GameLevel gameLevel)
         {
 	        return gameLevel.GetPlayerCount() < gameLevel.GetMaxPlayers();
         }

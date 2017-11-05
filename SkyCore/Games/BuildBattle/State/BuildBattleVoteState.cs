@@ -183,26 +183,7 @@ namespace SkyCore.Games.BuildBattle.State
 				});
 			}
 
-			string neatRemaining;
-			{
-				int minutes = 0;
-				while (secondsLeft >= 60)
-				{
-					secondsLeft -= 60;
-					minutes++;
-				}
-
-				neatRemaining = minutes + ":";
-
-				if (secondsLeft < 10)
-				{
-					neatRemaining += "0" + secondsLeft;
-				}
-				else
-				{
-					neatRemaining += secondsLeft;
-				}
-			}
+			string neatRemaining = GetNeatTimeRemaining(secondsLeft);
 
 			gameLevel.DoForAllPlayers(player =>
 			{

@@ -70,7 +70,9 @@ namespace SkyCore.Game.State.Impl
 				    neatRemaining += secondsLeft;
 			    }
 		    }
-		}
+
+		    return neatRemaining;
+	    }
 
 	}
 }
