@@ -157,28 +157,28 @@ namespace SkyCore
 				switch (serverGame)
 				{
 					case "murder":
-						{
-							gameName = "Murder Mystery";
-							gameControllerType = typeof(MurderCoreGameController);
-							break;
-						}
+					{
+						gameName = "Murder Mystery";
+						gameControllerType = typeof(MurderCoreGameController);
+						break;
+					}
 					case "build-battle":
-						{
-							gameName = "Build Battle";
-							gameControllerType = typeof(BuildBattleCoreGameController);
-							break;
-						}
+					{
+						gameName = "Build Battle";
+						gameControllerType = typeof(BuildBattleCoreGameController);
+						break;
+					}
 					case "none":
-						{
-							gameName = "Pure Hub";
+					{
+						gameName = "Pure Hub";
+						
+						//none -> hub
+						GameType = "hub";
 
-							//none -> hub
-							GameType = "hub";
+						gameControllerType = typeof(HubCoreController);
 
-							gameControllerType = typeof(HubCoreController);
-
-							break;
-						}
+						break;
+					}
 				}
 
 				if (gameControllerType == null)
@@ -191,6 +191,14 @@ namespace SkyCore
 				_initializeCustomGame(Activator.CreateInstance(gameControllerType, this) as CoreGameController);
 				Thread.Sleep(1000); //Pause the main thread for a second to ensure the levels are setup and avoid any CME
 				SkyUtil.log($"Finished Initializing {gameName}");
+
+				//Register all remaining games
+				bool spawnNPC = gameName.Equals("Pure Hub");
+
+				ExternalGameHandler.RegisterGameIntent("murder", spawnNPC);
+				ExternalGameHandler.RegisterGameIntent("build-battle", spawnNPC);
+				ExternalGameHandler.RegisterGameIntent("block-hunt", spawnNPC);
+				ExternalGameHandler.RegisterGameIntent("bed-wars", spawnNPC);
 			}
 			catch (Exception e)
 			{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Security.Policy;
 using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Utils;
@@ -42,11 +43,6 @@ namespace SkyCore.Games.Hub
 		public HubCoreController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>{"hub"})
 		{
 			Tick = 1;
-			
-			ExternalGameHandler.RegisterGameIntent("murder");
-			ExternalGameHandler.RegisterGameIntent("build-battle");
-			ExternalGameHandler.RegisterGameIntent("block-hunt");
-			ExternalGameHandler.RegisterGameIntent("bed-wars");
 			
 			//Register all hubs
 			for (int i = 0; i < MaxHubCount; i++)

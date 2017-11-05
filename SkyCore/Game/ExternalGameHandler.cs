@@ -36,7 +36,6 @@ namespace SkyCore.Game
 			server.MotdProvider = new SkyMotdProvider();
 			new Thread(() =>
 			{
-
 				while (!SkyCoreAPI.IsDisabled)
 				{
 					Thread.Sleep(1000); // Update every 1 second
@@ -100,62 +99,72 @@ namespace SkyCore.Game
 
 		//
 
-		public static void RegisterGameIntent(string gameName)
+		public static void RegisterGameIntent(string gameName, bool spawnNPC = false)
 		{
-			string neatName = gameName;
-			PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);
-
 			bool npcOnly = false; //Some games may not be completed. Use an NPC as a placeholder
-			switch (gameName)
+			if (spawnNPC)
 			{
-				case "murder":
+				string neatName = gameName;
+				PlayerLocation npcLocation = new PlayerLocation(0.5D, 30D, 16.5D, 180F, 180F, 0F);
+
+				switch (gameName)
 				{
-					neatName = "§c§lMurder Mystery";
-					npcLocation = new PlayerLocation(260.5, 77, 271.5, 180F, 180F, 0F);
-					break;
+					case "murder":
+					{
+						neatName = "§c§lMurder Mystery";
+						npcLocation = new PlayerLocation(260.5, 77, 271.5, 180F, 180F, 0F);
+						break;
+					}
+					case "build-battle":
+					{
+						neatName = "§e§lBuild Battle";
+						npcLocation = new PlayerLocation(252.5, 77, 271.5, 180F, 180F, 0F);
+						break;
+					}
+					case "block-hunt":
+					{
+						neatName = PlayerNPC.ComingSoonName;
+						npcLocation = new PlayerLocation(263.5, 77, 269.5, 180F, 180F, 0F);
+						npcOnly = true;
+						break;
+					}
+					case "bed-wars":
+					{
+						neatName = PlayerNPC.ComingSoonName;
+						npcLocation = new PlayerLocation(249.5, 77, 269.5, 180F, 180F, 0F);
+						npcOnly = true;
+						break;
+					}
 				}
-				case "build-battle":
+
+				if (!gameName.Equals("hub"))
 				{
-					neatName = "§e§lBuild Battle";
-					npcLocation = new PlayerLocation(252.5, 77, 271.5, 180F, 180F, 0F);
-					break;
-				}
-				case "block-hunt":
-				{
-					neatName = PlayerNPC.ComingSoonName;
-					npcLocation = new PlayerLocation(263.5, 77, 269.5, 180F, 180F, 0F);
-					npcOnly = true;
-					break;
-				}
-				case "bed-wars":
-				{
-					neatName = PlayerNPC.ComingSoonName;
-					npcLocation = new PlayerLocation(249.5, 77, 269.5, 180F, 180F, 0F);
-					npcOnly = true;
-					break;
+					try
+					{
+						PlayerNPC.SpawnHubNPC(null, neatName, npcLocation, $"GID:{gameName}");
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine(e);
+					}
 				}
 			}
 
-			if (!gameName.Equals("hub"))
 			{
-				try
+				if (!GameRegistrations.ContainsKey(gameName))
 				{
-					PlayerNPC.SpawnHubNPC(null, neatName, npcLocation, $"GID:{gameName}");
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
-			}
+					//Initialize GamePool
+					GamePool gamePool = GetGamePool(gameName);
 
-			{
-				//Initialize GamePool
-				GamePool gamePool = GetGamePool(gameName);
-
-				if (npcOnly)
+					if (npcOnly)
+					{
+						gamePool.Active = false;
+						return;
+					}
+				}
+				else
 				{
-					gamePool.Active = false;
-					return;
+					return; //Already listening, Don't start again.
 				}
 			}
 
