@@ -21,7 +21,7 @@ namespace SkyCore.Game.State.Impl
 			});
 
 	        //Spawn Lobby NPC
-	        PlayerNPC.SpawnLobbyNPC(gameLevel, "§eChange Game", new PlayerLocation(260.5, 10, 252.5));
+	        PlayerNPC.SpawnLobbyNPC(gameLevel, "", new PlayerLocation(260.5, 10, 252.5));
 
 			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\TestImage.bmp", 7, 4, gameLevel,
 				new BlockCoordinates(252, 10, 249));

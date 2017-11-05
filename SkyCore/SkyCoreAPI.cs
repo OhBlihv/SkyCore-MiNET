@@ -248,10 +248,6 @@ namespace SkyCore
             if (player == null) throw new ArgumentNullException(nameof(eventArgs.Player));
             Console.Write(" for " + player.Username + "\n");
 
-            player.Inventory.Slots[4] = new ItemCompass {Count = 1};
-
-            player.SendPlayerInventory();
-
 	        RunnableTask.RunTaskLater(() =>
 	        {
 		        player.SendTitle("§f", TitleType.Clear);

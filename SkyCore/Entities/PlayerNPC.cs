@@ -229,13 +229,20 @@ namespace SkyCore.Entities
 				}
 
 				//Ensure this NPC can be seen
-				PlayerNPC npc = new PlayerNPC("", level, spawnLocation) { Scale = 1.5 };
+				PlayerNPC npc = new PlayerNPC("", level, spawnLocation, GameUtil.ShowGameList) { Scale = 1.5 };
 
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
 					npc.KnownPosition = spawnLocation;
 
 					npc.SpawnEntity();
+
+					PlayerLocation gameNameLocation = (PlayerLocation)spawnLocation.Clone();
+					gameNameLocation.Y += 3.1f;
+
+					Hologram changeGameHologram = new Hologram("§eChange Game", level, gameNameLocation);
+
+					changeGameHologram.SpawnEntity();
 				});
 
 				Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
