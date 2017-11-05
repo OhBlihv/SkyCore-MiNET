@@ -27,11 +27,6 @@ namespace SkyCore.Game.State.Impl
 				new BlockCoordinates(252, 10, 249));
 		}
 
-        public override void LeaveState(GameLevel gameController)
-        {
-            
-        }
-
         public override bool CanAddPlayer(GameLevel gameLevel)
         {
 	        return gameLevel.GetPlayerCount() < gameLevel.GetMaxPlayers();
@@ -54,16 +49,6 @@ namespace SkyCore.Game.State.Impl
 
 	        player.SendPlayerInventory();
 		}
-
-        public override void HandleLeave(GameLevel gameController, SkyPlayer player)
-        {
-            
-        }
-
-        public override void HandleDamage(GameLevel gameLevel, Entity source, Entity target, Item item, int damage, DamageCause damageCause)
-        {
-            //No damage during Lobby Phase
-        }
 
         public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {

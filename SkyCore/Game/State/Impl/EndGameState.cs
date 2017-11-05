@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
-using MiNET;
-using MiNET.Entities;
-using MiNET.Items;
-using MiNET.Net;
-using MiNET.Worlds;
 using SkyCore.Game.Items;
 using SkyCore.Game.Level;
-using SkyCore.Games.Murder;
-using SkyCore.Games.Murder.State;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -62,21 +51,6 @@ namespace SkyCore.Game.State.Impl
         public override bool CanAddPlayer(GameLevel gameLevel)
         {
             return false;
-        }
-
-        public override void InitializePlayer(GameLevel gameLevel, SkyPlayer player)
-        {
-            
-        }
-
-        public override void HandleLeave(GameLevel gameLevel, SkyPlayer player)
-        {
-            
-        }
-
-        public override void HandleDamage(GameLevel gameLevel, Entity source, Entity target, Item item, int damage, DamageCause damageCause)
-        {
-            //No damage during End Game Phase
         }
 
         public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)

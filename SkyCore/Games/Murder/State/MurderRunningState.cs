@@ -5,13 +5,11 @@ using System.Threading;
 using MiNET;
 using MiNET.Effects;
 using MiNET.Entities;
-using MiNET.Entities.Projectiles;
 using MiNET.Items;
 using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Utils;
 using MiNET.Worlds;
-using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
@@ -26,14 +24,10 @@ namespace SkyCore.Games.Murder.State
     class MurderRunningState : RunningState
     {
 
-	    //private const int MaxGameTime = 120;
-	    public const int MaxGameTime = 300 * 2;
 	    public const int PreStartTime = 10;
 
 	    public const int MaxGunParts = 5;
 		public const int MaxGunAmmo = 5;
-
-        public int EndTick { get; set; } = -1; //Default value
 
         private static readonly List<PlayerLocation> GunPartLocations = new List<PlayerLocation>();
         private static readonly List<PlayerLocation> PlayerSpawnLocations = new List<PlayerLocation>();
@@ -43,10 +37,13 @@ namespace SkyCore.Games.Murder.State
         public readonly Dictionary<string, int> PlayerGunPartCounts = new Dictionary<string, int>();
         public readonly Dictionary<string, int> PlayerAmmoCounts = new Dictionary<string, int>();
 
-        public override void EnterState(GameLevel gameLevel)
-        {
-            base.EnterState(gameLevel);
+	    public MurderRunningState()
+	    {
+		    MaxGameTime = 300 * 2;
+	    }
 
+		public override void EnterState(GameLevel gameLevel)
+        {
             GunPartLocations.Clear();
             PlayerSpawnLocations.Clear();
 
@@ -201,8 +198,6 @@ namespace SkyCore.Games.Murder.State
 
         public override void LeaveState(GameLevel gameLevel)
         {
-            base.LeaveState(gameLevel);
-
             foreach (MurderGunPartEntity item in GunParts.Values)
             {
                 item.DespawnEntity();
@@ -280,48 +275,7 @@ namespace SkyCore.Games.Murder.State
 		        return;
 	        }
 
-	        /*{
-				PlayerLocation soundLocation = PlayerSpawnLocations[_random.Next(PlayerSpawnLocations.Count)];
-		        Vector3 soundVector = new Vector3(soundLocation.X, soundLocation.Y, soundLocation.Z);
-
-		        Sound sound;
-
-		        switch (_random.Next(2))
-		        {
-			        case 0:
-				        sound = new DoorCloseSound(soundVector);
-				        break;
-					case 1:
-						sound = new FizzSound(soundVector);
-						break;
-					default:
-						sound = new BlazeFireballSound(soundVector);
-						break;
-		        }
-
-		        sound.Spawn(gameLevel);
-			}*/
-
-	        string neatRemaining;
-	        {
-		        int minutes = 0;
-				while (secondsLeft >= 60)
-				{
-					secondsLeft -= 60;
-					minutes++;
-				}
-
-		        neatRemaining = minutes + ":";
-
-		        if (secondsLeft < 10)
-		        {
-			        neatRemaining += "0" + secondsLeft;
-		        }
-		        else
-		        {
-			        neatRemaining += secondsLeft;
-		        }
-	        }
+	        string neatRemaining = GetNeatTimeRemaining(secondsLeft);
 
             gameLevel.DoForPlayersIn(player =>
             {
@@ -358,7 +312,6 @@ namespace SkyCore.Games.Murder.State
 				if (player.IsSprinting && gameLevel.GetPlayerTeam(player) != MurderTeam.Murderer)
 				{
 					player.SetSprinting(false);
-					//TODO: Enforce some freeze for hacking players?
 				}
 			});
 
