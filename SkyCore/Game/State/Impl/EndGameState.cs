@@ -55,7 +55,7 @@ namespace SkyCore.Game.State.Impl
 			{
 				player.RemoveAllEffects();
 
-				ExternalGameHandler.RequeuePlayer(player, gameLevel.GameType);
+				ExternalGameHandler.AddPlayer(player, "hub");
 			});
 		}
 
