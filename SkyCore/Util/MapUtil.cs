@@ -63,6 +63,9 @@ namespace SkyCore.Util
 						cachedMap = CachedMaps[imageLocation];
 						image = cachedMap.CachedImage;
 						SkyUtil.log("Using Cached Map Image");
+
+						//Dodgily ensure the building flag is disabled
+						cachedMap.IsBuilding = false;
 					}
 					else
 					{
@@ -73,8 +76,6 @@ namespace SkyCore.Util
 
 						image = new Bitmap((Bitmap) Image.FromFile(imageLocation), width * 128, height * 128);
 						cachedMap = new CachedMap(image);
-
-						CachedMaps.TryAdd(imageLocation, cachedMap);
 
 						SkyUtil.log("Creating/Loading new Cached Map Image");
 					}
@@ -114,18 +115,23 @@ namespace SkyCore.Util
 								Coordinates = frambc
 							};
 
-							var itemFrame = new CustomItemFrame(frame, itemFrameBlockEntity, level)
+							var itemFrame = new FullyLuminousItemFrame(frame, itemFrameBlockEntity, level)
 							{
 								Coordinates = frambc,
 								Metadata = 2,
-								BlockLight = 15
+								BlockLight = 15,
+								SkyLight = 15
 							};
-							level.SetBlock(itemFrame);
+							level.SetBlock(itemFrame, true, false, true);
 							level.SetBlockEntity(itemFrameBlockEntity);
 						}
 					}
 
-					cachedMap.IsBuilding = false; //Completely Cached
+					if (cachedMap.IsBuilding)
+					{
+						CachedMaps.TryAdd(imageLocation, cachedMap);
+						cachedMap.IsBuilding = false; //Completely Cached
+					}
 				}
 				catch (Exception e)
 				{
@@ -192,12 +198,12 @@ namespace SkyCore.Util
 
 	}
 
-	public class CustomItemItemFrame : ItemItemFrame
+	public class FullyLuminousItemFrameItem : ItemItemFrame
 	{
 
 		private readonly MapEntity _frame;
 
-		public CustomItemItemFrame(MapEntity frame)
+		public FullyLuminousItemFrameItem(MapEntity frame)
 		{
 			_frame = frame;
 		}
@@ -211,7 +217,7 @@ namespace SkyCore.Util
 				Coordinates = coor
 			};
 
-			CustomItemFrame itemFrame = new CustomItemFrame(_frame, itemFrameBlockEntity, world)
+			FullyLuminousItemFrame itemFrame = new FullyLuminousItemFrame(_frame, itemFrameBlockEntity, world)
 			{
 				Coordinates = coor,
 			};
@@ -226,13 +232,17 @@ namespace SkyCore.Util
 		}
 	}
 
-	public class CustomItemFrame : ItemFrame
+	public class FullyLuminousItemFrame : ItemFrame
 	{
-		public CustomItemFrame(MapEntity frame, ItemFrameBlockEntity itemFrameBlockEntity, Level level)
+
+		public FullyLuminousItemFrame()
 		{
 			IsTransparent = true;
 			LightLevel = 15; //Full Bright
+		}
 
+		public FullyLuminousItemFrame(MapEntity frame, ItemFrameBlockEntity itemFrameBlockEntity, Level level) : this()
+		{
 			ItemMap map = new ItemMap(frame.EntityId);
 
 			ItemFrameBlockEntity blockEntity = itemFrameBlockEntity;

@@ -66,7 +66,7 @@ namespace SkyCore.Util
 			}
 		}
 
-		private static void RecalculateLight(Level level, AnvilWorldProvider anvilWorldProvider)
+		public static void RecalculateLight(Level level, AnvilWorldProvider anvilWorldProvider)
 		{
 			SkyLightCalculations.Calculate(level);
 

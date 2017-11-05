@@ -79,6 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blocks\SkyBlockFactory.cs" />
     <Compile Include="Commands\Commands.cs" />
     <Compile Include="Database\DatabaseAction.cs" />
     <Compile Include="Entities\Holograms\Hologram.cs" />

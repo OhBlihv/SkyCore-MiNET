@@ -5,12 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using MiNET;
+using MiNET.Blocks;
 using MiNET.Items;
 using MiNET.Net;
 using MiNET.Plugins;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.Blocks;
 using SkyCore.Commands;
 using SkyCore.Entities;
 using SkyCore.Game;
@@ -140,6 +142,7 @@ namespace SkyCore
 
 			ExternalGameHandler.CurrentHostAddress = CurrentIp;
 
+			BlockFactory.CustomBlockFactory = new SkyBlockFactory();
 			server.LevelManager = new SkyLevelManager(this);
 
 			//Create Games once the LevelManager has been initialized to avoid launching without any levels
