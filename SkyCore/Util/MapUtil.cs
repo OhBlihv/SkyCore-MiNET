@@ -55,12 +55,13 @@ namespace SkyCore.Util
 			{
 				try
 				{
-					Bitmap image = null;
+					Bitmap image;
 					CachedMap cachedMap;
 
 					if (CachedMaps.ContainsKey(imageLocation))
 					{
 						cachedMap = CachedMaps[imageLocation];
+						image = cachedMap.CachedImage;
 						SkyUtil.log("Using Cached Map Image");
 					}
 					else
