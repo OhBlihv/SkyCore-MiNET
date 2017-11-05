@@ -99,7 +99,7 @@ namespace SkyCore.Games.Murder.State
 			            player.IsAlwaysShowName = false;
 			            player.SetNameTagVisibility(false);
 
-						player.SetNoAi(true);
+						player.Freeze(true);
 
 						player.HungerManager.Hunger = 6; //Set food to 'unable to run' level.
 						player.SendUpdateAttributes(); //TODO: Not required? Or is this required for Hunger
@@ -117,7 +117,7 @@ namespace SkyCore.Games.Murder.State
 							//Poorly enforce speed
 							if (i == 0 || i == 11)
 							{
-								player.SetNoAi(true);
+								player.Freeze(true);
 								player.SetHideNameTag(true);
 								player.IsAlwaysShowName = false;
 								player.SetNameTagVisibility(false);
@@ -180,7 +180,7 @@ namespace SkyCore.Games.Murder.State
 					{
 						player.SendAdventureSettings();
 
-						player.SetNoAi(false);
+						player.Freeze(false);
 
 						//Ensure this player is at the correct spawn location
 						if (gameLevel.GetBlock(player.KnownPosition).Id != 0)

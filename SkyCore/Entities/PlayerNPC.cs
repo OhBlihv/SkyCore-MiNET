@@ -141,7 +141,7 @@ namespace SkyCore.Entities
 									action = player =>
 									{
 										//Freeze the players movement
-										player.SetNoAi(true);
+										player.Freeze(true);
 										RunnableTask.RunTaskLater(() => ExternalGameHandler.AddPlayer(player, gameName), 200);
 									};
 									break;

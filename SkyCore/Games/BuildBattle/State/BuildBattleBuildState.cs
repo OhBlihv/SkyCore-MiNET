@@ -42,7 +42,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 						player.Teleport(gameTeam.SpawnLocation);
 
-						player.SetNoAi(true);
+						player.Freeze(true);
 
 						player.UseCreativeInventory = true;
 						player.UpdateGameMode(GameMode.Creative, false);
@@ -62,7 +62,7 @@ namespace SkyCore.Games.BuildBattle.State
 						//Poorly enforce speed
 						if (i == 0 || i == 11)
 						{
-							player.SetNoAi(true);
+							player.Freeze(true);
 						}
 					}
 
@@ -72,7 +72,7 @@ namespace SkyCore.Games.BuildBattle.State
 				SelectedCategory = categoryRotation[new Random().Next(categoryRotation.Count)];
 				gameLevel.DoForAllPlayers(player =>
 				{
-					player.SetNoAi(false);
+					player.Freeze(false);
 					
 					player.IsWorldImmutable = true; //Allow breaking
 					player.IsWorldBuilder = false;

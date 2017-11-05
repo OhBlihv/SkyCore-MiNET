@@ -465,7 +465,7 @@ namespace SkyCore.Game
 					TitleUtil.SendCenteredSubtitle(player, " §c§lGAME UNAVAILABLE§r" + "\n" + "§7Try joining again soon!", false);
 				}
 				
-				player.SetNoAi(false); //Unfreeze
+				player.Freeze(false); //Unfreeze
 			}
 			else
 			{

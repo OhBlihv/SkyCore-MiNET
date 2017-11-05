@@ -229,6 +229,27 @@ namespace SkyCore.Player
             }
         }
 
+		//
+
+	    private bool _freeze;
+
+	    public void Freeze(bool freeze)
+	    {
+		    _freeze = freeze;
+		    SetNoAi(freeze);
+		}
+
+	    public override void HandleMcpeMovePlayer(McpeMovePlayer message)
+	    {
+		    if (_freeze)
+		    {
+				Teleport(KnownPosition);
+			    return;
+		    }
+
+		    base.HandleMcpeMovePlayer(message);
+	    }
+
 	    public override void HandleMcpeAnimate(McpeAnimate message)
 	    {
 		    if (message.actionId != 1)
