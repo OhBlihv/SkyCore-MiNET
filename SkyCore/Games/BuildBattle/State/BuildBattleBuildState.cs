@@ -45,6 +45,9 @@ namespace SkyCore.Games.BuildBattle.State
 
 						player.Freeze(true);
 
+						player.SetAllowFly(true);
+						player.IsFlying = true;
+
 						player.UseCreativeInventory = true;
 						player.UpdateGameMode(GameMode.Creative, false);
 

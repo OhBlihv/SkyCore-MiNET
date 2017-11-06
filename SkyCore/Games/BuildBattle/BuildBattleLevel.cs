@@ -34,17 +34,17 @@ namespace SkyCore.Games.BuildBattle
 				PlayerLocation spawnLocation;
 				switch (i)
 				{
-					case 0: teamName = "§aGreen";      spawnLocation = new PlayerLocation(213.5, 66, 297.5); break;
-					case 1: teamName = "§bAqua";       spawnLocation = new PlayerLocation(213.5, 66, 255.5); break;
-					case 2: teamName = "§cRed";        spawnLocation = new PlayerLocation(213.5, 66, 213.5); break;
-					case 3: teamName = "§dPink";       spawnLocation = new PlayerLocation(255.5, 66, 213.5); break;
-					case 4: teamName = "§eYellow";     spawnLocation = new PlayerLocation(255.5, 66, 255.5); break;
-					case 5: teamName = "§fWhite";      spawnLocation = new PlayerLocation(255.5, 66, 297.5); break;
-					case 6: teamName = "§5Purple";     spawnLocation = new PlayerLocation(297.5, 66, 297.5); break;
-					case 7: teamName = "§6Gold";       spawnLocation = new PlayerLocation(297.5, 66, 255.5); break;
-					case 8: teamName = "§7Grey";       spawnLocation = new PlayerLocation(297.5, 66, 213.5); break;
-					case 9: teamName = "§9Indigo";     spawnLocation = new PlayerLocation(213.5, 66, 297.5); break;
-					default: teamName = "§8Dark Grey"; spawnLocation = new PlayerLocation(213.5, 66, 297.5); break;
+					case 0: teamName = "§aGreen";      spawnLocation = new PlayerLocation(213.5, 70, 297.5); break;
+					case 1: teamName = "§bAqua";       spawnLocation = new PlayerLocation(213.5, 70, 255.5); break;
+					case 2: teamName = "§cRed";        spawnLocation = new PlayerLocation(213.5, 70, 213.5); break;
+					case 3: teamName = "§dPink";       spawnLocation = new PlayerLocation(255.5, 70, 213.5); break;
+					case 4: teamName = "§eYellow";     spawnLocation = new PlayerLocation(255.5, 70, 255.5); break;
+					case 5: teamName = "§fWhite";      spawnLocation = new PlayerLocation(255.5, 70, 297.5); break;
+					case 6: teamName = "§5Purple";     spawnLocation = new PlayerLocation(297.5, 70, 297.5); break;
+					case 7: teamName = "§6Gold";       spawnLocation = new PlayerLocation(297.5, 70, 255.5); break;
+					case 8: teamName = "§7Grey";       spawnLocation = new PlayerLocation(297.5, 70, 213.5); break;
+					case 9: teamName = "§9Indigo";     spawnLocation = new PlayerLocation(213.5, 70, 297.5); break;
+					default: teamName = "§8Dark Grey"; spawnLocation = new PlayerLocation(213.5, 70, 297.5); break;
 				}
 
 				BuildBattleTeam colourTeam = new BuildBattleTeam(i, teamName, spawnLocation);
