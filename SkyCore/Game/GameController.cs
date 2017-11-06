@@ -229,7 +229,13 @@ namespace SkyCore.Game
 			    {
 				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
 
-				    return (GameLevelInfo) JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename), GetGameLevelInfoType(), new GameLevelInfoJsonConverter());
+				    GameLevelInfo gameLevelInfo = (GameLevelInfo) JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename),
+					    GetGameLevelInfoType(), new GameLevelInfoJsonConverter());
+
+					//Forcefully update/recalculate BlockCoordinates in-case the configuration was changed without modifying the Distance Property
+					gameLevelInfo.LobbyMapLocation = new BlockCoordinates(gameLevelInfo.LobbyMapLocation.X, gameLevelInfo.LobbyMapLocation.Y, gameLevelInfo.LobbyMapLocation.Z);
+
+					return gameLevelInfo;
 			    }
 
 				SkyUtil.log($"Could not find '{levelInfoFilename} for level. Not loading.");
