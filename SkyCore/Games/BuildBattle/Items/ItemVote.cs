@@ -9,13 +9,13 @@ using MiNET.Items;
 
 namespace SkyCore.Games.BuildBattle.Items
 {
-	public class ItemVote : ItemBlock
+	public class ItemVote : Item
 	{
 
 		private readonly int _voteValue;
 		private readonly string _votePlayer;
 
-		public ItemVote(int voteValue, string votePlayer) : base(new StainedGlassPane(), (short) GetVoteId(_getCorrectedVoteValue(voteValue)))
+		public ItemVote(int voteValue, string votePlayer) : base(160, (short) GetVoteId(_getCorrectedVoteValue(voteValue)))
 		{
 			_voteValue = _getCorrectedVoteValue(voteValue);
 
