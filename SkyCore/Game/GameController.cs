@@ -316,8 +316,7 @@ namespace SkyCore.Game
 			SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 			lock (GameLevels)
 			{
-				GameLevel targetedGame = GameLevels[gameInfo.GameId];
-				if (targetedGame == null || !targetedGame.CurrentState.CanAddPlayer(targetedGame))
+				if (!GameLevels.TryGetValue(gameInfo.GameId, out var targetedGame) || !targetedGame.CurrentState.CanAddPlayer(targetedGame))
 				{
 					return false;
 				}
