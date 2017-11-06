@@ -30,7 +30,7 @@ namespace SkyCore.Game.State.Impl
 		        SkyUtil.log($"LobbyNPCLocation Updated with default value for {gameLevel.LevelName}");
 	        }
 
-	        PlayerNPC.SpawnLobbyNPC(gameLevel, "", gameLevel.GameLevelInfo.LobbyNPCLocation);
+	        PlayerNPC.SpawnLobbyNPC(gameLevel, gameLevelInfo.GameType, gameLevel.GameLevelInfo.LobbyNPCLocation);
 
 	        //Spawn Lobby Map/Image
 	        if (gameLevelInfo.LobbyMapLocation.Y < 0) //Default == -1

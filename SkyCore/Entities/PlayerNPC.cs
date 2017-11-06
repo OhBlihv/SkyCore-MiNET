@@ -217,19 +217,12 @@ namespace SkyCore.Entities
 			}
         }
 
-		public static void SpawnLobbyNPC(GameLevel level, string npcName, PlayerLocation spawnLocation)
+		public static void SpawnLobbyNPC(GameLevel level, string gameName, PlayerLocation spawnLocation)
 		{
 			try
 			{
-				npcName = npcName.Replace("_", " ").Replace("&", "§");
-
-				if (npcName.Equals("\"\""))
-				{
-					npcName = "";
-				}
-
 				//Ensure this NPC can be seen
-				PlayerNPC npc = new PlayerNPC("", level, spawnLocation, GameUtil.ShowGameList) { Scale = 1.5 };
+				PlayerNPC npc = new PlayerNPC("", level, spawnLocation, GameUtil.ShowGameList, gameName) { Scale = 1.5 };
 
 				SkyCoreAPI.Instance.AddPendingTask(() =>
 				{
@@ -244,8 +237,6 @@ namespace SkyCore.Entities
 
 					changeGameHologram.SpawnEntity();
 				});
-
-				Console.WriteLine($"§e§l(!) §r§eSpawned NPC with text '{npcName}§r'");
 			}
 			catch (Exception e)
 			{
