@@ -93,5 +93,15 @@ namespace SkyCore.Games.Hub
 			return typeof(GameLevelInfo); //Nothing Custom
 		}
 
+		protected override bool HandleGameEditCommand(SkyPlayer player, GameLevel gameLevel, GameLevelInfo gameLevelInfo, params string[] args)
+		{
+			return false;
+		}
+
+		protected override string GetGameEditCommandHelp(SkyPlayer player)
+		{
+			return null;
+		}
+
 	}
 }
