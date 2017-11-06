@@ -24,7 +24,9 @@ namespace SkyCore.Game.Level
 
 		public PlayerLocation LobbyLocation { get; set; }
 
-		public PlayerLocation LobbyNPCLocation { get; set; }
+		public PlayerLocation LobbyNPCLocation { get; set; } = new PlayerLocation(260.5, 16, 251.5);
+
+		public BlockCoordinates LobbyMapLocation { get; set; } = new BlockCoordinates(0, -1, 0);
 
 		//JSON Loading
 		public GameLevelInfo()

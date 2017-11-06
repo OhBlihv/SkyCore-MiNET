@@ -19,10 +19,12 @@ namespace SkyCore.Game.State.Impl
 				player.RemoveAllEffects();
 			});
 
+	        GameLevelInfo gameLevelInfo = gameLevel.GameLevelInfo;
+
 	        //Spawn Lobby NPC
-	        if (gameLevel.GameLevelInfo.LobbyNPCLocation == null)
+	        if (gameLevelInfo.LobbyNPCLocation == null)
 	        {
-		        gameLevel.GameLevelInfo.LobbyNPCLocation = new PlayerLocation(260.5, 16, 251.5);
+		        gameLevelInfo.LobbyNPCLocation = new PlayerLocation(260.5, 16, 251.5);
 
 				File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
 		        SkyUtil.log($"LobbyNPCLocation Updated with default value for {gameLevel.LevelName}");
@@ -30,8 +32,16 @@ namespace SkyCore.Game.State.Impl
 
 	        PlayerNPC.SpawnLobbyNPC(gameLevel, "", gameLevel.GameLevelInfo.LobbyNPCLocation);
 
-			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\TestImage.bmp", 7, 4, gameLevel,
-				new BlockCoordinates(252, 10, 249));
+	        //Spawn Lobby Map/Image
+	        if (gameLevelInfo.LobbyMapLocation.Y < 0) //Default == -1
+	        {
+		        gameLevelInfo.LobbyMapLocation = new BlockCoordinates(252, 16, 249);
+
+		        File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
+		        SkyUtil.log($"LobbyMapLocation Updated with default value for {gameLevel.LevelName}");
+	        }
+
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation);
 		}
 
 	    public override void LeaveState(GameLevel gameLevel)
