@@ -1,5 +1,7 @@
-﻿using MiNET.Items;
+﻿using System.IO;
+using MiNET.Items;
 using MiNET.Utils;
+using Newtonsoft.Json;
 using SkyCore.Entities;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -18,7 +20,15 @@ namespace SkyCore.Game.State.Impl
 			});
 
 	        //Spawn Lobby NPC
-	        PlayerNPC.SpawnLobbyNPC(gameLevel, "", new PlayerLocation(260.5, 10, 251.5));
+	        if (gameLevel.GameLevelInfo.LobbyNPCLocation == null)
+	        {
+		        gameLevel.GameLevelInfo.LobbyNPCLocation = new PlayerLocation(260.5, 16, 251.5);
+
+				File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
+		        SkyUtil.log($"LobbyNPCLocation Updated with default value for {gameLevel.LevelName}");
+	        }
+
+	        PlayerNPC.SpawnLobbyNPC(gameLevel, "", gameLevel.GameLevelInfo.LobbyNPCLocation);
 
 			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\TestImage.bmp", 7, 4, gameLevel,
 				new BlockCoordinates(252, 10, 249));

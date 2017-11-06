@@ -200,6 +200,11 @@ namespace SkyCore.Game
 		    return gameLevelInfo;
 	    }
 
+	    public static string GetGameLevelInfoLocation(string rawGameName, string levelName)
+	    {
+			return $@"C:\Users\Administrator\Desktop\worlds\{rawGameName}\{rawGameName}-{levelName}.json";
+		}
+
 	    public GameLevelInfo LoadGameLevelInfo(string levelName)
 	    {
 		    try
@@ -211,8 +216,7 @@ namespace SkyCore.Game
 				    shortLevelName = levelNameSplit[levelNameSplit.Length - 1];
 			    }
 
-			    string levelInfoFilename =
-				    $"C:\\Users\\Administrator\\Desktop\\worlds\\{RawName}\\{RawName}-{shortLevelName}.json";
+			    string levelInfoFilename = GetGameLevelInfoLocation(RawName, shortLevelName);
 
 				if (File.Exists(levelInfoFilename))
 			    {

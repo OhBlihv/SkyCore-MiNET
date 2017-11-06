@@ -24,6 +24,8 @@ namespace SkyCore.Game.Level
 
 		public PlayerLocation LobbyLocation { get; set; }
 
+		public PlayerLocation LobbyNPCLocation { get; set; }
+
 		//JSON Loading
 		public GameLevelInfo()
 		{
