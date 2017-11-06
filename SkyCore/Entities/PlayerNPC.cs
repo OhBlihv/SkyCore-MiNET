@@ -37,11 +37,11 @@ namespace SkyCore.Entities
 	        if (string.IsNullOrEmpty(gameName))
 	        {
 				Skin = new Skin { SkinData = Skin.GetTextureFromFile("Skin.png") };
-			}
+	        }
 	        else
 	        {
-				Skin = new Skin { SkinData = Skin.GetTextureFromFile($"..\\npc-skins\\{gameName}-npc.png") };
-			}
+				Skin = new Skin { SkinData = Skin.GetTextureFromFile($@"C:\Users\Administrator\Desktop\npc-skins\{gameName}-npc.png") };
+	        }
 
 			Scale = 1.8D; //Ensure this NPC is visible
 
