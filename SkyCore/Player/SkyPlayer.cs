@@ -8,6 +8,7 @@ using MiNET.Utils;
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Worlds;
+using SkyCore.BugSnag;
 using SkyCore.Database;
 using SkyCore.Entities;
 using SkyCore.Game;
@@ -16,10 +17,11 @@ using SkyCore.Game.State;
 using SkyCore.Punishments;
 using SkyCore.Statistics;
 using SkyCore.Util;
+using Bugsnag;
 
 namespace SkyCore.Player
 {
-    public class SkyPlayer : MiNET.Player
+    public class SkyPlayer : MiNET.Player, IBugSnagMetadatable
     {
 
         public readonly SkyCoreAPI SkyCoreApi;
@@ -225,13 +227,24 @@ namespace SkyCore.Player
 			}
             catch (Exception e)
             {
-                Console.WriteLine(e);
-            }
+				BugSnagUtil.ReportBug(this, e);
+			}
         }
+
+	    public void PopulateMetadata(Metadata metadata)
+	    {
+		    metadata.AddToTab("SkyPlayer", "Username", Username);
+		    metadata.AddToTab("SkyPlayer", "XUID", CertificateData.ExtraData.Xuid);
+		    metadata.AddToTab("SkyPlayer", "UUID", CertificateData.ExtraData.Identity);
+		    metadata.AddToTab("SkyPlayer", "GameTeam", GameTeam);
+		    metadata.AddToTab("SkyPlayer", "Game Name", (Level as GameLevel)?.GameType);
+		    metadata.AddToTab("SkyPlayer", "Game Id", (Level as GameLevel)?.GameId);
+			metadata.AddToTab("SkyPlayer", "Level Name", Level?.LevelName);
+	    }
 
 		//
 
-	    private bool _freeze;
+		private bool _freeze;
 
 	    public void Freeze(bool freeze)
 	    {
@@ -425,7 +438,6 @@ namespace SkyCore.Player
 	    {
 		    return $"SkyPlayer: {Username}";
 	    }
-
-    }
+	}
 
 }

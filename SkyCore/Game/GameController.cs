@@ -6,11 +6,13 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Threading;
+using Bugsnag;
 using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
 using Newtonsoft.Json;
+using SkyCore.BugSnag;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
@@ -22,7 +24,7 @@ using StackExchange.Redis;
 
 namespace SkyCore.Game
 {
-    public abstract class GameController : IDisposable
+    public abstract class GameController : IDisposable, IBugSnagMetadatable
     {
 
 	    public const int MaxGames = 30;
@@ -121,8 +123,8 @@ namespace SkyCore.Game
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-            }
+	            BugSnagUtil.ReportBug(this, e);
+			}
         }
 
 		protected int Tick = 1;
@@ -580,5 +582,14 @@ namespace SkyCore.Game
 
 	    protected abstract string GetGameEditCommandHelp(SkyPlayer player);
 
+	    public void PopulateMetadata(Metadata metadata)
+	    {
+		    metadata.AddToTab("GameController", "GameName", RawName);
+		    metadata.AddToTab("GameController", "Registered Levels", LevelNames);
+			metadata.AddToTab("GameController", "Active Games", GameLevels);
+			metadata.AddToTab("GameController", "Queued Players", QueuedPlayers);
+			metadata.AddToTab("GameController", "Next Redis Game Id", RedisGameIdKey);
+		    
+	    }
     }
 }

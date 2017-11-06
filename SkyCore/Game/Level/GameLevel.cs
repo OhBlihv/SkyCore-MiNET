@@ -13,12 +13,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
+using Bugsnag;
 using MiNET.Net;
+using SkyCore.BugSnag;
 using SkyCore.Entities;
 
 namespace SkyCore.Game.Level
 {
-	public abstract class GameLevel : MiNET.Worlds.Level, IDisposable, IComparable<GameLevel>
+	public abstract class GameLevel : MiNET.Worlds.Level, IDisposable, IComparable<GameLevel>, IBugSnagMetadatable
     {
 
 	    public new string LevelName { get; }
@@ -278,7 +280,7 @@ namespace SkyCore.Game.Level
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                BugSnagUtil.ReportBug(this, e);
             }
         }
 
@@ -311,8 +313,15 @@ namespace SkyCore.Game.Level
 		        player.Teleport(GameLevelInfo.LobbyLocation);
 	        }
 
-			CurrentState.InitializePlayer(this, player);
-
+	        try
+	        {
+		        CurrentState.InitializePlayer(this, player);
+			}
+	        catch (Exception e)
+			{
+		        BugSnagUtil.ReportBug(this, e);
+			}
+			
 	        //Update Time
 			McpeSetTime message = McpeSetTime.CreateObject();
 	        message.time = GameLevelInfo.WorldTime;
@@ -667,7 +676,22 @@ namespace SkyCore.Game.Level
 			};
 			return rules;
 		}
-	}
+
+	    public void PopulateMetadata(Metadata metadata)
+	    {
+			//Populate information about the parent GameController
+			SkyCoreAPI.Instance.GameModes[GameType].PopulateMetadata(metadata);
+
+			metadata.AddToTab("GameLevel", "GameName", GameType);
+		    metadata.AddToTab("GameLevel", "GameId", GameId);
+		    metadata.AddToTab("GameLevel", "LevelName", LevelName);
+		    metadata.AddToTab("GameLevel", "Tick", Tick);
+		    metadata.AddToTab("GameLevel", "Incoming Players", _incomingPlayers);
+		    metadata.AddToTab("GameLevel", "Player -> Team Dictionary", PlayerTeamDict);
+		    metadata.AddToTab("GameLevel", "Team -> Player Dictionary", TeamPlayerDict);
+		    metadata.AddToTab("GameLevel", "GameLevelInfo", GameLevelInfo);
+		}
+    }
 	
     
 }

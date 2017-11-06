@@ -34,6 +34,9 @@
     <Reference Include="AStarNavigator, Version=1.0.63.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AStarNavigator.1.0.63\lib\net35\AStarNavigator.dll</HintPath>
     </Reference>
+    <Reference Include="Bugsnag, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bugsnag.1.4.0.0\lib\Net45\Bugsnag.dll</HintPath>
+    </Reference>
     <Reference Include="fNbt, Version=1.0.12.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MiNET.fnbt.1.0.12\lib\net461\fNbt.dll</HintPath>
     </Reference>
@@ -80,6 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blocks\SkyBlockFactory.cs" />
+    <Compile Include="BugSnag\BugSnagUtil.cs" />
+    <Compile Include="BugSnag\IBugSnagMetadatable.cs" />
     <Compile Include="Commands\Commands.cs" />
     <Compile Include="Database\DatabaseAction.cs" />
     <Compile Include="Entities\Holograms\Hologram.cs" />

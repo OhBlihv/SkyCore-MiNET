@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Bugsnag.Clients;
 using MiNET;
 using MiNET.Blocks;
 using MiNET.Items;
@@ -13,6 +14,7 @@ using MiNET.Plugins.Attributes;
 using MiNET.Utils;
 using MiNET.Worlds;
 using SkyCore.Blocks;
+using SkyCore.BugSnag;
 using SkyCore.Commands;
 using SkyCore.Entities;
 using SkyCore.Game;
@@ -48,7 +50,7 @@ namespace SkyCore
 
 		public string GameType { get; private set; }
 
-        public readonly ConcurrentDictionary<string, GameController> GameModes = new ConcurrentDictionary<string, GameController>();
+		public readonly ConcurrentDictionary<string, GameController> GameModes = new ConcurrentDictionary<string, GameController>();
 
 		private readonly List<PendingTask> _pendingTasks = new List<PendingTask>();
 		public delegate void PendingTask();
@@ -72,6 +74,8 @@ namespace SkyCore
 
         public void OnEnable(PluginContext context)
         {
+			BugSnagUtil.Init();
+
 			context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
 	        context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
 
