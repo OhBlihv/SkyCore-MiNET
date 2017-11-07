@@ -39,7 +39,7 @@ namespace SkyCore.Util
 			_player = player;
 		}
 
-		public void AddMinorLine(string line, int expiryTicks = 4, int priority = 5)
+		public void AddMinorLine(string line, int expiryTicks = 2, int priority = 5)
 		{
 			AddToPriorityQueue(_barContentQueue, priority, line, expiryTicks);
 		}
