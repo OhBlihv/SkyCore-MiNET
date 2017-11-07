@@ -219,32 +219,30 @@ namespace SkyCore.Entities
 			}
         }
 
-		public static void SpawnLobbyNPC(GameLevel level, string gameName, PlayerLocation spawnLocation)
+		public static List<Entity> SpawnLobbyNPC(GameLevel level, string gameName, PlayerLocation spawnLocation)
 		{
-			try
+			//Ensure this NPC can be seen
+			PlayerNPC npc = new PlayerNPC("", level, spawnLocation, GameUtil.ShowGameList, gameName)
 			{
-				//Ensure this NPC can be seen
-				PlayerNPC npc = new PlayerNPC("", level, spawnLocation, GameUtil.ShowGameList, gameName) { Scale = 1.5 };
+				Scale = 1.5,
+				KnownPosition = spawnLocation
+			};
 
-				SkyCoreAPI.Instance.AddPendingTask(() =>
-				{
-					npc.KnownPosition = spawnLocation;
+			PlayerLocation gameNameLocation = (PlayerLocation)spawnLocation.Clone();
+			gameNameLocation.Y += 3.1f;
 
-					npc.SpawnEntity();
+			Hologram changeGameHologram = new Hologram("§eChange Game", level, gameNameLocation);
 
-					PlayerLocation gameNameLocation = (PlayerLocation)spawnLocation.Clone();
-					gameNameLocation.Y += 3.1f;
-
-					Hologram changeGameHologram = new Hologram("§eChange Game", level, gameNameLocation);
-
-					changeGameHologram.SpawnEntity();
-				});
-			}
-			catch (Exception e)
+			SkyCoreAPI.Instance.AddPendingTask(() =>
 			{
-				Console.WriteLine(e);
-				throw;
-			}
+				npc.SpawnEntity();
+
+				changeGameHologram.SpawnEntity();
+			});
+
+			List<Entity> spawnedEntities = new List<Entity> {npc, changeGameHologram};
+
+			return spawnedEntities;
 		}
 
 	}

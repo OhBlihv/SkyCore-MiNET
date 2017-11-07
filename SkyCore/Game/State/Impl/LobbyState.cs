@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
 using Newtonsoft.Json;
@@ -13,6 +15,9 @@ namespace SkyCore.Game.State.Impl
 
     public abstract class LobbyState : GameState
     {
+
+	    private List<Entity> spawnedEntities = null;
+
         public override void EnterState(GameLevel gameLevel)
         {
             gameLevel.DoForAllPlayers(player =>
@@ -31,7 +36,7 @@ namespace SkyCore.Game.State.Impl
 		        SkyUtil.log($"LobbyNPCLocation Updated with default value for {gameLevel.LevelName}");
 	        }
 
-	        PlayerNPC.SpawnLobbyNPC(gameLevel, gameLevelInfo.GameType, gameLevel.GameLevelInfo.LobbyNPCLocation);
+	        spawnedEntities = PlayerNPC.SpawnLobbyNPC(gameLevel, gameLevelInfo.GameType, gameLevel.GameLevelInfo.LobbyNPCLocation);
 
 	        //Spawn Lobby Map/Image
 	        if (gameLevelInfo.LobbyMapLocation.Y < 0) //Default == -1
@@ -41,12 +46,17 @@ namespace SkyCore.Game.State.Impl
 		        File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
 	        }
 
-			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation);
+			spawnedEntities.AddRange(MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation));
 		}
 
 	    public override void LeaveState(GameLevel gameLevel)
 	    {
-		    //
+		    foreach (Entity entity in spawnedEntities)
+		    {
+			    entity.DespawnEntity();
+		    }
+
+			spawnedEntities.Clear();
 	    }
 
 		public override bool CanAddPlayer(GameLevel gameLevel)

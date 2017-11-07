@@ -9,6 +9,7 @@ using System.Numerics;
 using MiNET;
 using MiNET.BlockEntities;
 using MiNET.Blocks;
+using MiNET.Entities;
 using MiNET.Entities.ImageProviders;
 using MiNET.Entities.World;
 using MiNET.Items;
@@ -59,96 +60,98 @@ namespace SkyCore.Util
 		/**
 		 * Credit to @gurun, as what is below is based on his work.
 		 */
-		public static void SpawnMapImage(string imageLocation, int width, int height, Level level, BlockCoordinates spawnLocation, MapDirection mapDirection = MapDirection.South)
+		public static List<Entity> SpawnMapImage(string imageLocation, int width, int height, Level level, BlockCoordinates spawnLocation, MapDirection mapDirection = MapDirection.South)
 		{
-			RunnableTask.RunTask(() =>
+			List<Entity> spawnedEntities = new List<Entity>();
+			try
 			{
-				try
+				Bitmap image;
+				CachedMap cachedMap;
+
+				if (CachedMaps.ContainsKey(imageLocation))
 				{
-					Bitmap image;
-					CachedMap cachedMap;
+					cachedMap = CachedMaps[imageLocation];
+					image = cachedMap.CachedImage;
+					SkyUtil.log("Using Cached Map Image");
 
-					if (CachedMaps.ContainsKey(imageLocation))
+					//Dodgily ensure the building flag is disabled
+					cachedMap.IsBuilding = false;
+				}
+				else
+				{
+					if (!File.Exists(imageLocation))
 					{
-						cachedMap = CachedMaps[imageLocation];
-						image = cachedMap.CachedImage;
-						SkyUtil.log("Using Cached Map Image");
-
-						//Dodgily ensure the building flag is disabled
-						cachedMap.IsBuilding = false;
-					}
-					else
-					{
-						if (!File.Exists(imageLocation))
-						{
-							return;
-						}
-
-						image = new Bitmap((Bitmap) Image.FromFile(imageLocation), width * 128, height * 128);
-						cachedMap = new CachedMap(image);
-
-						SkyUtil.log("Creating/Loading new Cached Map Image");
+						return spawnedEntities;
 					}
 
-					BlockCoordinates center = spawnLocation;
+					image = new Bitmap((Bitmap)Image.FromFile(imageLocation), width * 128, height * 128);
+					cachedMap = new CachedMap(image);
 
-					for (int x = 0; x < width; x++)
+					SkyUtil.log("Creating/Loading new Cached Map Image");
+				}
+
+				BlockCoordinates center = spawnLocation;
+
+				for (int x = 0; x < width; x++)
+				{
+					int xSpawnLoc = center.X + x;
+					for (int y = 0; y < height; y++)
 					{
-						int xSpawnLoc = center.X + x;
-						for (int y = 0; y < height; y++)
+						byte[] bitmapToBytes;
+						if (cachedMap.IsBuilding)
 						{
-							byte[] bitmapToBytes;
-							if (cachedMap.IsBuilding)
-							{
-								var croppedImage = CropImage(image, new Rectangle(new Point(x * 128, y * 128), new Size(128, 128)));
-								bitmapToBytes = BitmapToBytes(croppedImage, true);
+							var croppedImage = CropImage(image, new Rectangle(new Point(x * 128, y * 128), new Size(128, 128)));
+							bitmapToBytes = BitmapToBytes(croppedImage, true);
 
-								if (bitmapToBytes.Length != 128 * 128 * 4)
-								{
-									return; //TODO: Throw Exception/Alert Log?
-								}
-
-								cachedMap.CachedBitmaps.Add(new Tuple<int, int>(x, y), bitmapToBytes);
-							}
-							else
+							if (bitmapToBytes.Length != 128 * 128 * 4)
 							{
-								bitmapToBytes = cachedMap.CachedBitmaps[new Tuple<int, int>(x, y)];
+								return spawnedEntities; //TODO: Throw Exception/Alert Log?
 							}
 
-							MapEntity frame = new MapEntity(level);
-							frame.ImageProvider = new MapImageProvider { Batch = CreateCachedPacket(frame.EntityId, bitmapToBytes) };
-							frame.SpawnEntity();
-
-							BlockCoordinates frambc = new BlockCoordinates(xSpawnLoc, center.Y + height - y - 2, center.Z);
-							ItemFrameBlockEntity itemFrameBlockEntity = new ItemFrameBlockEntity
-							{
-								Coordinates = frambc
-							};
-
-							var itemFrame = new FullyLuminousItemFrame(frame, itemFrameBlockEntity, level)
-							{
-								Coordinates = frambc,
-								Metadata = (byte) mapDirection,
-								BlockLight = 15,
-								SkyLight = 15
-							};
-							level.SetBlock(itemFrame, true, false, true);
-							level.SetBlockEntity(itemFrameBlockEntity);
+							cachedMap.CachedBitmaps.Add(new Tuple<int, int>(x, y), bitmapToBytes);
 						}
-					}
+						else
+						{
+							bitmapToBytes = cachedMap.CachedBitmaps[new Tuple<int, int>(x, y)];
+						}
 
-					if (cachedMap.IsBuilding)
-					{
-						CachedMaps.TryAdd(imageLocation, cachedMap);
-						cachedMap.IsBuilding = false; //Completely Cached
+						MapEntity frame = new MapEntity(level);
+						frame.ImageProvider = new MapImageProvider { Batch = CreateCachedPacket(frame.EntityId, bitmapToBytes) };
+						frame.SpawnEntity();
+
+						BlockCoordinates frambc = new BlockCoordinates(xSpawnLoc, center.Y + height - y - 2, center.Z);
+						ItemFrameBlockEntity itemFrameBlockEntity = new ItemFrameBlockEntity
+						{
+							Coordinates = frambc
+						};
+
+						var itemFrame = new FullyLuminousItemFrame(frame, itemFrameBlockEntity, level)
+						{
+							Coordinates = frambc,
+							Metadata = (byte)mapDirection,
+							BlockLight = 15,
+							SkyLight = 15
+						};
+						level.SetBlock(itemFrame, true, false, true);
+						level.SetBlockEntity(itemFrameBlockEntity);
+
+						spawnedEntities.Add(frame);
 					}
 				}
-				catch (Exception e)
+
+				if (cachedMap.IsBuilding)
 				{
-					SkyUtil.log("Aborted image generation");
-					Console.WriteLine(e);
+					CachedMaps.TryAdd(imageLocation, cachedMap);
+					cachedMap.IsBuilding = false; //Completely Cached
 				}
-			});
+			}
+			catch (Exception e)
+			{
+				SkyUtil.log("Aborted image generation");
+				Console.WriteLine(e);
+			}
+
+			return spawnedEntities;
 		}
 
 		private static McpeWrapper CreateCachedPacket(long mapId, byte[] bitmapToBytes)
