@@ -551,6 +551,12 @@ namespace SkyCore.Game
 			else if (args[0].Equals("nextstate"))
 			{
 				GameState nextState = level.CurrentState.GetNextGameState(level);
+				if (nextState is VoidGameState)
+				{
+					player.SendMessage("§cNo Next Available State Available.");
+					return;
+				}
+
 				player.SendMessage($"§cProgressing to next state ({level.CurrentState.GetType()} -> {nextState.GetType()})");
 				level.UpdateGameState(nextState);
 			}
@@ -560,6 +566,7 @@ namespace SkyCore.Game
 				{
 					player.SendMessage("§c/gameedit timeleft");
 					player.SendMessage("§c/gameedit tp");
+					player.SendMessage("§c/gameedit nextstate");
 					player.SendMessage("§c/gameedit level <level-name>");
 					{
 						string subCommandHelp = GetGameEditCommandHelp(player as SkyPlayer);
