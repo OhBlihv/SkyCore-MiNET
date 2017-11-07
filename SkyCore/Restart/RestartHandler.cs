@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MiNET;
+using MiNET.Plugins;
 using MiNET.Utils;
 using SkyCore.Game;
 using SkyCore.Game.Level;
@@ -126,10 +128,15 @@ namespace SkyCore.Restart
 			SkyUtil.log("Shutting down...");
 
 			//Start Actual Shutdown
+			MiNetServer server = SkyCoreAPI.Instance.Server;
 
-			SkyCoreAPI.Instance.OnDisable();
-			SkyCoreAPI.Instance.Server.PluginManager.Plugins.Remove(SkyCoreAPI.Instance);
-			SkyCoreAPI.Instance.Server.StopServer();
+			foreach (Plugin plugin in server.PluginManager.Plugins)
+			{
+				plugin.OnDisable();
+			}
+
+			server.PluginManager.Plugins.Clear();
+			server.StopServer();
 
 			Environment.Exit(0);
 		}
