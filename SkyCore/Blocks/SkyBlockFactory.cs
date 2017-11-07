@@ -13,7 +13,7 @@ namespace SkyCore.Blocks
 
 		public SkyBlockFactory()
 		{
-			BlockFactory.LuminousBlocks.Add(199, 15); //Item Frames
+			BlockFactory.LuminousBlocks[191] = 15; //Item Frames
 		}
 
 		public Block GetBlockById(byte blockId)
