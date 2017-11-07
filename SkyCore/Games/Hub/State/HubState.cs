@@ -107,7 +107,8 @@ namespace SkyCore.Games.Hub.State
 			{
 				foreach (SkyPlayer player in gameLevel.Players.Values)
 				{
-					if (player == null || !player.IsConnected)
+					//Player is not initialized yet.
+					if (player == null || !player.IsConnected || player.KnownPosition == null)
 					{
 						continue;
 					}
