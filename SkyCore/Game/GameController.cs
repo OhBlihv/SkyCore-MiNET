@@ -548,6 +548,12 @@ namespace SkyCore.Game
 
 				player.SendMessage($"§cUpdating game level to {args[1]}");
 			}
+			else if (args[0].Equals("nextstate"))
+			{
+				GameState nextState = level.CurrentState.GetNextGameState(level);
+				player.SendMessage($"§cProgressing to next state ({level.CurrentState.GetType()} -> {nextState.GetType()})");
+				level.UpdateGameState(nextState);
+			}
 			else
 			{
 				if (!HandleGameEditCommand(player as SkyPlayer, level, gameLevelInfo, args))
