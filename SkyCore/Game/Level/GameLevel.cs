@@ -105,7 +105,7 @@ namespace SkyCore.Game.Level
 			EnableBlockTicking = false;
             EnableChunkTicking = false;
 
-            SkyUtil.log($"Initializing world {gameId}");
+		    SkyUtil.log($"Initializing world {gameId}");
             Initialize();
 
 			SpawnPoint = GameLevelInfo.LobbyLocation;
@@ -134,7 +134,7 @@ namespace SkyCore.Game.Level
 
 			BlockBreak += HandleBlockBreak;
 			BlockPlace += HandleBlockPlace;
-        }
+	    }
 
 	    protected virtual void SetupWorldTime()
 	    {

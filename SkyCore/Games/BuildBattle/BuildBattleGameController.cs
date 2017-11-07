@@ -124,7 +124,23 @@ namespace SkyCore.Games.BuildBattle
 
 		protected override bool HandleGameEditCommand(SkyPlayer player, GameLevel gameLevel, GameLevelInfo gameLevelInfo, params string[] args)
 		{
-			return false;
+			if (args[0].Equals("tp"))
+			{
+				if (!(gameLevel is BuildBattleLevel level))
+				{
+					player.SendMessage("§eWorld is not BuildBattle world!");
+					return false;
+				}
+
+				player.SendMessage("§eTeleporting to a random spawn location");
+				player.Teleport(level.BuildTeams[Random.Next(level.BuildTeams.Count)].SpawnLocation);
+			}
+			else
+			{
+				return false;
+			}
+
+			return true;
 		}
 
 		protected override string GetGameEditCommandHelp(SkyPlayer player)

@@ -289,31 +289,39 @@ namespace SkyCore
         [PacketHandler, Receive]
         public Package MessageHandler(McpeText message, MiNET.Player player)
         {
-            string text = message.message;
-            if (text.StartsWith(".") || text.StartsWith("/"))
-            {
-                return message;
-            }
-
-	        if (PunishCore.GetPunishmentsFor(player.CertificateData.ExtraData.Xuid).HasActive(PunishmentType.Mute))
+	        try //TODO: Remove - Just for testing
 	        {
-				player.SendMessage("§c§l(!)§r §cYou cannot chat while you are muted.");
+		        string text = message.message;
+		        if (text.StartsWith(".") || text.StartsWith("/"))
+		        {
+			        return message;
+		        }
+
+		        if (PunishCore.GetPunishmentsFor(player.CertificateData.ExtraData.Xuid).HasActive(PunishmentType.Mute))
+		        {
+			        player.SendMessage("§c§l(!)§r §cYou cannot chat while you are muted.");
+			        return null;
+		        }
+
+		        text = TextUtils.RemoveFormatting(text);
+
+		        string chatColor = ChatColors.White;
+		        if (((SkyPlayer)player).PlayerGroup == PlayerGroup.Player)
+		        {
+			        chatColor = ChatColors.Gray;
+		        }
+
+		        string formattedText = $"{GetNameTag(player)}{ChatColors.Gray}: {chatColor}{text}";
+		        SkyUtil.log($"Broadcasting to {player.Level.LevelId}: {formattedText}");
+		        player.Level.BroadcastMessage(formattedText, MessageType.Raw);
+
+		        return null;
+			}
+	        catch (Exception e)
+	        {
+		        Console.WriteLine(e);
 		        return null;
 	        }
-            
-            text = TextUtils.RemoveFormatting(text);
-
-	        string chatColor = ChatColors.White;
-	        if (((SkyPlayer) player).PlayerGroup == PlayerGroup.Player)
-	        {
-		        chatColor = ChatColors.Gray;
-	        }
-
-            string formattedText = $"{GetNameTag(player)}{ChatColors.Gray}: {chatColor}{text}";
-            SkyUtil.log($"Broadcasting to {player.Level.LevelId}: {formattedText}");
-            player.Level.BroadcastMessage(formattedText, MessageType.Raw);
-
-            return null;
         }
 
         private string GetNameTag(MiNET.Player player)

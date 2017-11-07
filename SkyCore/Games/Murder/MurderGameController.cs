@@ -132,7 +132,7 @@ namespace SkyCore.Games.Murder
 
 							Vector3 particleLocation = displayLocation.ToVector3();
 
-							new FlameParticle(player.Level) { Position = particleLocation }.Spawn(new[] { player });
+							new FlameParticle(player.Level) { Position = particleLocation }.Spawn(new MiNET.Player[] { player });
 						}
 
 						foreach (PlayerLocation location in murderLevelInfo.PlayerSpawnLocations)
@@ -142,7 +142,7 @@ namespace SkyCore.Games.Murder
 
 							Vector3 particleLocation = displayLocation.ToVector3();
 
-							new HeartParticle(player.Level) { Position = particleLocation }.Spawn(new[] { player });
+							new HeartParticle(player.Level) { Position = particleLocation }.Spawn(new MiNET.Player[] { player });
 						}
 					}, 500));
 				}
