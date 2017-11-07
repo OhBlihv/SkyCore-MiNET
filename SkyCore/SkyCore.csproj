@@ -120,6 +120,7 @@
     <Compile Include="Games\Murder\State\MurderLobbyState.cs" />
     <Compile Include="Games\Murder\State\MurderRunningState.cs" />
     <Compile Include="Game\ExternalGameHandler.cs" />
+    <Compile Include="Game\GameCommands.cs" />
     <Compile Include="Game\GameUtil.cs" />
     <Compile Include="Game\Items\ItemEndNav.cs" />
     <Compile Include="Game\Level\GameLevelInfo.cs" />

@@ -94,7 +94,7 @@ namespace SkyCore.Game
 
 	    public virtual void PostLaunchTask()
 	    {
-		    SkyCoreAPI.Instance.Server.PluginManager.LoadCommands(this);  //Initialize /gameedit Command Set
+		    
 		}
 
 	    public void Dispose()
@@ -481,118 +481,9 @@ namespace SkyCore.Game
 		 * Commands
 		 */
 
-		[Command(Name = "gameedit")]
-		[Authorize(Permission = CommandPermission.Normal)]
-		public void CommandGameEdit(MiNET.Player player, params string[] args)
-		{
-			if (player.CommandPermission < CommandPermission.Admin)
-			{
-				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
-				return;
-			}
+	    public abstract bool HandleGameEditCommand(SkyPlayer player, GameLevel gameLevel, GameLevelInfo gameLevelInfo, params string[] args);
 
-			if (!(player.Level is GameLevel level))
-			{
-				player.SendMessage($"§cYou must be in a {GameName} game to use this command!");
-				return;
-			}
-
-			if (!(level.GameLevelInfo is GameLevelInfo gameLevelInfo))
-			{
-				player.SendMessage("§cThe current level's information could not be loaded.");
-				return;
-			}
-
-			if (args[0].Equals("timeleft"))
-			{
-				if (args.Length < 2)
-				{
-					player.SendMessage("§c/gameedit timeleft <time>");
-					return;
-				}
-
-				if (!int.TryParse(args[1], out var timeRemaining))
-				{
-					player.SendMessage($"§cInvalid time remaining ({args[1]})");
-					return;
-				}
-
-				level.Tick = 0;
-				((RunningState) level.CurrentState).EndTick = timeRemaining * 2;
-
-				player.SendMessage($"§eReset in-game timer, and updated end-time to {timeRemaining} seconds");
-			}
-			else if (args[0].Equals("level"))
-			{
-				if (args.Length < 2)
-				{
-					player.SendMessage("§c/gameedit level <levelname>");
-					return;
-				}
-
-				string fullyQualifiedName = $"C:\\Users\\Administrator\\Desktop\\worlds\\{RawName}\\{args[1]}";
-				GameLevel gameLevel;
-				if (!LevelNames.Contains(fullyQualifiedName) || (gameLevel = InitializeNewGame(fullyQualifiedName)) == null)
-				{
-					player.SendMessage($"§cInvalid level name ({args[1]})");
-					player.SendMessage($"§cBad Args: \n§c- {string.Join("\n§c- ", LevelNames.Select(x => _removeQualification(x.ToString())).ToArray())}");
-					return;
-				}
-
-				foreach (SkyPlayer gamePlayer in level.GetAllPlayers())
-				{
-					gameLevel.AddPlayer(gamePlayer);
-				}
-
-				level.UpdateGameState(new VoidGameState()); //'Close' the game eventually
-
-				player.SendMessage($"§cUpdating game level to {args[1]}");
-			}
-			else if (args[0].Equals("nextstate"))
-			{
-				GameState nextState = level.CurrentState.GetNextGameState(level);
-				if (nextState is VoidGameState)
-				{
-					player.SendMessage("§cNo Next Available State Available.");
-					return;
-				}
-
-				player.SendMessage($"§cProgressing to next state ({level.CurrentState.GetType()} -> {nextState.GetType()})");
-				level.UpdateGameState(nextState);
-			}
-			else
-			{
-				if (!HandleGameEditCommand(player as SkyPlayer, level, gameLevelInfo, args))
-				{
-					player.SendMessage("§c/gameedit timeleft");
-					player.SendMessage("§c/gameedit tp");
-					player.SendMessage("§c/gameedit nextstate");
-					player.SendMessage("§c/gameedit level <level-name>");
-					{
-						string subCommandHelp = GetGameEditCommandHelp(player as SkyPlayer);
-						if (subCommandHelp != null)
-						{
-							player.SendMessage(subCommandHelp);
-						}
-					}
-					player.SendMessage($"§cBad Args: {string.Join(",", args.Select(x => x.ToString()).ToArray())}");
-				}
-			}
-		}
-
-		protected string _removeQualification(string fullyQualifiedName)
-		{
-			string levelName;
-			{
-				string[] split = fullyQualifiedName.Split('\\');
-				levelName = split[split.Length - 1];
-			}
-			return levelName;
-		}
-
-	    protected abstract bool HandleGameEditCommand(SkyPlayer player, GameLevel gameLevel, GameLevelInfo gameLevelInfo, params string[] args);
-
-	    protected abstract string GetGameEditCommandHelp(SkyPlayer player);
+	    public abstract string GetGameEditCommandHelp(SkyPlayer player);
 
 	    public void PopulateMetadata(Metadata metadata)
 	    {
@@ -601,7 +492,6 @@ namespace SkyCore.Game
 			metadata.AddToTab("GameController", "Active Games", GameLevels);
 			metadata.AddToTab("GameController", "Queued Players", QueuedPlayers);
 			metadata.AddToTab("GameController", "Next Redis Game Id", RedisGameIdKey);
-		    
 	    }
     }
 }
