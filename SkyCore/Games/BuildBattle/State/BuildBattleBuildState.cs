@@ -146,7 +146,7 @@ namespace SkyCore.Games.BuildBattle.State
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
 		{
 			BlockCoordinates centreLocation = ((BuildBattleTeam) player.GameTeam).SpawnLocation.GetCoordinates3D();
-			BlockCoordinates interactLocation = targetBlock.Coordinates;
+			BlockCoordinates interactLocation = existingBlock.Coordinates;
 
 			return CanModifyAt(gameLevel, player, centreLocation, interactLocation);
 		}
