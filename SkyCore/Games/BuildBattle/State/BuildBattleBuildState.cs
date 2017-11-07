@@ -140,7 +140,7 @@ namespace SkyCore.Games.BuildBattle.State
 			return false; //Avoid cancelling to allow block placing
 		}
 
-		public const int PlotRadius = 12;
+		public const int PlotRadius = 13;
 		public const int MaxHeight = 92;
 
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)

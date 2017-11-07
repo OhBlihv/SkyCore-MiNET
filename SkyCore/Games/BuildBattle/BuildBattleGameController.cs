@@ -225,7 +225,7 @@ namespace SkyCore.Games.BuildBattle
 			}
 		}*/
 
-		protected override bool HandleGameEditCommand(SkyPlayer player, GameLevel gameLevel, GameLevelInfo gameLevelInfo, params string[] args)
+		public override bool HandleGameEditCommand(SkyPlayer player, GameLevel gameLevel, GameLevelInfo gameLevelInfo, params string[] args)
 		{
 			if (args[0].Equals("tp"))
 			{
@@ -246,7 +246,7 @@ namespace SkyCore.Games.BuildBattle
 			return true;
 		}
 
-		protected override string GetGameEditCommandHelp(SkyPlayer player)
+		public override string GetGameEditCommandHelp(SkyPlayer player)
 		{
 			return null;
 		}

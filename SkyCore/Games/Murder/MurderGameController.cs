@@ -50,7 +50,7 @@ namespace SkyCore.Games.Murder
 
 	    private readonly IDictionary<string, RunnableTask> _currentVisualizationTasks = new Dictionary<string, RunnableTask>();
 
-		protected override bool HandleGameEditCommand(SkyPlayer player, GameLevel level, GameLevelInfo gameLevelInfo, params string[] args)
+	    public override bool HandleGameEditCommand(SkyPlayer player, GameLevel level, GameLevelInfo gameLevelInfo, params string[] args)
 		{
 			if (!(gameLevelInfo is MurderLevelInfo murderLevelInfo))
 			{
@@ -162,7 +162,7 @@ namespace SkyCore.Games.Murder
 			return true;
 		}
 
-	    protected override string GetGameEditCommandHelp(SkyPlayer player)
+	    public override string GetGameEditCommandHelp(SkyPlayer player)
 	    {
 		    return "§c/gameedit add <spawn/gunpart>\n" +
 		           "§c/gameedit visualize";
