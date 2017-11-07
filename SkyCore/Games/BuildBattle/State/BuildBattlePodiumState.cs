@@ -67,7 +67,7 @@ namespace SkyCore.Games.BuildBattle.State
 			if (winningPlayer == null)
 			{
 				BuildBattleTeam podiumCentre;
-				if (topPlayers == null)
+				if (topPlayers == null || topPlayers.Count == 0)
 				{
 					//Pick a random team
 					podiumCentre = ((BuildBattleLevel) gameLevel).BuildTeams[0];
