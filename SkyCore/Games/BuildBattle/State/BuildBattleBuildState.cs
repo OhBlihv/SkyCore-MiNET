@@ -37,13 +37,11 @@ namespace SkyCore.Games.BuildBattle.State
 				{
 					foreach (SkyPlayer player in gameLevel.GetPlayersInTeam(gameTeam))
 					{
-						player.IsWorldImmutable = true; //Allow breaking
-						player.IsWorldBuilder = false;
+						player.IsWorldImmutable = true; //Prevent Breaking
+						//player.IsWorldBuilder = false;
 						player.SendAdventureSettings();
 
 						player.Teleport(gameTeam.SpawnLocation);
-
-						player.Freeze(true);
 
 						player.SetAllowFly(true);
 						player.IsFlying = true;
@@ -62,12 +60,6 @@ namespace SkyCore.Games.BuildBattle.State
 					foreach (SkyPlayer player in players)
 					{
 						TitleUtil.SendCenteredSubtitle(player, category.ThemeName);
-
-						//Poorly enforce speed
-						if (i == 0 || i == 11)
-						{
-							player.Freeze(true);
-						}
 					}
 
 					Thread.Sleep(250);
@@ -76,10 +68,8 @@ namespace SkyCore.Games.BuildBattle.State
 				SelectedCategory = categoryRotation[new Random().Next(categoryRotation.Count)];
 				gameLevel.DoForAllPlayers(player =>
 				{
-					player.Freeze(false);
-					
 					player.IsWorldImmutable = true; //Allow breaking
-					player.IsWorldBuilder = false;
+					//player.IsWorldBuilder = false;
 					player.SendAdventureSettings();
 					
 					player.UpdateGameMode(GameMode.Creative, true);
@@ -145,7 +135,12 @@ namespace SkyCore.Games.BuildBattle.State
 			});
 		}
 
-		public const int PlotRadius = 13;
+		public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+		{
+			return false; //Avoid cancelling to allow block placing
+		}
+
+		public const int PlotRadius = 12;
 		public const int MaxHeight = 92;
 
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
@@ -169,7 +164,7 @@ namespace SkyCore.Games.BuildBattle.State
 		{
 			if (Math.Abs(centreLocation.X - interactLocation.X) > PlotRadius ||
 			    Math.Abs(centreLocation.Z - interactLocation.Z) > PlotRadius ||
-			    interactLocation.Y < (centreLocation.Y - 1) ||
+			    interactLocation.Y < (centreLocation.Y - 5) ||
 			    interactLocation.Y > MaxHeight)
 			{
 				/*SkyUtil.log($"{interactLocation.X}:{interactLocation.Y}:{interactLocation.Z} vs {centreLocation.X}:{centreLocation.Y}:{centreLocation.Z} " +

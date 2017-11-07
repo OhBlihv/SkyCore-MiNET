@@ -256,8 +256,14 @@ namespace SkyCore.Player
 	    {
 		    if (_freeze)
 		    {
-				Teleport(KnownPosition);
-			    return;
+			    if (Math.Abs(message.x - KnownPosition.X) > 0.1 ||
+			        Math.Abs(message.z - KnownPosition.Z) > 0.1)
+			    {
+				    SkyUtil.log($"{Username} - X: {Math.Abs(message.x - KnownPosition.X)} " + 
+								$"Z: {Math.Abs(message.z - KnownPosition.Z)} ");
+				    Teleport(KnownPosition);
+				    return;
+			    }
 		    }
 
 		    base.HandleMcpeMovePlayer(message);
@@ -374,8 +380,9 @@ namespace SkyCore.Player
             {
                 if (Level is GameLevel level)
                 {
-	                return level.DoInteract(actionId, this, (SkyPlayer) target);
-                }
+					//return level.DoInteract(actionId, this, (SkyPlayer) target);
+					level.DoInteract(actionId, this, (SkyPlayer)target);
+				}
             }
 
 	        return false;
@@ -388,13 +395,13 @@ namespace SkyCore.Player
 		    if (gameMode == GameMode.Creative && allowBreakingIfCreative)
 		    {
 				IsWorldImmutable = false; //Allow breaking
-			    IsWorldBuilder = true;
+			    //IsWorldBuilder = true;
 			    SendAdventureSettings();
 			}
 		    else if(allowBreakingIfCreative)
 		    {
 				IsWorldImmutable = true; //Prevent breaking
-			    IsWorldBuilder = false;
+			    //IsWorldBuilder = false;
 			    SendAdventureSettings();
 			}
 		}

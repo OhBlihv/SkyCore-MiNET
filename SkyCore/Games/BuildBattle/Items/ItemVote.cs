@@ -115,7 +115,7 @@ namespace SkyCore.Games.BuildBattle.Items
 					voteName = "§bGreat";
 					break;
 				case 5:
-					voteName = "§aAmazing";
+					voteName = "§dAmazing";
 					break;
 				default:
 					voteName = "§dN/A";
