@@ -32,7 +32,10 @@ namespace SkyCore.Game.Level
 
 	    public void AddIncomingPlayer(string username)
 	    {
-			_incomingPlayers.Add(username, DateTimeOffset.Now.ToUnixTimeSeconds() + IncomingPlayerTimeoutSeconds);
+		    lock (_incomingPlayers)
+		    {
+				_incomingPlayers.Add(username, DateTimeOffset.Now.ToUnixTimeSeconds() + IncomingPlayerTimeoutSeconds);
+			}
 	    }
 
 	    //Player -> Team
@@ -263,18 +266,21 @@ namespace SkyCore.Game.Level
 				 * Clean up any 'incoming players' who never showed up
 				 * '15 seconds' to appear before they are cleared
 				 */
-	            if (_incomingPlayers.Count > 0)
+	            lock (_incomingPlayers)
 	            {
-		            long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-					foreach (KeyValuePair<string, long> entry in _incomingPlayers)
-		            {
-			            //entry.Value starts off as 15 seconds ahead of UNIX time
-			            if (entry.Value - currentTime < 0)
-			            {
-				            _incomingPlayers.Remove(entry.Key);
-			            }
-		            }
-	            }
+					if (_incomingPlayers.Count > 0)
+					{
+						long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+						foreach (KeyValuePair<string, long> entry in _incomingPlayers)
+						{
+							//entry.Value starts off as 15 seconds ahead of UNIX time
+							if (entry.Value - currentTime < 0)
+							{
+								_incomingPlayers.Remove(entry.Key);
+							}
+						}
+					}
+				}
 				
 				Tick = tick; //Workaround?
             }
@@ -290,10 +296,18 @@ namespace SkyCore.Game.Level
 	        {
 		        level.RemovePlayer(player); //Clear from old world
 	        }
-	        
-	        if (_incomingPlayers.ContainsKey(player.Username))
+
+			//Remove a player from _incomingPlayers only if it's non-empty.
+			//Avoid claiming a lock for a useless check
+	        if (_incomingPlayers.Count > 0)
 	        {
-		        _incomingPlayers.Remove(player.Username);
+		        lock (_incomingPlayers)
+		        {
+					if (_incomingPlayers.ContainsKey(player.Username))
+					{
+						_incomingPlayers.Remove(player.Username);
+					}
+				}
 	        }
 	        
             GameTeam defaultTeam = GetDefaultTeam();
