@@ -44,8 +44,8 @@ namespace SkyCore.Entities
 	        }
 
 			Scale = 1.8D; //Ensure this NPC is visible
-	        Width = 0.99;
-	        Height = 0.99;
+	        Width = 0.43;
+	        Height = 3.0D;
 
             _action = action;
         }
