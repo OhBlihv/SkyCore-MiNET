@@ -89,6 +89,11 @@ namespace SkyCore.Games.BuildBattle.State
 			int j = 0;
 			gameLevel.DoForAllPlayers(player =>
 			{
+				player.SetAllowFly(true);
+				player.IsFlying = true;
+
+				player.SendAdventureSettings();
+
 				player.Inventory.Clear();
 
 				TitleUtil.SendCenteredSubtitle(player, $"§a§lWinner:§r §d{winningPlayerName}");
