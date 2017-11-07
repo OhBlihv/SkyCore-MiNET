@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using SkyCore.Game.Items;
 using SkyCore.Game.Level;
@@ -18,13 +19,6 @@ namespace SkyCore.Game.State.Impl
         {
 	        TimeRemaining = 30 * 2; //30 Seconds
 
-			//Re-enable the player nametags
-			gameLevel.DoForAllPlayers(player =>
-			{
-				player.HideNameTag = false;
-				player.Inventory.SetInventorySlot(4, new ItemEndNav());
-			});
-
 			RunnableTask.RunTaskLater(() =>
 			{
 				if (SkyCoreAPI.IsRebootQueued)
@@ -34,6 +28,13 @@ namespace SkyCore.Game.State.Impl
 				else
 				{
 					gameLevel.DoForAllPlayers(gameLevel.ShowEndGameMenu);
+
+					//Re-enable the player nametags
+					gameLevel.DoForAllPlayers(player =>
+					{
+						player.HideNameTag = false;
+						player.Inventory.SetInventorySlot(4, new ItemEndNav());
+					});
 				}
 			}, 5000);
 		}
@@ -76,36 +77,34 @@ namespace SkyCore.Game.State.Impl
 
 					if (player.Inventory.InHandSlot == 4)
 					{
-						int remainingTime;
-						
 						if (_modalCountdownDict.TryGetValue(player.Username, out var countdownValue))
 						{
-							if (countdownValue == 0)
+							if (countdownValue == 1)
 							{
 								if (player.Level is GameLevel level)
 								{
 									level.ShowEndGameMenu(player);
-									_modalCountdownDict[player.Username] = 3; //Reset to default
+									_modalCountdownDict[player.Username] = 6; //Reset to default
 									player.Inventory.SetHeldItemSlot(3); //Shift off slot.
+
+									player.BarHandler.AddMinorLine("§r", 1);
 									return;
 								}
-
-								remainingTime = countdownValue;
 							}
 							else
 							{
-								_modalCountdownDict[player.Username] = countdownValue - 1;
-								remainingTime = countdownValue - 1;
+								_modalCountdownDict[player.Username] = (countdownValue = (countdownValue - 1));
 							}
 						}
 						else
 						{
-							_modalCountdownDict.Add(player.Username, 3); //Default to 3 seconds
-
-							remainingTime = 3;
+							_modalCountdownDict.Add(player.Username, 6); //Default to 3 seconds
+							countdownValue = 6;
 						}
-						
-						player.BarHandler.AddMinorLine($"§eContinue Holding for {remainingTime} seconds to Reopen Modal!");
+
+						int visibleCountdown = (int) Math.Ceiling(countdownValue / 2D);
+
+						player.BarHandler.AddMinorLine($"§dContinue Holding for {visibleCountdown} Second{(visibleCountdown == 1 ? "" : "s")} to Open Menu", 1);
 					}
 					else
 					{

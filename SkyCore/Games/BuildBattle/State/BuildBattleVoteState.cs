@@ -40,6 +40,12 @@ namespace SkyCore.Games.BuildBattle.State
 				player.Inventory.Clear();
 
 				player.SetNameTagVisibility(true);
+
+				//Toggle Flight
+				player.SetAllowFly(true);
+				player.IsFlying = true;
+
+				player.SendAdventureSettings();
 			});
 		}
 

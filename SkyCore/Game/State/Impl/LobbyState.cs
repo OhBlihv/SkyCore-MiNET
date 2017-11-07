@@ -23,7 +23,7 @@ namespace SkyCore.Game.State.Impl
 	        GameLevelInfo gameLevelInfo = gameLevel.GameLevelInfo;
 
 	        //Spawn Lobby NPC
-	        if (gameLevelInfo.LobbyNPCLocation == null || Math.Abs(gameLevelInfo.LobbyNPCLocation.Y - 16) < 0.1)
+	        if (gameLevelInfo.LobbyNPCLocation == null)
 	        {
 		        gameLevelInfo.LobbyNPCLocation = new PlayerLocation(260.5, 15, 251.5);
 
@@ -34,15 +34,14 @@ namespace SkyCore.Game.State.Impl
 	        PlayerNPC.SpawnLobbyNPC(gameLevel, gameLevelInfo.GameType, gameLevel.GameLevelInfo.LobbyNPCLocation);
 
 	        //Spawn Lobby Map/Image
-	        if (gameLevelInfo.LobbyMapLocation.Y < 0 || gameLevelInfo.LobbyMapLocation.Y == 16) //Default == -1
+	        if (gameLevelInfo.LobbyMapLocation.Y < 0) //Default == -1
 	        {
 		        gameLevelInfo.LobbyMapLocation = new BlockCoordinates(252, 15, 249);
 
 		        File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
-		        SkyUtil.log($"LobbyMapLocation Updated with default value for {gameLevel.LevelName}");
 	        }
 
-			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation);
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation);
 		}
 
 	    public override void LeaveState(GameLevel gameLevel)

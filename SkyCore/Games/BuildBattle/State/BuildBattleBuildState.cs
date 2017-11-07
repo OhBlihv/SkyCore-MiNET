@@ -39,12 +39,12 @@ namespace SkyCore.Games.BuildBattle.State
 					{
 						player.IsWorldImmutable = true; //Prevent Breaking
 						//player.IsWorldBuilder = false;
-						player.SendAdventureSettings();
-
 						player.Teleport(gameTeam.SpawnLocation);
 
 						player.SetAllowFly(true);
 						player.IsFlying = true;
+
+						player.SendAdventureSettings();
 
 						player.UseCreativeInventory = true;
 						player.UpdateGameMode(GameMode.Creative, false);
