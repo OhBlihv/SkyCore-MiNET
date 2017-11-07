@@ -259,6 +259,13 @@ namespace SkyCore.Game.Level
 				//Process player action/popup bars
 	            foreach (SkyPlayer player in GetAllPlayers())
 	            {
+					//Attempt to clean up any players who are no longer in this game.
+		            if (!player.IsConnected || player.Level != this)
+		            {
+			            RemovePlayer(player);
+			            continue;
+		            }
+
 		            player.BarHandler.DoTick();
 	            }
 
