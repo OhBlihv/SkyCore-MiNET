@@ -155,6 +155,12 @@ namespace SkyCore.Games.Murder.State
 						idx++;
 					}
 
+					//Workaround for one player (single murderer)
+		            if (((MurderLevel) gameLevel).Detective == null)
+		            {
+			            ((MurderLevel) gameLevel).Detective = ((MurderLevel) gameLevel).Murderer;
+		            }
+
 					gameLevel.DoForPlayersIn(player =>
 					{
 						TitleUtil.SendCenteredSubtitle(player, "§a§lInnocent §r\n§7Track down the murderer!");
@@ -309,7 +315,7 @@ namespace SkyCore.Games.Murder.State
 
 			gameLevel.DoForAllPlayers(player =>
 			{
-				if (player.IsSprinting && gameLevel.GetPlayerTeam(player) != MurderTeam.Murderer)
+				if (player.IsSprinting && gameLevel.GetPlayerTeam(player)!= MurderTeam.Murderer)
 				{
 					player.SetSprinting(false);
 				}
