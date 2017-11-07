@@ -25,7 +25,14 @@ namespace SkyCore.Games.Hub.State
 	{
 		public override void EnterState(GameLevel gameLevel)
 		{
-			
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, gameLevel,
+									new BlockCoordinates(249, 77, 268), MapUtil.MapDirection.West);
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\buildbattlemapimage.png", 1, 1, gameLevel,
+									new BlockCoordinates(252, 77, 270), MapUtil.MapDirection.West);
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\murdermapimage.png", 1, 1, gameLevel,
+									new BlockCoordinates(260, 77, 270), MapUtil.MapDirection.West);
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, gameLevel,
+									new BlockCoordinates(263, 77, 268), MapUtil.MapDirection.West);
 		}
 
 		public override void LeaveState(GameLevel gameLevel)

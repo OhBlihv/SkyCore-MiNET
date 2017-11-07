@@ -44,12 +44,22 @@ namespace SkyCore.Util
 	public class MapUtil
 	{
 
+		public enum MapDirection
+		{
+			
+			North = 0,
+			East = 1,
+			South = 2,
+			West = 3
+
+		}
+
 		private static readonly ConcurrentDictionary<string, CachedMap> CachedMaps = new ConcurrentDictionary<string, CachedMap>();
 
 		/**
 		 * Credit to @gurun, as what is below is based on his work.
 		 */
-		public static void SpawnMapImage(string imageLocation, int width, int height, Level level, BlockCoordinates spawnLocation)
+		public static void SpawnMapImage(string imageLocation, int width, int height, Level level, BlockCoordinates spawnLocation, MapDirection mapDirection = MapDirection.South)
 		{
 			RunnableTask.RunTask(() =>
 			{
@@ -118,7 +128,7 @@ namespace SkyCore.Util
 							var itemFrame = new FullyLuminousItemFrame(frame, itemFrameBlockEntity, level)
 							{
 								Coordinates = frambc,
-								Metadata = 2,
+								Metadata = (byte) mapDirection,
 								BlockLight = 15,
 								SkyLight = 15
 							};
