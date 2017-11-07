@@ -305,7 +305,8 @@ namespace SkyCore.Game.Level
 	        {
 		        SkyUtil.log("Spawning in");
 				//Only show the level transition screen to players changing games on this instance
-		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
+		        //player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
+		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, true);
 			}
 	        else //Still teleport the player to the spawn location
 	        {
