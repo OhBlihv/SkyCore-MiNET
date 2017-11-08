@@ -10,9 +10,7 @@ namespace SkyCore
     {
 
         public static bool log(String line)
-        {
-			Console.WriteLine("Attempting to write " + line);
-
+		{
             Console.WriteLine("[SkyCore] " + line);
 
 	        return true;

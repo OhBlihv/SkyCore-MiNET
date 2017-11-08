@@ -18,6 +18,7 @@ using SkyCore.Punishments;
 using SkyCore.Statistics;
 using SkyCore.Util;
 using Bugsnag;
+using MiNET.Blocks;
 
 namespace SkyCore.Player
 {
@@ -297,15 +298,16 @@ namespace SkyCore.Player
 			switch ((McpeInventoryTransaction.ItemUseOnEntityAction)transaction.ActionType)
 		    {
 			    case McpeInventoryTransaction.ItemUseOnEntityAction.Interact: // Right click
-				case McpeInventoryTransaction.ItemUseOnEntityAction.Attack:
-					
-				    Entity target = Level.GetEntity(transaction.EntityId);
+			    case McpeInventoryTransaction.ItemUseOnEntityAction.Attack:
+			    {
+					Entity target = Level.GetEntity(transaction.EntityId);
 
-				    if (HandleInteract((byte) transaction.ActionType, target))
+					if (HandleInteract((byte)transaction.ActionType, target))
 				    {
-					    return; 
+					    return;
 				    }
-					break;
+				    break;
+				}
 		    }
 
 		    base.HandleTransactionItemUseOnEntity(transaction);
@@ -352,13 +354,69 @@ namespace SkyCore.Player
 
 	    protected override void HandleTransactionItemUse(Transaction transaction)
 	    {
-		    if(HandleInteract(2, null)) //'Right Click'
-			{
-			    return;
+		    Block clickedBlock = Level.GetBlock(new BlockCoordinates(transaction.Position));
+			switch (clickedBlock.Id)
+		    {
+			    case 64:
+			    case 193:
+			    case 194:
+			    case 195:
+			    case 196:
+			    case 197:
+			    {
+				    SkyUtil.log("Blocking interaction");
+				    SkyUtil.log("(2) Fixing block at " + new BlockCoordinates(transaction.Position));
+
+				    Block upperHalf, lowerHalf;
+
+				    //Lower Half
+				    if ((clickedBlock.Metadata | 0x8) == 0)
+				    {
+					    lowerHalf = clickedBlock;
+
+					    BlockCoordinates otherHalfCoordinates = new BlockCoordinates(transaction.Position);
+					    otherHalfCoordinates.Y += 1;
+
+					    upperHalf = Level.GetBlock(otherHalfCoordinates);
+				    }
+				    //Upper Half
+				    else
+				    {
+					    upperHalf = clickedBlock;
+
+					    BlockCoordinates otherHalfCoordinates = new BlockCoordinates(transaction.Position);
+					    otherHalfCoordinates.Y -= 1;
+
+					    lowerHalf = Level.GetBlock(otherHalfCoordinates);
+				    }
+
+				    lowerHalf.Metadata = (byte)(lowerHalf.Metadata | 0x4);
+
+					var lowerHalfUpdate = McpeUpdateBlock.CreateObject();
+				    lowerHalfUpdate.blockId = lowerHalf.Id;
+				    lowerHalfUpdate.coordinates = lowerHalf.Coordinates;
+				    lowerHalfUpdate.blockMetaAndPriority = (byte)(0xb << 4 | (lowerHalf.Metadata & 0xf));
+
+				    RunnableTask.RunTaskLater(() => SendPackage(lowerHalfUpdate), 1000);
+
+				    var upperHalfUpdate = McpeUpdateBlock.CreateObject();
+				    upperHalfUpdate.blockId = upperHalf.Id;
+				    upperHalfUpdate.coordinates = upperHalf.Coordinates;
+				    upperHalfUpdate.blockMetaAndPriority = (byte)(0xb << 4 | (upperHalf.Metadata & 0xf));
+
+				    RunnableTask.RunTaskLater(() => SendPackage(upperHalfUpdate), 1000);
+					break;
+			    }
 		    }
 
-		    base.HandleTransactionItemUse(transaction);
-	    }
+			
+			if (HandleInteract(2, null)) //'Right Click'
+			{
+
+			}
+
+			base.HandleTransactionItemUse(transaction);
+		}
 
 		public bool HandleInteract(byte actionId, Entity target)
         {
@@ -384,7 +442,9 @@ namespace SkyCore.Player
                 {
 					//return level.DoInteract(actionId, this, (SkyPlayer) target);
 					level.DoInteract(actionId, this, (SkyPlayer)target);
-				}
+
+	                return true;
+                }
             }
 
 	        return false;
@@ -438,7 +498,7 @@ namespace SkyCore.Player
             IsFlying = false;
             IsSpectator = false;
 
-	        base.SpawnLevel(toLevel, spawnPoint, false, levelFunc);
+	        base.SpawnLevel(toLevel, spawnPoint, false, levelFunc, postSpawnAction);
         }
 
 	    public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)

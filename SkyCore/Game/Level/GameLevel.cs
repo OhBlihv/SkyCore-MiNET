@@ -522,7 +522,7 @@ namespace SkyCore.Game.Level
         //Returns true if default behaviour should not occur (effectively cancelled)
         public bool DoInteract(int interactId, SkyPlayer player, SkyPlayer target)
         {
-            return CurrentState.DoInteract(this, interactId, player, target);
+	        return CurrentState.DoInteract(this, interactId, player, target);
         }
 
 		/// <summary>
