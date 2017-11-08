@@ -278,13 +278,20 @@ namespace SkyCore.Game.Level
 					if (_incomingPlayers.Count > 0)
 					{
 						long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+						List<string> toRemovePlayers = new List<string>();
 						foreach (KeyValuePair<string, long> entry in _incomingPlayers)
 						{
 							//entry.Value starts off as 15 seconds ahead of UNIX time
 							if (entry.Value - currentTime < 0)
 							{
-								_incomingPlayers.Remove(entry.Key);
+								toRemovePlayers.Add(entry.Key);
 							}
+						}
+
+						foreach (string toRemove in toRemovePlayers)
+						{
+							_incomingPlayers.Remove(toRemove);
 						}
 					}
 				}
