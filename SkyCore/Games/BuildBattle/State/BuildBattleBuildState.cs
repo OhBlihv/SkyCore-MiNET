@@ -195,7 +195,8 @@ namespace SkyCore.Games.BuildBattle.State
 				tickableInformation = GetTickableInformation(player);
 			}
 
-			player.BarHandler.AddMajorLine($"§d§lTime Remaining:§r §e{((BuildBattleBuildTickableInformation) tickableInformation).NeatTimeRemaining} §f| §d§lCategory:§r §f{SelectedCategory.ThemeName}§r", 2);
+			player.BarHandler.AddMajorLine(
+				$"{SelectedCategory.ThemeName} &7| {((BuildBattleBuildTickableInformation) tickableInformation).NeatTimeRemaining} &fRemaining...");
 		}
 
 		public ITickableInformation GetTickableInformation(SkyPlayer player)
