@@ -16,15 +16,23 @@ using SkyCore.Util;
 
 namespace SkyCore.Games.BuildBattle.State
 {
-	class BuildBattleVoteState : RunningState
+
+	class BuildBattleVoteTickableInformation : ITickableInformation
+	{
+
+		public SkyPlayer BuildingPlayer { get; set; }
+
+		public string NeatTimeRemaining { get; set; }
+
+	}
+
+	class BuildBattleVoteState : RunningState, IMessageTickableState
 	{
 
 		private const int MaxVoteTime = 15 * 2;
 
 		private int _currentVotingTeam = -1;
 		private SkyPlayer _currentVotingPlayer;
-
-		private int _endTick = -1; //Default value
 
 		private readonly ConcurrentDictionary<SkyPlayer, int> _voteTally = new ConcurrentDictionary<SkyPlayer, int>();
 
@@ -59,13 +67,13 @@ namespace SkyCore.Games.BuildBattle.State
 			base.OnTick(gameLevel, currentTick, out outTick);
 
 			int secondsLeft;
-			if (_endTick == -1)
+			if (EndTick == -1)
 			{
 				secondsLeft = 0; //Trigger a initial refresh
 			}
 			else
 			{
-				secondsLeft = (_endTick - currentTick) / 2;
+				secondsLeft = (EndTick - currentTick) / 2;
 			}
 
 			if (secondsLeft > MaxVoteTime / 2)
@@ -141,7 +149,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 				_currentVotingPlayer = nextVotePlayer;
 
-				_endTick = gameLevel.Tick + MaxVoteTime;
+				EndTick = gameLevel.Tick + MaxVoteTime;
 
 				List<PlayerLocation> voteLocations = ((BuildBattleLevel) gameLevel).GetVoteLocations((BuildBattleTeam) _currentVotingPlayer.GameTeam);
 
@@ -189,52 +197,72 @@ namespace SkyCore.Games.BuildBattle.State
 				});
 			}
 
-			string neatRemaining = GetNeatTimeRemaining(secondsLeft);
-
 			gameLevel.DoForAllPlayers(player =>
 			{
-				string voteString = "";
-				if (player != _currentVotingPlayer)
-				{
-					int heldSlot = player.Inventory.InHandSlot;
-					if (heldSlot < 2)
-					{
-						heldSlot = 2;
-						player.Inventory.SetHeldItemSlot(2);
-					}
-					else if (heldSlot > 6)
-					{
-						heldSlot = 6;
-						player.Inventory.InHandSlot = 6;
-					}
-
-					string voteName = "N/A";
-					switch (heldSlot)
-					{
-						case 2:
-							voteName = ItemVote.GetVoteName(1);
-							break;
-						case 3:
-							voteName = ItemVote.GetVoteName(2);
-							break;
-						case 4:
-							voteName = ItemVote.GetVoteName(3);
-							break;
-						case 5:
-							voteName = ItemVote.GetVoteName(4);
-							break;
-						case 6:
-							voteName = ItemVote.GetVoteName(5);
-							break;
-					}
-
-					voteString = $" | {voteName} §fSelected...";
-
-					player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");
-				}
-				
-				player.BarHandler.AddMajorLine($"§d§lBUILDER§r §f{_currentVotingPlayer.Username}§r §7| {neatRemaining} Vote Time{voteString}", 2);
+				SendTickableMessage(gameLevel, player, GetTickableInformation(_currentVotingPlayer));
 			});
+		}
+
+		public void SendTickableMessage(GameLevel gameLevel, SkyPlayer player, ITickableInformation tickableInformation)
+		{
+			BuildBattleVoteTickableInformation voteInformation = (BuildBattleVoteTickableInformation) tickableInformation;
+
+			string voteString = "";
+			if (player != voteInformation.BuildingPlayer)
+			{
+				//Do not set the held item slot, since this will cause a recursive loop.
+				int heldSlot = player.Inventory.InHandSlot;
+				if (heldSlot < 2)
+				{
+					heldSlot = 2;
+				}
+				else if (heldSlot > 6)
+				{
+					heldSlot = 6;
+				}
+
+				string voteName = "N/A";
+				switch (heldSlot)
+				{
+					case 2:
+						voteName = ItemVote.GetVoteName(1);
+						break;
+					case 3:
+						voteName = ItemVote.GetVoteName(2);
+						break;
+					case 4:
+						voteName = ItemVote.GetVoteName(3);
+						break;
+					case 5:
+						voteName = ItemVote.GetVoteName(4);
+						break;
+					case 6:
+						voteName = ItemVote.GetVoteName(5);
+						break;
+				}
+
+				try
+				{
+					voteString = $" | {voteName ?? "N/A"} §fSelected...";
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
+
+				player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");
+			}
+
+			player.BarHandler.AddMajorLine($"§d§lBUILDER§r §f{voteInformation.BuildingPlayer.Username}§r §7| {voteInformation.NeatTimeRemaining} Vote Time {voteString}", 2);
+		}
+
+		public ITickableInformation GetTickableInformation(SkyPlayer player)
+		{
+			return new BuildBattleVoteTickableInformation
+			{
+				NeatTimeRemaining = GetNeatTimeRemaining(GetSecondsLeft()),
+				BuildingPlayer = player
+			};
 		}
 
 	}

@@ -14,7 +14,15 @@ using SkyCore.Util;
 
 namespace SkyCore.Games.BuildBattle.State
 {
-	class BuildBattleBuildState : RunningState
+
+	class BuildBattleBuildTickableInformation : ITickableInformation
+	{
+		
+		public string NeatTimeRemaining { get; set; }
+
+	}
+
+	class BuildBattleBuildState : RunningState, IMessageTickableState
 	{
 
 		private const int PreStartTime = 10;
@@ -121,7 +129,7 @@ namespace SkyCore.Games.BuildBattle.State
 		{
 			base.OnTick(gameLevel, currentTick, out outTick);
 
-			int secondsLeft = (EndTick - currentTick) / 2;
+			int secondsLeft = GetSecondsLeft();
 
 			if (secondsLeft > (MaxGameTime / 2))
 			{
@@ -133,12 +141,9 @@ namespace SkyCore.Games.BuildBattle.State
 				return;
 			}
 
-			string neatRemaining = GetNeatTimeRemaining(secondsLeft);
+			ITickableInformation tickableInformation = GetTickableInformation(null);
 
-			gameLevel.DoForAllPlayers(player =>
-			{
-				player.BarHandler.AddMajorLine($"§d§lTime Remaining:§r §e{neatRemaining} §f| §d§lCategory:§r §f{SelectedCategory.ThemeName}§r", 2);
-			});
+			gameLevel.DoForAllPlayers((player) => SendTickableMessage(gameLevel, player, tickableInformation));
 		}
 
 		public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
@@ -182,5 +187,21 @@ namespace SkyCore.Games.BuildBattle.State
 
 			return false;
 		}
+
+		public void SendTickableMessage(GameLevel gameLevel, SkyPlayer player, ITickableInformation tickableInformation)
+		{
+			if (tickableInformation == null)
+			{
+				tickableInformation = GetTickableInformation(player);
+			}
+
+			player.BarHandler.AddMajorLine($"§d§lTime Remaining:§r §e{((BuildBattleBuildTickableInformation) tickableInformation).NeatTimeRemaining} §f| §d§lCategory:§r §f{SelectedCategory.ThemeName}§r", 2);
+		}
+
+		public ITickableInformation GetTickableInformation(SkyPlayer player)
+		{
+			return new BuildBattleBuildTickableInformation {NeatTimeRemaining = GetNeatTimeRemaining(GetSecondsLeft())};
+		}
+
 	}
 }

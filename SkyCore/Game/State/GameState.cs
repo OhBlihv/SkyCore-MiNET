@@ -1,20 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using MiNET;
 using MiNET.Blocks;
 using MiNET.Entities;
 using MiNET.Items;
-using MiNET.Net;
 using MiNET.Utils;
 using SkyCore.Game.Level;
 using SkyCore.Player;
-using SkyCore.Util;
 
 namespace SkyCore.Game.State
 {
+
+	public interface IMessageTickableState
+	{
+
+		void SendTickableMessage(GameLevel gameLevel, SkyPlayer player, ITickableInformation tickableInformation);
+
+		ITickableInformation GetTickableInformation(SkyPlayer player);
+
+	}
+
+	public interface ITickableInformation
+	{
+		
+
+
+	}
+
+	//
+
     public abstract class GameState
     {
 
@@ -63,6 +76,14 @@ namespace SkyCore.Game.State
 	    public virtual bool HandleBlockBreak(GameLevel gameLevel, SkyPlayer player, Block block, List<Item> drops)
 	    {
 		    return true;
+	    }
+
+	    public virtual void HandleHeldItemSlotChange(GameLevel gameLevel, SkyPlayer player, int newHeldItemSlot)
+	    {
+			if(this is IMessageTickableState tickableState)
+		    {
+				tickableState.SendTickableMessage(gameLevel, player, null);
+		    }
 	    }
 
 		public bool IsActiveState(GameLevel gameController)

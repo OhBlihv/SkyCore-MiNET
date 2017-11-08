@@ -13,6 +13,8 @@ using MiNET.Worlds;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
+using SkyCore.Games.BuildBattle.State;
+using SkyCore.Games.Hub;
 using SkyCore.Games.Murder.Entities;
 using SkyCore.Games.Murder.Items;
 using SkyCore.Games.Murder.Level;
@@ -21,7 +23,15 @@ using SkyCore.Util;
 
 namespace SkyCore.Games.Murder.State
 {
-    class MurderRunningState : RunningState
+
+	class MurderTickableInformation : ITickableInformation
+	{
+		
+		public string NeatTimeRemaining { get; set; }
+
+	}
+
+    class MurderRunningState : RunningState, IMessageTickableState
     {
 
 	    public const int PreStartTime = 10;
@@ -269,7 +279,7 @@ namespace SkyCore.Games.Murder.State
         {
 	        base.OnTick(gameLevel, currentTick, out outTick);
 
-            int secondsLeft = (EndTick - currentTick) / 2;
+	        int secondsLeft = GetSecondsLeft();
 
 	        if (secondsLeft > (MaxGameTime / 2))
 	        {
@@ -281,40 +291,12 @@ namespace SkyCore.Games.Murder.State
 		        return;
 	        }
 
-	        string neatRemaining = GetNeatTimeRemaining(secondsLeft);
-
-            gameLevel.DoForPlayersIn(player =>
-            {
-	            int gunAmmo = GetPlayerAmmo((MurderLevel) gameLevel, player);
-	            player.BarHandler.AddMajorLine(
-		            gunAmmo > 0
-			            ? $"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerAmmo((MurderLevel) gameLevel, player)}/{MaxGunAmmo} §fBullets..."
-			            : $"§a§lINNOCENT§r §7| {neatRemaining} Remaining §7| §d{GetPlayerGunParts((MurderLevel) gameLevel, player)}/{MaxGunParts} §fGun Parts...",
-		            2);
-            }, MurderTeam.Innocent);
-
-            gameLevel.DoForPlayersIn(player =>
-            {
-	            player.BarHandler.AddMajorLine($"§9§lDETECTIVE§r §7| {neatRemaining} Remaining §7| §dUnlimited §fBullets...", 2);
-            }, MurderTeam.Detective);
-
-            gameLevel.DoForPlayersIn(player =>
-			{
-				player.BarHandler.AddMajorLine($"§c§lMURDERER§r §7| {neatRemaining} §fRemaining...", 2);
-				//$"              §7{PlayerAmmoCounts[player.Username]}/3 Throwing Knives", TitleType.ActionBar);
-			}, MurderTeam.Murderer);
-
-			gameLevel.DoForPlayersIn(player =>
-			{
-				player.BarHandler.AddMajorLine($"§7§lSPECTATOR §7 | {neatRemaining} §fRemaining...", 2);
-			}, MurderTeam.Spectator);
-
-			/*
-			 * Dodgy Anti-Cheat
-			 */
+	        ITickableInformation tickableInformation = GetTickableInformation(null);
 
 			gameLevel.DoForAllPlayers(player =>
 			{
+				SendTickableMessage(gameLevel, player, tickableInformation);
+
 				if (player.IsSprinting && gameLevel.GetPlayerTeam(player)!= MurderTeam.Murderer)
 				{
 					player.SetSprinting(false);
@@ -581,5 +563,43 @@ namespace SkyCore.Games.Murder.State
 			return count;
         }
 
-    }
+	    public void SendTickableMessage(GameLevel gameLevel, SkyPlayer player, ITickableInformation tickableInformation)
+	    {
+		    if (tickableInformation == null)
+		    {
+			    tickableInformation = GetTickableInformation(player);
+		    }
+
+		    MurderTickableInformation murderInformation = (MurderTickableInformation) tickableInformation;
+
+		    if (player.GameTeam == MurderTeam.Murderer)
+		    {
+				player.BarHandler.AddMajorLine($"§c§lMURDERER§r §7| {murderInformation.NeatTimeRemaining} §fRemaining...", 2);
+			    //$"              §7{PlayerAmmoCounts[player.Username]}/3 Throwing Knives", TitleType.ActionBar);
+			}
+			else if (player.GameTeam == MurderTeam.Innocent)
+		    {
+				int gunAmmo = GetPlayerAmmo((MurderLevel) gameLevel, player);
+			    player.BarHandler.AddMajorLine(
+				    gunAmmo > 0
+					    ? $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} Remaining §7| §d{GetPlayerAmmo((MurderLevel)gameLevel, player)}/{MaxGunAmmo} §fBullets..."
+					    : $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} Remaining §7| §d{GetPlayerGunParts((MurderLevel)gameLevel, player)}/{MaxGunParts} §fGun Parts...",
+				    2);
+			}
+			else if (player.GameTeam == MurderTeam.Detective)
+		    {
+				player.BarHandler.AddMajorLine($"§9§lDETECTIVE§r §7| {murderInformation.NeatTimeRemaining} Remaining §7| §dUnlimited §fBullets...", 2);
+			}
+			else if (player.GameTeam == HubTeam.Spectator)
+		    {
+			    player.BarHandler.AddMajorLine($"§7§lSPECTATOR §7 | {murderInformation.NeatTimeRemaining} §fRemaining...", 2);
+			}
+	    }
+
+	    public ITickableInformation GetTickableInformation(SkyPlayer player)
+	    {
+		    return new MurderTickableInformation() { NeatTimeRemaining = GetNeatTimeRemaining(GetSecondsLeft()) };
+	    }
+
+	}
 }

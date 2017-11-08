@@ -97,6 +97,8 @@ namespace SkyCore.Player
         public SkyPlayer(MiNetServer server, IPEndPoint endpoint, SkyCoreAPI skyCoreApi) : base(server, endpoint)
         {
             SkyCoreApi = skyCoreApi;
+
+			Inventory = new SkyPlayerInventory(this);
         }
 
         private bool _hasJoined;
@@ -411,6 +413,14 @@ namespace SkyCore.Player
 		    BarHandler?.Clear();
 
 		    base.OnPlayerLeave(e);
+	    }
+
+	    public void HandleHeldItemSlotChange(int newHeldSlot)
+	    {
+		    if (Level is GameLevel level)
+		    {
+			    level.CurrentState.HandleHeldItemSlotChange(level, this, newHeldSlot);
+		    }
 	    }
 
 		public override void SpawnLevel(Level toLevel, PlayerLocation spawnPoint, bool useLoadingScreen = false, Func<Level> levelFunc = null, Action postSpawnAction = null)

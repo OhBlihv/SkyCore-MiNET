@@ -12,6 +12,8 @@ namespace SkyCore.Game.State.Impl
 	    public int MaxGameTime { get; set; } = 120;
 		public int EndTick { get; set; } = -1; //Default value
 
+		public int CurrentTick { get; protected set; }
+
 		public override void EnterState(GameLevel gameLevel)
 	    {
 		    //
@@ -36,7 +38,9 @@ namespace SkyCore.Game.State.Impl
         public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
             outTick = currentTick;
-		}
+
+	        CurrentTick = currentTick;
+        }
 
         public override StateType GetEnumState(GameLevel gameLevel)
         {
@@ -46,6 +50,11 @@ namespace SkyCore.Game.State.Impl
 	    public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 	    {
 		    return true;
+	    }
+
+	    public int GetSecondsLeft()
+	    {
+		    return (EndTick - CurrentTick) / 2;
 	    }
 
 	    public string GetNeatTimeRemaining(int secondsLeft)
