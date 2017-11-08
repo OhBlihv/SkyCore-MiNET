@@ -1,6 +1,7 @@
 ﻿using System;
 using Bugsnag;
 using Bugsnag.Clients;
+using MiNET.Utils;
 
 namespace SkyCore.BugSnag
 {

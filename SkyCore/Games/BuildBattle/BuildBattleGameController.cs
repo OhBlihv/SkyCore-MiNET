@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using MiNET.Blocks;
 using MiNET.Items;
-using MiNET.Net;
-using MiNET.Plugins.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SkyCore.Game;
 using SkyCore.Game.Level;
-using SkyCore.Game.State;
-using SkyCore.Game.State.Impl;
 using SkyCore.Player;
 
 namespace SkyCore.Games.BuildBattle
@@ -21,7 +16,7 @@ namespace SkyCore.Games.BuildBattle
 	public class BuildBattleTheme
 	{
 	
-		public String ThemeName { get; }
+		public String ThemeName { get; set; }
 	
 		public List<CachedItem> TemplateItems { get; }
 
@@ -95,6 +90,16 @@ namespace SkyCore.Games.BuildBattle
 				try
 				{
 					_themeList = array.ToObject<List<BuildBattleTheme>>();
+
+					foreach (BuildBattleTheme theme in _themeList)
+					{
+						//Automatic Bolding
+						if (theme.ThemeName.StartsWith("§"))
+						{
+							theme.ThemeName = theme.ThemeName.Substring(0, 2) + "§l" +
+							                  theme.ThemeName.Substring(2, theme.ThemeName.Length - 2);
+						}
+					}
 				}
 				catch (Exception e)
 				{

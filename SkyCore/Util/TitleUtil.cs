@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MiNET;
+using MiNET.Utils;
 
 namespace SkyCore.Util
 {
@@ -24,51 +25,9 @@ namespace SkyCore.Util
 				subtitleString += "§r\n";
 			}
 
-			int longestLine = 0;
-			List<string> centeredLines = new List<string>();
-			foreach(string line in content.Split('\n'))
+			if (centreText)
 			{
-				i++;
-
-				centeredLines.Add(line);
-
-				int lineLength = TextUtil.GetLineLength(line);
-				if (lineLength > longestLine)
-				{
-					longestLine = lineLength;
-				}
-			}
-
-			foreach (string line in content.Split('\n'))
-			{
-				string centeredLine = line;
-
-				if (centreText)
-				{
-					//int j = centeredLine.Length;
-					int j = TextUtil.GetLineLength(centeredLine);
-					//SkyUtil.log($"({longestLine - centeredLine.Length} < {j}) - ({longestLine} - {centeredLine.Length})");
-					if (j < longestLine)
-					{
-						//int spaceLength = TextUtil.GetCharLength(' ');
-
-						do
-						{
-							//SkyUtil.log($"Adding space to ({j} < {longestLine - centeredLine.Length}) - ({longestLine} - {centeredLine.Length})");
-							centeredLine = " " + centeredLine;
-
-							//j += 3; //(3 is the length of the space character)
-							//j += spaceLength; //(3 is the length of the space character)
-							j += 6; //(3 is the length of the space character)
-						} while (j < longestLine);
-
-						centeredLine = " " + centeredLine; //Add one more space for good luck
-
-						centeredLine = "§f" + centeredLine;
-					}
-				}
-
-				subtitleString += centeredLine + "\n";
+				subtitleString += TextUtils.Center(content);
 			}
 
 			while (i++ < 10)

@@ -58,11 +58,9 @@ namespace SkyCore.Games.BuildBattle.State
 				for (int i = 0; i < 12; i++)
 				{
 					BuildBattleTheme category = categoryRotation[i % categoryRotation.Count];
-					foreach (SkyPlayer player in players)
+					foreach (MiNET.Player player in players)
 					{
-						player.SendTitle("§f", TitleType.AnimationTimes, 2, 2, 5);
-						player.SendTitle(category.ThemeName, TitleType.SubTitle);
-						player.SendTitle("§f", TitleType.Title);
+						TitleUtil.SendCenteredSubtitle(player, category.ThemeName);
 					}
 
 					Thread.Sleep(250);
@@ -77,10 +75,10 @@ namespace SkyCore.Games.BuildBattle.State
 					
 					player.UpdateGameMode(GameMode.Creative, true);
 
-					player.SendTitle("§f", TitleType.AnimationTimes, 2, 2, 5);
-					player.SendTitle(SelectedCategory.ThemeName, TitleType.SubTitle);
-					player.SendTitle("§fCategory: ", TitleType.Title);
-					
+					string secondLine = "§fYou have §5 minutes§f, let's go!";
+
+					TitleUtil.SendCenteredSubtitle(player, $"{SelectedCategory.ThemeName}\n{secondLine}");
+
 					player.Inventory.Clear();
 					for (int i = 0; i < SelectedCategory.TemplateItems.Count;i++)
 					{

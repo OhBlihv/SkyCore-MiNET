@@ -15,7 +15,7 @@ namespace SkyCore.Game
 		{
 			try
 			{
-				if (player == null)
+				if (player == null || !player.IsConnected || player.KnownPosition == null)
 				{
 					SkyUtil.log("Attempted to show GameList to a null player");
 					return;
