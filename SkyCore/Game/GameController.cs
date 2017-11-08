@@ -202,7 +202,7 @@ namespace SkyCore.Game
 			    return gameLevelInfo;
 		    }
 		    
-			gameLevelInfo = LoadGameLevelInfo(levelName) ?? new GameLevelInfo(RawName, levelName, 6000, new PlayerLocation(255.5, 11, 268.5, 180, 180));
+			gameLevelInfo = LoadGameLevelInfo(levelName);
 
 		    _cachedGameLevelInfos.Add(levelName, gameLevelInfo);
 
@@ -227,23 +227,51 @@ namespace SkyCore.Game
 
 			    string levelInfoFilename = GetGameLevelInfoLocation(RawName, shortLevelName);
 
+			    GameLevelInfo gameLevelInfo;
 				if (File.Exists(levelInfoFilename))
 			    {
 				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
 
-				    GameLevelInfo gameLevelInfo = (GameLevelInfo) JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename),
+				    gameLevelInfo = (GameLevelInfo) JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename),
 					    GetGameLevelInfoType(), new GameLevelInfoJsonConverter());
 
 					//Forcefully update/recalculate BlockCoordinates in-case the configuration was changed without modifying the Distance Property
 					gameLevelInfo.LobbyMapLocation = new BlockCoordinates(gameLevelInfo.LobbyMapLocation.X, gameLevelInfo.LobbyMapLocation.Y, gameLevelInfo.LobbyMapLocation.Z);
 
-					return gameLevelInfo;
-			    }
+					//Ensure all values are non-null
+				    bool dirty = false;
 
-				SkyUtil.log($"Could not find '{levelInfoFilename} for level. Not loading.");
+				    if (string.IsNullOrEmpty(gameLevelInfo.GameType))
+				    {
+					    gameLevelInfo.GameType = RawName;
+						dirty = true;
+				    }
+				    if (string.IsNullOrEmpty(gameLevelInfo.LevelName))
+				    {
+					    gameLevelInfo.LevelName = shortLevelName;
+					    dirty = true;
+				    }
 
-				return null;
-		    }
+				    if (dirty)
+				    {
+						File.WriteAllText(levelInfoFilename, JsonConvert.SerializeObject(gameLevelInfo, Formatting.Indented));
+
+					    SkyUtil.log($"Updating '{levelInfoFilename}' for level. Saving...");
+					}
+				}
+				else
+				{
+					SkyUtil.log($"Could not find '{levelInfoFilename} for level. Generating from base.");
+
+					gameLevelInfo = new GameLevelInfo(RawName, levelName, 6000, new PlayerLocation(255.5, 15, 268.5, 180, 180));
+
+					File.WriteAllText(levelInfoFilename, JsonConvert.SerializeObject(gameLevelInfo, Formatting.Indented));
+
+					SkyUtil.log($"Updating '{levelInfoFilename}' for level. Saving...");
+				}
+
+			    return gameLevelInfo;
+			}
 		    catch (Exception e)
 		    {
 			    Console.WriteLine(e);

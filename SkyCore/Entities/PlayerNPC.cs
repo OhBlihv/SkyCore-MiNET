@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using MiNET.Entities;
 using MiNET.Utils;
 using MiNET.Utils.Skins;
@@ -34,13 +35,14 @@ namespace SkyCore.Entities
 	        NameTag = name;
             KnownPosition = playerLocation;
 
-	        if (string.IsNullOrEmpty(gameName))
+	        string npcSkinLocation;
+	        if (string.IsNullOrEmpty(gameName) || !File.Exists((npcSkinLocation = $@"C:\Users\Administrator\Desktop\npc-skins\{gameName}-npc.png")))
 	        {
 				Skin = new Skin { SkinData = Skin.GetTextureFromFile("Skin.png") };
 	        }
 	        else
 	        {
-				Skin = new Skin { SkinData = Skin.GetTextureFromFile($@"C:\Users\Administrator\Desktop\npc-skins\{gameName}-npc.png") };
+				Skin = new Skin { SkinData = Skin.GetTextureFromFile(npcSkinLocation) };
 	        }
 
 			Scale = 1.8D; //Ensure this NPC is visible

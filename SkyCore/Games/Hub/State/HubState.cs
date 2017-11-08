@@ -120,7 +120,15 @@ namespace SkyCore.Games.Hub.State
 
 						player.Teleport(teleportLocation);
 
-						GameUtil.ShowGameList(player);
+						try
+						{
+							GameUtil.ShowGameList(player);
+						}
+						catch (Exception e)
+						{
+							Console.WriteLine(e);
+							throw;
+						}
 					}
 					else if (IsInInvisRegion(player.KnownPosition))
 					{
