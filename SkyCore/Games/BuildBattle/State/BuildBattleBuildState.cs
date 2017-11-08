@@ -55,18 +55,21 @@ namespace SkyCore.Games.BuildBattle.State
 				}
 
 				List<BuildBattleTheme> categoryRotation = ((BuildBattleLevel) gameLevel).ThemeList;
-				for (int i = 0; i < 12; i++)
 				{
-					BuildBattleTheme category = categoryRotation[i % categoryRotation.Count];
-					foreach (MiNET.Player player in players)
+					int initialTheme = Random.Next(categoryRotation.Count);
+					for (int i = initialTheme; i < (initialTheme + 12); i++)
 					{
-						TitleUtil.SendCenteredSubtitle(player, category.ThemeName);
-					}
+						BuildBattleTheme category = categoryRotation[i % categoryRotation.Count];
+						foreach (MiNET.Player player in players)
+						{
+							TitleUtil.SendCenteredSubtitle(player, category.ThemeName);
+						}
 
-					Thread.Sleep(250);
+						Thread.Sleep(250);
+					}
 				}
 
-				SelectedCategory = categoryRotation[new Random().Next(categoryRotation.Count)];
+				SelectedCategory = categoryRotation[Random.Next(categoryRotation.Count)];
 				gameLevel.DoForAllPlayers(player =>
 				{
 					player.IsWorldImmutable = true; //Allow breaking
