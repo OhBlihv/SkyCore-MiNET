@@ -75,7 +75,7 @@ namespace SkyCore.Games.BuildBattle.State
 					
 					player.UpdateGameMode(GameMode.Creative, true);
 
-					string secondLine = "§fYou have §5 minutes§f, let's go!";
+					string secondLine = "§fYou have §75 minutes§f, let's go!";
 
 					TitleUtil.SendCenteredSubtitle(player, $"{SelectedCategory.ThemeName}\n{secondLine}");
 
