@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using MiNET;
 using MiNET.Blocks;
 using MiNET.Items;
 using MiNET.Utils;
@@ -59,7 +60,9 @@ namespace SkyCore.Games.BuildBattle.State
 					BuildBattleTheme category = categoryRotation[i % categoryRotation.Count];
 					foreach (SkyPlayer player in players)
 					{
-						TitleUtil.SendCenteredSubtitle(player, category.ThemeName);
+						player.SendTitle("§f", TitleType.AnimationTimes, 2, 2, 5);
+						player.SendTitle(category.ThemeName, TitleType.SubTitle);
+						player.SendTitle("§f", TitleType.Title);
 					}
 
 					Thread.Sleep(250);
@@ -74,7 +77,9 @@ namespace SkyCore.Games.BuildBattle.State
 					
 					player.UpdateGameMode(GameMode.Creative, true);
 
-					TitleUtil.SendCenteredSubtitle(player, "§fCategory:\n" + TextUtils.Center(SelectedCategory.ThemeName, "§eCategory:".Length));
+					player.SendTitle("§f", TitleType.AnimationTimes, 2, 2, 5);
+					player.SendTitle(SelectedCategory.ThemeName, TitleType.SubTitle);
+					player.SendTitle("§fCategory: ", TitleType.Title);
 					
 					player.Inventory.Clear();
 					for (int i = 0; i < SelectedCategory.TemplateItems.Count;i++)
