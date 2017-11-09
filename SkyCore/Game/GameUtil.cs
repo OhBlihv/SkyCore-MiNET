@@ -33,7 +33,7 @@ namespace SkyCore.Game
 							Image = new Image
 							{
 								Type = "url",
-								Url = "https://static.skytonia.com/dl/hubicon.png"
+								Url = "https://static.skytonia.com/dl/hubiconmenu.png"
 							},
 							ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "hub"); }
 						},
@@ -43,7 +43,7 @@ namespace SkyCore.Game
 							Image = new Image
 							{
 								Type = "url",
-								Url = "https://static.skytonia.com/dl/murdericon.png"
+								Url = "https://static.skytonia.com/dl/murdericonmenu.png"
 							},
 							ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "murder"); }
 						},
@@ -53,7 +53,7 @@ namespace SkyCore.Game
 							Image = new Image
 							{
 								Type = "url",
-								Url = "https://static.skytonia.com/dl/buildbattleicon.png"
+								Url = "https://static.skytonia.com/dl/buildbattleiconmenu.png"
 							},
 							ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, "build-battle"); }
 						},
@@ -63,7 +63,7 @@ namespace SkyCore.Game
 							Image = new Image
 							{
 								Type = "url",
-								Url = "https://static.skytonia.com/dl/comingsoonicon.png"
+								Url = "https://static.skytonia.com/dl/comingsooniconmenu.png"
 							},
 							ExecuteAction = delegate {  } //Empty
 						}
