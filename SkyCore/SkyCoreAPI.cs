@@ -347,24 +347,6 @@ namespace SkyCore
             return $"{rank}{username}";
         }
 
-	    public Level GetHubLevel()
-	    {
-		    Level level = Server.LevelManager.Levels.FirstOrDefault(l => l.LevelId.Equals("Overworld", StringComparison.InvariantCultureIgnoreCase));
-
-		    if (level == null)
-		    {
-			    if (Server.LevelManager.Levels.Count > 0)
-			    {
-					Console.WriteLine("§c§l(!) §r§cUnable to find level Overworld/world. Returning 0th level.");
-				    return Server.LevelManager.Levels[0];
-				}
-
-			    return null;
-		    }
-
-		    return level;
-	    }
-
 	    public SkyPlayer GetPlayer(string username)
         {
             username = username.ToLower();

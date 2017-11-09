@@ -188,6 +188,11 @@ namespace SkyCore.Games.BuildBattle.State
 			return false;
 		}
 
+		public override bool HandleInventoryModification(SkyPlayer player, GameLevel gameLevel, TransactionRecord message)
+		{
+			return false; //Allow edits
+		}
+
 		public void SendTickableMessage(GameLevel gameLevel, SkyPlayer player, ITickableInformation tickableInformation)
 		{
 			if (tickableInformation == null)

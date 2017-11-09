@@ -109,7 +109,14 @@ namespace SkyCore.Games.BuildBattle.State
 								currentVoteCount += 5;
 								break;
 							default:
-								currentVoteCount += 3; //3/5 vote if invalid
+								if (player.Inventory.InHandSlot < 2)
+								{
+									currentVoteCount += 1; //2
+								}
+								else if (player.Inventory.InHandSlot > 6)
+								{
+									currentVoteCount += 5;
+								}
 								break;
 						}
 					});
@@ -205,10 +212,17 @@ namespace SkyCore.Games.BuildBattle.State
 
 		public void SendTickableMessage(GameLevel gameLevel, SkyPlayer player, ITickableInformation tickableInformation)
 		{
-			BuildBattleVoteTickableInformation voteInformation = (BuildBattleVoteTickableInformation) tickableInformation;
+			BuildBattleVoteTickableInformation voteInformation = tickableInformation as BuildBattleVoteTickableInformation ??
+				GetTickableInformation(_currentVotingPlayer) as BuildBattleVoteTickableInformation;
+
+			if (voteInformation == null)
+			{
+				SkyUtil.log("Unable to process TickableInformation. == null");
+				return;
+			}
 
 			string voteString = "";
-			if (player != voteInformation.BuildingPlayer)
+			if (player != voteInformation.BuildingPlayer) 
 			{
 				//Do not set the held item slot, since this will cause a recursive loop.
 				int heldSlot = player.Inventory.InHandSlot;
@@ -247,7 +261,8 @@ namespace SkyCore.Games.BuildBattle.State
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e);
+					//Console.WriteLine(e);
+					//Ignore this dumb problem. Only happens on the first tick(?)
 				}
 
 				player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");

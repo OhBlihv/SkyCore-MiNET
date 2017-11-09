@@ -117,24 +117,14 @@ namespace SkyCore.Game.State.Impl
 				List<SkyPlayer> remainingPlayers = gameLevel.GetAllPlayers();
 		        if (remainingPlayers.Count > 0)
 		        {
-			        MiNET.Worlds.Level hubLevel = SkyCoreAPI.Instance.GetHubLevel();
-
 			        foreach (SkyPlayer player in remainingPlayers)
 			        {
-				        if (hubLevel == null)
-				        {
-					        //TODO: Avoid kicking them?
-					        player.Disconnect("Unable to enter hub.");
-				        }
-				        else
-				        {
-					        player.BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."), 20, 7);
+						player.BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."), 20, 7);
 
-							gameLevel.RemovePlayer(player);
-							
-							ExternalGameHandler.RequeuePlayer(player, gameLevel.GameType);
-				        }
-			        }
+				        gameLevel.RemovePlayer(player);
+
+				        ExternalGameHandler.RequeuePlayer(player, gameLevel.GameType);
+					}
 		        }
 
 				Thread.Sleep(5000);

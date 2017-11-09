@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MiNET;
 using MiNET.Blocks;
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
+using SkyCore.BugSnag;
 using SkyCore.Game.Level;
 using SkyCore.Player;
 
@@ -87,7 +89,14 @@ namespace SkyCore.Game.State
 	    {
 			if(this is IMessageTickableState tickableState)
 		    {
-				tickableState.SendTickableMessage(gameLevel, player, null);
+			    try
+			    {
+				    tickableState.SendTickableMessage(gameLevel, player, null);
+				}
+			    catch (Exception e)
+			    {
+					BugSnagUtil.ReportBug(null, e);
+			    }
 		    }
 	    }
 

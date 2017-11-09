@@ -248,15 +248,20 @@ namespace SkyCore.Game.Level
             }
         }
 
+	    private readonly object _tickLock = new object();
+
         protected void PreGameTick(object sender)
         {
             try
             {
                 int tick = Tick;
 
-                GameTick(++tick);
+	            lock (_tickLock)
+	            {
+					GameTick(++tick);
 
-                CurrentState.OnTick(this, tick, out tick);
+		            CurrentState.OnTick(this, tick, out tick);
+				}
 
 				//Process player action/popup bars
 	            foreach (SkyPlayer player in GetAllPlayers())
@@ -411,19 +416,6 @@ namespace SkyCore.Game.Level
 			player.RemoveAllEffects();
 		
 			base.RemovePlayer(player); //Remove player from the 'world'
-
-	        if (removeFromWorld && player.Level == this)
-	        {
-		        MiNET.Worlds.Level level = SkyCoreAPI.Instance.GetHubLevel();
-		        if (level == null)
-		        {
-			        player.Disconnect("Unable to send you back to the hub!");
-			        return;
-		        }
-
-		        //player.SpawnLevel(level, level.SpawnPoint, true);
-		        player.SpawnLevel(level, level.SpawnPoint);
-			}
         }
 
         public GameTeam GetPlayerTeam(SkyPlayer player)
@@ -514,11 +506,14 @@ namespace SkyCore.Game.Level
 
         public void UpdateGameState(GameState gameState)
         {
-            CurrentState.LeaveState(this);
+	        lock (_tickLock)
+	        {
+		        CurrentState.LeaveState(this);
 
-            CurrentState = gameState;
+		        CurrentState = gameState;
 
-            CurrentState.EnterState(this);
+		        CurrentState.EnterState(this);
+			}
         }
 
         //Returns true if default behaviour should not occur (effectively cancelled)

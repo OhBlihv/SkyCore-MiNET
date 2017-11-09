@@ -72,7 +72,6 @@ namespace SkyCore.Util
 				{
 					cachedMap = CachedMaps[imageLocation];
 					image = cachedMap.CachedImage;
-					SkyUtil.log("Using Cached Map Image");
 
 					//Dodgily ensure the building flag is disabled
 					cachedMap.IsBuilding = false;
@@ -86,8 +85,6 @@ namespace SkyCore.Util
 
 					image = new Bitmap((Bitmap)Image.FromFile(imageLocation), width * 128, height * 128);
 					cachedMap = new CachedMap(image);
-
-					SkyUtil.log("Creating/Loading new Cached Map Image");
 				}
 
 				BlockCoordinates center = spawnLocation;
