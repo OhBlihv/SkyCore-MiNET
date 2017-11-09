@@ -633,7 +633,7 @@ namespace SkyCore.Game.Level
 					    Image = new Image
 					    {
 						    Type = "url",
-						    Url = "https://static.skytonia.com/dl/replayicon.png"
+						    Url = "https://static.skytonia.com/dl/replayiconmenu.png"
 						},
 					    ExecuteAction = delegate { ExternalGameHandler.AddPlayer(player, GameType); }
 				    }
@@ -652,7 +652,7 @@ namespace SkyCore.Game.Level
 						Image = new Image
 						{
 							Type = "url",
-							Url = "https://static.skytonia.com/dl/spectateicon.png"
+							Url = "https://static.skytonia.com/dl/spectateiconmenu.png"
 						},
 						ExecuteAction = delegate { SetPlayerTeam(player, GetSpectatorTeam()); }
 					}
@@ -667,7 +667,7 @@ namespace SkyCore.Game.Level
 				    Image = new Image
 				    {
 					    Type = "url",
-					    Url = "https://static.skytonia.com/dl/comingsoonicon.png"
+					    Url = "https://static.skytonia.com/dl/comingsooniconmenu.png"
 					},
 					ExecuteAction = delegate { GameUtil.ShowGameList(player); }
 			    }

@@ -177,6 +177,16 @@ namespace SkyCore.Games.Hub.State
 
 		public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 		{
+			return DoInteract(gameLevel, player, interactId);
+		}
+
+		public override bool DoInteractAtBlock(GameLevel gameLevel, int interactId, SkyPlayer player, Block block)
+		{
+			return DoInteract(gameLevel, player, interactId);
+		}
+
+		private bool DoInteract(GameLevel gameLevel, SkyPlayer player, int interactId)
+		{
 			SkyUtil.log($"Handling Hub Interacting from {player.Username} ID:{interactId}");
 			if (player.Inventory.GetItemInHand() is ItemNavigationCompass)
 			{
