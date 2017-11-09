@@ -53,12 +53,17 @@ namespace SkyCore.Game.State
 
         public abstract StateType GetEnumState(GameLevel gameLevel);
 
-	    public virtual bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+	    public virtual bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 	    {
 		    return true;
 	    }
 
-	    public virtual bool HandleInventoryModification(SkyPlayer player, GameLevel gameLevel, TransactionRecord message)
+	    public virtual bool DoInteractAtBlock(GameLevel gameLevel, int interactId, SkyPlayer player, Block block)
+	    {
+		    return true;
+	    }
+
+		public virtual bool HandleInventoryModification(SkyPlayer player, GameLevel gameLevel, TransactionRecord message)
 	    {
 		    return true;
 	    }

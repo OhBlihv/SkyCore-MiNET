@@ -284,7 +284,7 @@ namespace SkyCore.Player
 
 		    if (Level is GameLevel level)
 		    {
-			    if (level.DoInteract(message.actionId, this, null))
+			    if (level.DoInteractAtEntity(message.actionId, this, null))
 			    {
 				    //return; //Avoid default handling
 			    }
@@ -354,65 +354,111 @@ namespace SkyCore.Player
 
 	    protected override void HandleTransactionItemUse(Transaction transaction)
 	    {
-		    Block clickedBlock = Level.GetBlock(new BlockCoordinates(transaction.Position));
-			switch (clickedBlock.Id)
+			Block clickedBlock;
+			if (Level is GameLevel level && level.DoInteractAtBlock(2, this, clickedBlock = Level.GetBlock(new BlockCoordinates(transaction.Position)))) //'Right Click'
 		    {
-			    case 64:
-			    case 193:
-			    case 194:
-			    case 195:
-			    case 196:
-			    case 197:
+				switch (clickedBlock.Id)
 			    {
-				    SkyUtil.log("Blocking interaction");
-				    SkyUtil.log("(2) Fixing block at " + new BlockCoordinates(transaction.Position));
-
-				    Block upperHalf, lowerHalf;
-
-				    //Lower Half
-				    if ((clickedBlock.Metadata | 0x8) == 0)
+					//Single-Block Interactables (Visible)
+				    case 107:   //Fence Gate
+					case 183:   //Fence Gate (Spruce)
+					case 184:   //Fence Gate (Birch)
+					case 185:   //Fence Gate (Jungle)
+					case 186:   //Fence Gate (Dark Oak)
+					case 187:	//Fence Gate (Acacia)
+				    case 69:	//Lever
+				    case 149:	//Comparator (Unpowered)
+				    case 150:	//Comparator (Powered)
+				    case 93:	//Repeater (Unpowered)
+				    case 94:    //Repeater (Powered)
+					case 96:    //Trap Door (Wood)
+					//case 167:	//Trap Door (Iron)
 				    {
-					    lowerHalf = clickedBlock;
+						var blockUpdate = McpeUpdateBlock.CreateObject();
+					    blockUpdate.blockId = clickedBlock.Id;
+					    blockUpdate.coordinates = clickedBlock.Coordinates;
+					    blockUpdate.blockMetaAndPriority = (byte)(0xb << 4 | (clickedBlock.Metadata & 0xf));
 
-					    BlockCoordinates otherHalfCoordinates = new BlockCoordinates(transaction.Position);
-					    otherHalfCoordinates.Y += 1;
-
-					    upperHalf = Level.GetBlock(otherHalfCoordinates);
-				    }
-				    //Upper Half
-				    else
-				    {
-					    upperHalf = clickedBlock;
-
-					    BlockCoordinates otherHalfCoordinates = new BlockCoordinates(transaction.Position);
-					    otherHalfCoordinates.Y -= 1;
-
-					    lowerHalf = Level.GetBlock(otherHalfCoordinates);
+						SendPackage(blockUpdate);
+					    return;
 				    }
 
-				    lowerHalf.Metadata = (byte)(lowerHalf.Metadata | 0x4);
+					//Single-Block Interactables (Block)
+					/*case 70:	//Stone Pressure Plate
+					case 72:    //Wood Pressure Plate
+					case 147:   //Light (Gold) Pressure Plate
+					case 148:   //Heavy (Iron) Pressure Plate*/
+				    case 77:	//Stone Button
+				    case 143:	//Wood Button
+				    {
+					    return; //Ignore Handling
+				    }
 
-					var lowerHalfUpdate = McpeUpdateBlock.CreateObject();
-				    lowerHalfUpdate.blockId = lowerHalf.Id;
-				    lowerHalfUpdate.coordinates = lowerHalf.Coordinates;
-				    lowerHalfUpdate.blockMetaAndPriority = (byte)(0xb << 4 | (lowerHalf.Metadata & 0xf));
+					//Containers (Block)
+				    case 54: //Chest
+					case 146: //Trapped Chest
+				    case 61: //Furnace (Unlit)
+				    case 62: //Furnace (Lit)
+				    case 117: //Brewing Stand
+				    case 130: //EnderChest
+				    case 138: //Beacon
+				    case 125: //Dropper
+				    case 23: //Dispenser
+				    case 25: //Noteblock
+				    case 84: //Jukebox
+				    case 58: //Crafting Bench
+				    {
+					    return; //Ignore handling
+				    }
 
-				    RunnableTask.RunTaskLater(() => SendPackage(lowerHalfUpdate), 1000);
+					//Doors
+					case 64:	//Door (Wood)
+					//case 71:  //Door (Iron)
+				    case 193:
+				    case 194:
+				    case 195:
+				    case 196:
+				    case 197:
+				    {
+					    Block upperHalf, lowerHalf;
 
-				    var upperHalfUpdate = McpeUpdateBlock.CreateObject();
-				    upperHalfUpdate.blockId = upperHalf.Id;
-				    upperHalfUpdate.coordinates = upperHalf.Coordinates;
-				    upperHalfUpdate.blockMetaAndPriority = (byte)(0xb << 4 | (upperHalf.Metadata & 0xf));
+					    //Lower Half
+					    if ((clickedBlock.Metadata | 0x8) == 0)
+					    {
+						    lowerHalf = clickedBlock;
 
-				    RunnableTask.RunTaskLater(() => SendPackage(upperHalfUpdate), 1000);
-					break;
+						    BlockCoordinates otherHalfCoordinates = new BlockCoordinates(transaction.Position);
+						    otherHalfCoordinates.Y += 1;
+
+						    upperHalf = Level.GetBlock(otherHalfCoordinates);
+					    }
+					    //Upper Half
+					    else
+					    {
+						    upperHalf = clickedBlock;
+
+						    BlockCoordinates otherHalfCoordinates = new BlockCoordinates(transaction.Position);
+						    otherHalfCoordinates.Y -= 1;
+
+						    lowerHalf = Level.GetBlock(otherHalfCoordinates);
+					    }
+
+					    var lowerHalfUpdate = McpeUpdateBlock.CreateObject();
+					    lowerHalfUpdate.blockId = lowerHalf.Id;
+					    lowerHalfUpdate.coordinates = lowerHalf.Coordinates;
+					    lowerHalfUpdate.blockMetaAndPriority = (byte)(0xb << 4 | (lowerHalf.Metadata & 0xf));
+
+					    var upperHalfUpdate = McpeUpdateBlock.CreateObject();
+					    upperHalfUpdate.blockId = upperHalf.Id;
+					    upperHalfUpdate.coordinates = upperHalf.Coordinates;
+					    upperHalfUpdate.blockMetaAndPriority = (byte)(0xb << 4 | (upperHalf.Metadata & 0xf));
+
+					    SendPackage(lowerHalfUpdate);
+
+					    SendPackage(upperHalfUpdate);
+					    return; //Avoid base functionality
+				    }
 			    }
-		    }
-
-			
-			if (HandleInteract(2, null)) //'Right Click'
-			{
-
 			}
 
 			base.HandleTransactionItemUse(transaction);
@@ -440,8 +486,8 @@ namespace SkyCore.Player
             {
                 if (Level is GameLevel level)
                 {
-					//return level.DoInteract(actionId, this, (SkyPlayer) target);
-					level.DoInteract(actionId, this, (SkyPlayer)target);
+					//return level.DoInteractAtEntity(actionId, this, (SkyPlayer) target);
+					level.DoInteractAtEntity(actionId, this, (SkyPlayer)target);
 
 	                return true;
                 }

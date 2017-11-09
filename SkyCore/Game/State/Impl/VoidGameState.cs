@@ -54,7 +54,7 @@ namespace SkyCore.Game.State.Impl
 			return StateType.Closing;
 		}
 
-		public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+		public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 		{
 			return false;
 		}

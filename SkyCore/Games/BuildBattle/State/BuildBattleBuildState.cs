@@ -146,7 +146,7 @@ namespace SkyCore.Games.BuildBattle.State
 			gameLevel.DoForAllPlayers((player) => SendTickableMessage(gameLevel, player, tickableInformation));
 		}
 
-		public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+		public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 		{
 			return false; //Avoid cancelling to allow block placing
 		}

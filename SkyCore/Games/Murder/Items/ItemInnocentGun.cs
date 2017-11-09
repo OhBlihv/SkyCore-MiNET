@@ -54,7 +54,7 @@ namespace SkyCore.Games.Murder.Items
 
         public override void Release(MiNET.Worlds.Level world, MiNET.Player player, BlockCoordinates blockCoordinates, long timeUsed)
         {
-	        ((MurderRunningState) ((MurderLevel) world).CurrentState).DoInteract((GameLevel) world, 1, (SkyPlayer) player, null);
+	        ((MurderRunningState) ((MurderLevel) world).CurrentState).DoInteractAtEntity((GameLevel) world, 1, (SkyPlayer) player, null);
         }
     }
 }

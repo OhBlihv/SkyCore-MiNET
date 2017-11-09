@@ -346,7 +346,7 @@ namespace SkyCore.Games.Murder.State
             return new MurderEndState();
         }
 
-        public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+        public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
         {
             MurderLevel murderLevel = (MurderLevel) gameLevel;
             Item itemInHand = player.Inventory.GetItemInHand();

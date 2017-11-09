@@ -175,7 +175,7 @@ namespace SkyCore.Games.Hub.State
 			return StateType.PreGame; //Allow all joins
 		}
 
-		public override bool DoInteract(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+		public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 		{
 			SkyUtil.log($"Handling Hub Interacting from {player.Username} ID:{interactId}");
 			if (player.Inventory.GetItemInHand() is ItemNavigationCompass)

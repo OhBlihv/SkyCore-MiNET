@@ -14,9 +14,11 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using Bugsnag;
+using MiNET.Blocks;
 using MiNET.Net;
 using SkyCore.BugSnag;
 using SkyCore.Entities;
+using Button = MiNET.UI.Button;
 
 namespace SkyCore.Game.Level
 {
@@ -39,10 +41,10 @@ namespace SkyCore.Game.Level
 	    }
 
 	    //Player -> Team
-        public readonly Dictionary<string, GameTeam> PlayerTeamDict = new Dictionary<string, GameTeam>();
+        public readonly IDictionary<string, GameTeam> PlayerTeamDict = new Dictionary<string, GameTeam>();
 
         //Team -> Player(s)
-        protected readonly Dictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
+        protected readonly IDictionary<GameTeam, List<SkyPlayer>> TeamPlayerDict = new Dictionary<GameTeam, List<SkyPlayer>>();
 
 	    public GameLevelInfo GameLevelInfo { get; set; }
 
@@ -520,10 +522,16 @@ namespace SkyCore.Game.Level
         }
 
         //Returns true if default behaviour should not occur (effectively cancelled)
-        public bool DoInteract(int interactId, SkyPlayer player, SkyPlayer target)
+        public bool DoInteractAtEntity(int interactId, SkyPlayer player, SkyPlayer target)
         {
-	        return CurrentState.DoInteract(this, interactId, player, target);
+	        return CurrentState.DoInteractAtEntity(this, interactId, player, target);
         }
+
+	    //Returns true if default behaviour should not occur (effectively cancelled)
+		public bool DoInteractAtBlock(int interactId, SkyPlayer player, Block block)
+	    {
+		    return CurrentState.DoInteractAtBlock(this, interactId, player, block);
+	    }
 
 		/// <summary>
 		/// 
