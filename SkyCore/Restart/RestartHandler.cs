@@ -130,9 +130,12 @@ namespace SkyCore.Restart
 			//Start Actual Shutdown
 			MiNetServer server = SkyCoreAPI.Instance.Server;
 
-			foreach (IPlugin plugin in server.PluginManager.Plugins)
+			foreach (object pluginObject in server.PluginManager.Plugins)
 			{
-				plugin.OnDisable();
+				if (pluginObject is IPlugin plugin)
+				{
+					plugin.OnDisable();
+				}
 			}
 
 			server.PluginManager.Plugins.Clear();
