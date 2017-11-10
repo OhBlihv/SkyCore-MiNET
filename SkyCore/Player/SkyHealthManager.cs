@@ -27,17 +27,16 @@ namespace SkyCore.Player
 	        {
 		        level.HandleDamage(source, Entity, tool, damage, cause);
 	        }
-	        else
-	        {
-		        if (cause == DamageCause.Void)
-		        {
-			        PlayerLocation spawnLocation = (PlayerLocation) Entity.Level.SpawnPoint.Clone();
-			        spawnLocation.Y += 1; //Spawn slightly above the spawn block
 
-					((SkyPlayer) Entity).Teleport(spawnLocation);
-		        }
-	        }
-        }
+			//Void damage should be handled this way regardless of location
+			if (cause == DamageCause.Void)
+			{
+				PlayerLocation spawnLocation = (PlayerLocation)Entity.Level.SpawnPoint.Clone();
+				spawnLocation.Y += 1; //Spawn slightly above the spawn block
+
+				((SkyPlayer)Entity).Teleport(spawnLocation);
+			}
+		}
 
         private readonly object _killSync = new object();
 
