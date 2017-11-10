@@ -27,10 +27,12 @@ namespace SkyCore.Util
 
 			if (centreText)
 			{
+				i += content.Split('\n').Length;
+
 				subtitleString += TextUtils.Center(content);
 			}
 
-			while (i++ < 10)
+			while (i++ < 11) //Push Up
 			{
 				subtitleString += "§f\n";
 			}

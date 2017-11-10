@@ -119,7 +119,7 @@ namespace SkyCore.Games.Murder.State
 			            MurderTeam team = teamRotation[(offset + i) % 3];
 						foreach (SkyPlayer player in players)
 						{
-							TitleUtil.SendCenteredSubtitle(player, team.TeamPrefix + "§l" + team.TeamName + "\n");
+							TitleUtil.SendCenteredSubtitle(player, team.TeamPrefix + "§l" + team.TeamName);
 
 							//Poorly enforce speed
 							if (i == 0 || i == 11)

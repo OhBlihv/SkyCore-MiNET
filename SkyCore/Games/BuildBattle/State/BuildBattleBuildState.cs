@@ -70,7 +70,7 @@ namespace SkyCore.Games.BuildBattle.State
 						BuildBattleTheme category = categoryRotation[i % categoryRotation.Count];
 						foreach (MiNET.Player player in players)
 						{
-							TitleUtil.SendCenteredSubtitle(player, "§r\n" + category.ThemeName);
+							TitleUtil.SendCenteredSubtitle(player, category.ThemeName);
 						}
 
 						Thread.Sleep(250);
