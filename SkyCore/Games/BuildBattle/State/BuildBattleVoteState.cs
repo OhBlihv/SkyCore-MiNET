@@ -268,7 +268,7 @@ namespace SkyCore.Games.BuildBattle.State
 				player.BarHandler.AddMinorLine("§6(Please hold your vote selection)");
 			}
 
-			player.BarHandler.AddMajorLine($"§d§lBUILDER§r §f{voteInformation.BuildingPlayer.Username}§r §7| {voteInformation.NeatTimeRemaining} Vote Time {voteString}", 2);
+			player.BarHandler.AddMajorLine($"§d§lBUILDER§r §f{voteInformation.BuildingPlayer.Username}§r §7| {voteInformation.NeatTimeRemaining} Vote Time{voteString}", 2);
 		}
 
 		public ITickableInformation GetTickableInformation(SkyPlayer player)
