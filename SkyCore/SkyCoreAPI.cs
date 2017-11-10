@@ -293,7 +293,7 @@ namespace SkyCore
 	        try //TODO: Remove - Just for testing
 	        {
 		        string text = message.message;
-		        if (text.StartsWith(".") || text.StartsWith("/"))
+		        if (text.StartsWith("/"))
 		        {
 			        return message;
 		        }
