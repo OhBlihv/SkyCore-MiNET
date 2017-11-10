@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using MiNET;
 using MiNET.Plugins;
 using MiNET.Utils;
+using SkyCore.BugSnag;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -130,16 +131,31 @@ namespace SkyCore.Restart
 			//Start Actual Shutdown
 			MiNetServer server = SkyCoreAPI.Instance.Server;
 
-			foreach (object pluginObject in server.PluginManager.Plugins)
+			try
 			{
-				if (pluginObject is IPlugin plugin)
+				foreach (object pluginObject in server.PluginManager.Plugins)
 				{
-					plugin.OnDisable();
+					if (pluginObject is IPlugin plugin)
+					{
+						plugin.OnDisable();
+					}
 				}
+
+				server.PluginManager.Plugins.Clear();
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(null, e);
 			}
 
-			server.PluginManager.Plugins.Clear();
-			server.StopServer();
+			try
+			{
+				server.StopServer();
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(null, e);
+			}
 
 			Environment.Exit(0);
 		}
