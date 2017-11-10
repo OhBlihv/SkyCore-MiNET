@@ -701,7 +701,7 @@ namespace SkyCore.Game.Level
 				new GameRule<bool>(GameRulesEnum.Falldamage, false),
 				new GameRule<bool>(GameRulesEnum.Firedamage, false),
 				new GameRule<bool>(GameRulesEnum.Mobgriefing, false),
-				new GameRule<bool>(GameRulesEnum.ShowCoordinates, true),
+				new GameRule<bool>(GameRulesEnum.ShowCoordinates, false),
 				new GameRule<bool>(GameRulesEnum.NaturalRegeneration, false),
 				new GameRule<bool>(GameRulesEnum.TntExplodes, false),
 				new GameRule<bool>(GameRulesEnum.SendCommandfeedback, false)
