@@ -95,7 +95,29 @@ namespace SkyCore.Player
 			}
 	    }
 
-        public SkyPlayer(MiNetServer server, IPEndPoint endpoint, SkyCoreAPI skyCoreApi) : base(server, endpoint)
+	    public string GetNameTag(MiNET.Player player)
+	    {
+		    string username = player.Username;
+
+		    string rank;
+		    if (player is SkyPlayer skyPlayer)
+		    {
+			    rank = skyPlayer.PlayerGroup.Prefix;
+		    }
+		    else
+		    {
+			    rank = SkyCoreApi.Permissions.GetPlayerGroup(player.Username).Prefix;
+		    }
+
+		    if (rank.Length > 2)
+		    {
+			    rank += " ";
+		    }
+
+		    return $"{rank}{username}";
+	    }
+
+		public SkyPlayer(MiNetServer server, IPEndPoint endpoint, SkyCoreAPI skyCoreApi) : base(server, endpoint)
         {
             SkyCoreApi = skyCoreApi;
 

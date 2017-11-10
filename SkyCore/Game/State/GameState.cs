@@ -7,7 +7,9 @@ using MiNET.Items;
 using MiNET.Utils;
 using SkyCore.BugSnag;
 using SkyCore.Game.Level;
+using SkyCore.Permissions;
 using SkyCore.Player;
+using SkyCore.Punishments;
 
 namespace SkyCore.Game.State
 {
@@ -55,7 +57,29 @@ namespace SkyCore.Game.State
 
         public abstract StateType GetEnumState(GameLevel gameLevel);
 
-	    public virtual bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
+	    public virtual void HandlePlayerChat(SkyPlayer player, string message)
+	    {
+			if (PunishCore.GetPunishmentsFor(player.CertificateData.ExtraData.Xuid).HasActive(PunishmentType.Mute))
+		    {
+			    player.SendMessage("§c§l(!)§r §cYou cannot chat while you are muted.");
+			    return;
+		    }
+
+		    message = TextUtils.RemoveFormatting(message);
+
+		    string chatColor = ChatColors.White;
+		    if (player.PlayerGroup == PlayerGroup.Player)
+		    {
+			    chatColor = ChatColors.Gray;
+		    }
+
+		    string formattedText = $"{player.GetNameTag(player)}{ChatColors.Gray}: {chatColor}{message}";
+		    SkyUtil.log($"Broadcasting to {player.Level.LevelId}: {formattedText}");
+		    player.Level.BroadcastMessage(formattedText, MessageType.Raw);
+
+		}
+
+		public virtual bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
 	    {
 		    return true;
 	    }

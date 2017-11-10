@@ -290,62 +290,19 @@ namespace SkyCore
         [PacketHandler, Receive]
         public Package MessageHandler(McpeText message, MiNET.Player player)
         {
-	        try //TODO: Remove - Just for testing
+	        string text = message.message;
+	        if (text.StartsWith("/"))
 	        {
-		        string text = message.message;
-		        if (text.StartsWith("/"))
-		        {
-			        return message;
-		        }
-
-		        if (PunishCore.GetPunishmentsFor(player.CertificateData.ExtraData.Xuid).HasActive(PunishmentType.Mute))
-		        {
-			        player.SendMessage("§c§l(!)§r §cYou cannot chat while you are muted.");
-			        return null;
-		        }
-
-		        text = TextUtils.RemoveFormatting(text);
-
-		        string chatColor = ChatColors.White;
-		        if (((SkyPlayer)player).PlayerGroup == PlayerGroup.Player)
-		        {
-			        chatColor = ChatColors.Gray;
-		        }
-
-		        string formattedText = $"{GetNameTag(player)}{ChatColors.Gray}: {chatColor}{text}";
-		        SkyUtil.log($"Broadcasting to {player.Level.LevelId}: {formattedText}");
-		        player.Level.BroadcastMessage(formattedText, MessageType.Raw);
-
-		        return null;
-			}
-	        catch (Exception e)
-	        {
-		        Console.WriteLine(e);
-		        return null;
+		        return message;
 	        }
-        }
 
-        private string GetNameTag(MiNET.Player player)
-        {
-            string username = player.Username;
+			if (player is SkyPlayer skyPlayer && skyPlayer.Level is GameLevel level)
+	        {
+		        level.CurrentState.HandlePlayerChat(skyPlayer, text);
+	        }
 
-            string rank;
-            if (player is SkyPlayer skyPlayer)
-            {
-                rank = skyPlayer.PlayerGroup.Prefix;
-            }
-            else
-            {
-                rank = Permissions.GetPlayerGroup(player.Username).Prefix;
-            }
-
-            if (rank.Length > 2)
-            {
-                rank += " ";
-            }
-
-            return $"{rank}{username}";
-        }
+	        return null;
+		}
 
 	    public SkyPlayer GetPlayer(string username)
         {
