@@ -566,7 +566,7 @@ namespace SkyCore.Player
             IsFlying = false;
             IsSpectator = false;
 
-	        base.SpawnLevel(toLevel, spawnPoint, false, levelFunc, postSpawnAction);
+	        base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc, postSpawnAction);
         }
 
 	    public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
