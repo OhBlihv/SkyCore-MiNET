@@ -41,11 +41,17 @@ namespace SkyCore.Entities.Holograms
 
 			if (gamePool != null && gamePool.Active && playerCount >= 0)
 			{
-				SetNameTag($"§fPlayers Online:§r §e{playerCount}");
+				if (gamePool.GetAllInstances().Count > 0)
+				{
+					SetNameTag($"§fPlayers Online:§r §e{playerCount}");
+				}
+				else
+				{
+					SetNameTag("§cUnavailable");
+				}
 			}
 			else
 			{
-				//SetNameTag("§cUnavailable");
 				SetNameTag("§a(Coming Soon)");
 			}
 		}
