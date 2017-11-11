@@ -214,6 +214,7 @@ namespace SkyCore.Player
 							{
 								action.Invoke();
 							}
+							_postLoginActions.Clear();
 
 							if (Username.Equals("OhBlihv") || Username.Equals("Donnas Wraps"))
 							{
@@ -613,6 +614,12 @@ namespace SkyCore.Player
 	        }
 
 	        base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc, postSpawnAction);
+
+	        if (NoAi)
+	        {
+		        SkyUtil.log("(SPAWN) Re-enabling movement");
+		        SetNoAi(false);
+	        }
         }
 
 		public McpePlayerSkin CachedSkin { get; set; }

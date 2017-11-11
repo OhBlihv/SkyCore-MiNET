@@ -24,6 +24,15 @@ namespace SkyCore.Player
 
 					//Don't send any changes to the player
 					//This avoids the noticable 'flick' to the 0th slot that gets in the way
+					if (sendToPlayer)
+					{
+						McpeMobEquipment order = McpeMobEquipment.CreateObject();
+						order.runtimeEntityId = EntityManager.EntityIdSelf;
+						order.item = GetItemInHand();
+						order.selectedSlot = (byte)selectedHotbarSlot;
+						order.slot = (byte)ItemHotbar[InHandSlot];
+						Player.SendPackage(order);
+					}
 
 					McpeMobEquipment broadcast = McpeMobEquipment.CreateObject();
 					broadcast.runtimeEntityId = Player.EntityId;

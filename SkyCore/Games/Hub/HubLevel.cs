@@ -117,7 +117,7 @@ namespace SkyCore.Games.Hub
 					player.RemoveEffect(new Invisibility());
 					player.BroadcastSetEntityData();
 					player.SetNameTagVisibility(true);
-					player.Inventory.SetHeldItemSlot(player.Inventory.InHandSlot);
+					player.Inventory.SetHeldItemSlot(player.Inventory.InHandSlot, false);
 				}
 			}
 		}
@@ -163,7 +163,7 @@ namespace SkyCore.Games.Hub
 			}
 
 			//Update slot held for other players
-			player.Inventory.SetHeldItemSlot(player.Inventory.InHandSlot);
+			player.Inventory.SetHeldItemSlot(player.Inventory.InHandSlot, false);
 		}
 
 		public override int GetMaxPlayers()

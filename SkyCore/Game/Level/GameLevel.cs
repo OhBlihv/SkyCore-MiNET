@@ -311,7 +311,8 @@ namespace SkyCore.Game.Level
             }
         }
 
-		public void AddPlayer(SkyPlayer player)
+		//New GameLevel Method
+	    public void AddPlayer(SkyPlayer player)
         {
 	        if (player.Level != this && player.Level is GameLevel level)
 	        {
