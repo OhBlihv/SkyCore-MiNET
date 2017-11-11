@@ -278,6 +278,46 @@ namespace SkyCore.Player
 		    SetNoAi(freeze);
 		}
 
+		public override void BroadcastSetEntityData()
+		{
+			if (IsGameSpectator)
+			{
+				McpeSetEntityData mcpeSetEntityData = McpeSetEntityData.CreateObject();
+				mcpeSetEntityData.runtimeEntityId = EntityId;
+				mcpeSetEntityData.metadata = GetMetadata();
+				mcpeSetEntityData.metadata[(int)Entity.MetadataFlags.Scale] = new MetadataFloat(0.01f); // Scale
+
+				foreach (var gamePlayer in Level.GetAllPlayers())
+				{
+					if (gamePlayer == this)
+					{
+						continue;
+					}
+
+					gamePlayer.SendPackage(mcpeSetEntityData);
+				}
+
+				McpeSetEntityData selfSetEntityData = McpeSetEntityData.CreateObject();
+				selfSetEntityData.runtimeEntityId = EntityId;
+				selfSetEntityData.metadata = GetMetadata();
+
+				SendPackage(selfSetEntityData);
+			}
+			else
+			{
+				base.BroadcastSetEntityData();
+			}
+		}
+
+	    public override void SendEquipmentForPlayer(MiNET.Player[] receivers)
+	    {
+		    McpeMobEquipment mcpePlayerEquipment = McpeMobEquipment.CreateObject();
+		    mcpePlayerEquipment.runtimeEntityId = EntityId;
+		    mcpePlayerEquipment.item = IsGameSpectator ? new ItemAir() : Inventory.GetItemInHand();
+		    mcpePlayerEquipment.slot = 0;
+		    Level.RelayBroadcast(this, receivers, mcpePlayerEquipment);
+	    }
+
 	    public override void HandleMcpeMovePlayer(McpeMovePlayer message)
 	    {
 		    if (_freeze)
@@ -574,6 +614,14 @@ namespace SkyCore.Player
 
 	        base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc, postSpawnAction);
         }
+
+		public McpePlayerSkin CachedSkin { get; set; }
+
+	    public override void HandleMcpePlayerSkin(McpePlayerSkin message)
+	    {
+		    SkyUtil.log("Caching player skin");
+		    CachedSkin = message;
+	    }
 
 	    public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
 		{

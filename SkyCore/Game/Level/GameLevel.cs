@@ -338,14 +338,12 @@ namespace SkyCore.Game.Level
 
 	        if (player.Level != this)
 	        {
-		        SkyUtil.log("Spawning in");
 				//Only show the level transition screen to players changing games on this instance
 		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
 		        //player.SpawnLevel(this, GameLevelInfo.LobbyLocation, true);
 			}
 	        else //Still teleport the player to the spawn location
 	        {
-		        SkyUtil.log("Teleporting");
 		        player.Teleport(GameLevelInfo.LobbyLocation);
 	        }
 
@@ -495,8 +493,13 @@ namespace SkyCore.Game.Level
 		                });
 
 		                SkyUtil.log(
-			                $"Spawning {player.Username} to {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
+			                $"Spawning {player.Username} to ({string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())})");
 		                player.SpawnToPlayers(gamePlayers.ToArray());
+
+		                foreach (MiNET.Player gamePlayer in gamePlayers)
+		                {
+			                gamePlayer.SendPackage(player.CachedSkin);
+		                }
 	                }
 
 	                player.IsGameSpectator = false;

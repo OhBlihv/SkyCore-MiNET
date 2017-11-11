@@ -43,12 +43,15 @@ namespace SkyCore.Games.Hub
 		public HubController(SkyCoreAPI plugin) : base(plugin, "hub", "Hub", new List<string>{"hub"})
 		{
 			Tick = 1;
-			
+
 			//Register all hubs
-			for (int i = 0; i < MaxHubCount; i++)
+			/*for (int i = 0; i < MaxHubCount; i++)
 			{
 				InitializeNewGame();
-			}
+			}*/
+
+			//TODO: Remove - Initialize one hub for testing
+			InitializeNewGame();
 		}
 
 		public override string GetNextGameId()

@@ -1,20 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using log4net;
 using MiNET.Effects;
 using MiNET.Entities;
 using MiNET.Net;
 using MiNET.Utils;
-using MiNET.Worlds;
 using SkyCore.Entities;
-using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
-using SkyCore.Game.State.Impl;
 using SkyCore.Games.Hub.State;
 using SkyCore.Player;
 using SkyCore.Util;
@@ -71,41 +64,12 @@ namespace SkyCore.Games.Hub
 			TeamPlayerDict.Add(HubTeam.Player, new List<SkyPlayer>());
 			TeamPlayerDict.Add(HubTeam.Spectator, new List<SkyPlayer>());
 		}
-
-		private readonly object _playerWriteLock = new object();
-
-		public override void AddPlayer(MiNET.Player newPlayer, bool spawn)
+		
+		public override void AddPlayer(MiNET.Player player, bool spawn)
 		{
-			if (newPlayer.Username == null) throw new ArgumentNullException(nameof(newPlayer.Username));
+			AddSpectator(player as SkyPlayer);
 
-			EntityManager.AddEntity(newPlayer);
-
-			lock (_playerWriteLock)
-			{
-				if (!newPlayer.IsConnected)
-				{
-					Log.Error("Tried to add player that was already disconnected.");
-					return;
-				}
-
-				if (Players.TryAdd(newPlayer.EntityId, newPlayer))
-				{
-					//Avoid spawning players inside the invisibility region
-					//SpawnToAll(newPlayer);
-
-					foreach (Entity entity in Entities.Values.ToArray())
-					{
-						if (entity is SkyPlayer player && player.IsGameSpectator)
-						{
-							continue; //Ignore invisible players
-						}
-
-						entity.SpawnToPlayers(new[] { newPlayer });
-					}
-				}
-
-				newPlayer.IsSpawned = spawn;
-			}
+			base.AddPlayer(player, spawn);
 		}
 
 		public override void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
@@ -130,6 +94,34 @@ namespace SkyCore.Games.Hub
 			((SkyPlayer)player).GameTeam = null;
 		}
 
+		public override void SetPlayerTeam(SkyPlayer player, GameTeam oldTeam, GameTeam team)
+		{
+			if (oldTeam != null)
+			{
+				TeamPlayerDict[oldTeam].Remove(player);
+			}
+
+			if (team != null)
+			{
+				TeamPlayerDict[team].Add(player);
+
+				if (team.IsSpectator)
+				{
+					AddSpectator(player);
+				}
+				else
+				{
+					player.IsGameSpectator = false;
+
+					//Re-update visible characteristics
+					player.RemoveEffect(new Invisibility());
+					player.BroadcastSetEntityData();
+					player.SetNameTagVisibility(true);
+					player.Inventory.SetHeldItemSlot(player.Inventory.InHandSlot);
+				}
+			}
+		}
+
 		public override GameState GetInitialState()
 		{
 			return new HubState();
@@ -149,17 +141,29 @@ namespace SkyCore.Games.Hub
 		{
 			player.IsGameSpectator = true;
 
-			List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
-			DoForAllPlayers(gamePlayer =>
-			{
-				if (!gamePlayer.IsGameSpectator)
-				{
-					gamePlayers.Add(gamePlayer);
-				}
-			});
+			//Set an invisibily effect on top of the scale to completely 'remove' the player
+			player.SetEffect(new Invisibility { Duration = int.MaxValue, Particles = false });
 
-			SkyUtil.log($"Despawning {player.Username} from {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
-			player.DespawnFromPlayers(gamePlayers.ToArray());
+			player.SetNameTagVisibility(false);
+
+			McpeSetEntityData mcpeSetEntityData = McpeSetEntityData.CreateObject();
+			mcpeSetEntityData.runtimeEntityId = player.EntityId;
+			mcpeSetEntityData.metadata = player.GetMetadata();
+			mcpeSetEntityData.metadata[(int) Entity.MetadataFlags.Scale] = new MetadataFloat(0.5f); // Scale
+
+			//Avoid changing the local player's scale
+			foreach (SkyPlayer gamePlayer in GetAllPlayers())
+			{
+				if (gamePlayer == player)
+				{
+					continue;
+				}
+
+				gamePlayer.SendPackage(mcpeSetEntityData);
+			}
+
+			//Update slot held for other players
+			player.Inventory.SetHeldItemSlot(player.Inventory.InHandSlot);
 		}
 
 		public override int GetMaxPlayers()

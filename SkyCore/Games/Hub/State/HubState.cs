@@ -103,7 +103,7 @@ namespace SkyCore.Games.Hub.State
 				}
 			}
 
-			if (currentTick % 5 == 0)
+			if (currentTick % 2 == 0)
 			{
 				foreach (SkyPlayer player in gameLevel.Players.Values)
 				{
@@ -149,7 +149,7 @@ namespace SkyCore.Games.Hub.State
 			}
 		}
 
-		private bool IsInPortal(PlayerLocation playerLocation)
+		private static bool IsInPortal(PlayerLocation playerLocation)
 		{
 			return
 				playerLocation.X >= 253 && playerLocation.X <= 259 &&
@@ -157,7 +157,7 @@ namespace SkyCore.Games.Hub.State
 				playerLocation.Z >= 276 && playerLocation.Z <= 279;
 		}
 
-		private bool IsInInvisRegion(PlayerLocation playerLocation)
+		private static bool IsInInvisRegion(PlayerLocation playerLocation)
 		{
 			return
 				playerLocation.X >= 252 && playerLocation.X <= 261 &&

@@ -1,4 +1,8 @@
 ﻿using MiNET;
+using MiNET.Items;
+using MiNET.Net;
+using MiNET.Worlds;
+using SkyCore.Games.Hub;
 
 namespace SkyCore.Player
 {
@@ -12,11 +16,32 @@ namespace SkyCore.Player
 
 		public override void SetHeldItemSlot(int selectedHotbarSlot, bool sendToPlayer = true)
 		{
-			base.SetHeldItemSlot(selectedHotbarSlot, sendToPlayer);
-
 			if (Player is SkyPlayer player)
 			{
+				if (player.IsGameSpectator && Player.Level is HubLevel)
+				{
+					InHandSlot = selectedHotbarSlot;
+
+					//Don't send any changes to the player
+					//This avoids the noticable 'flick' to the 0th slot that gets in the way
+
+					McpeMobEquipment broadcast = McpeMobEquipment.CreateObject();
+					broadcast.runtimeEntityId = Player.EntityId;
+					broadcast.item = new ItemAir();
+					broadcast.selectedSlot = 0;
+					broadcast.slot = (byte)ItemHotbar[InHandSlot];
+					Player.Level?.RelayBroadcast(Player, broadcast);
+				}
+				else
+				{
+					base.SetHeldItemSlot(selectedHotbarSlot, sendToPlayer);
+				}
+
 				player.HandleHeldItemSlotChange(selectedHotbarSlot);
+			}
+			else
+			{
+				base.SetHeldItemSlot(selectedHotbarSlot, sendToPlayer);
 			}
 		}
 	}
