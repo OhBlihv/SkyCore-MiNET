@@ -19,6 +19,7 @@ using SkyCore.Statistics;
 using SkyCore.Util;
 using Bugsnag;
 using MiNET.Blocks;
+using SkyCore.Games.Hub;
 
 namespace SkyCore.Player
 {
@@ -565,6 +566,11 @@ namespace SkyCore.Player
             AllowFly = false;
             IsFlying = false;
             IsSpectator = false;
+
+	        if (toLevel is HubLevel)
+	        {
+		        useLoadingScreen = false; //Always disable when entering the server
+	        }
 
 	        base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc, postSpawnAction);
         }

@@ -4,9 +4,12 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 using MiNET.Effects;
+using MiNET.Entities;
 using MiNET.Net;
 using MiNET.Utils;
+using MiNET.Worlds;
 using SkyCore.Entities;
 using SkyCore.Game;
 using SkyCore.Game.Level;
@@ -15,12 +18,15 @@ using SkyCore.Game.State.Impl;
 using SkyCore.Games.Hub.State;
 using SkyCore.Player;
 using SkyCore.Util;
+using Hologram = SkyCore.Entities.Hologram;
 
 namespace SkyCore.Games.Hub
 {
 	public class HubLevel : GameLevel
 	{
-		
+
+		private static readonly ILog Log = LogManager.GetLogger(typeof(HubLevel));
+
 		public readonly ISet<string> CurrentlySpawnedNPCs = new HashSet<string>();
 	
 		public HubLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo, bool modifiable = false) : 
@@ -64,6 +70,42 @@ namespace SkyCore.Games.Hub
 		{
 			TeamPlayerDict.Add(HubTeam.Player, new List<SkyPlayer>());
 			TeamPlayerDict.Add(HubTeam.Spectator, new List<SkyPlayer>());
+		}
+
+		private readonly object _playerWriteLock = new object();
+
+		public override void AddPlayer(MiNET.Player newPlayer, bool spawn)
+		{
+			if (newPlayer.Username == null) throw new ArgumentNullException(nameof(newPlayer.Username));
+
+			EntityManager.AddEntity(newPlayer);
+
+			lock (_playerWriteLock)
+			{
+				if (!newPlayer.IsConnected)
+				{
+					Log.Error("Tried to add player that was already disconnected.");
+					return;
+				}
+
+				if (Players.TryAdd(newPlayer.EntityId, newPlayer))
+				{
+					//Avoid spawning players inside the invisibility region
+					//SpawnToAll(newPlayer);
+
+					foreach (Entity entity in Entities.Values.ToArray())
+					{
+						if (entity is SkyPlayer player && player.IsGameSpectator)
+						{
+							continue; //Ignore invisible players
+						}
+
+						entity.SpawnToPlayers(new[] { newPlayer });
+					}
+				}
+
+				newPlayer.IsSpawned = spawn;
+			}
 		}
 
 		public override void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
