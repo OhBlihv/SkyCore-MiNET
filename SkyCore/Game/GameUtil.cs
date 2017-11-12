@@ -26,7 +26,7 @@ namespace SkyCore.Game
 					{
 						new Button
 						{
-							Text = "Hub",
+							Text = $"Hub",
 							Image = new Image
 							{
 								Type = "url",
@@ -36,7 +36,7 @@ namespace SkyCore.Game
 						},
 						new Button
 						{
-							Text = "Murder",
+							Text = $"Murder\n{GetFormattedPlayerCount("murder")}",
 							Image = new Image
 							{
 								Type = "url",
@@ -46,7 +46,7 @@ namespace SkyCore.Game
 						},
 						new Button
 						{
-							Text = "Build Battle",
+							Text = $"Build Battle\n{GetFormattedPlayerCount("build-battle")}",
 							Image = new Image
 							{
 								Type = "url",
@@ -56,7 +56,7 @@ namespace SkyCore.Game
 						},
 						new Button
 						{
-							Text = "Coming Soon",
+							Text = $"Coming Soon",
 							Image = new Image
 							{
 								Type = "url",
@@ -74,6 +74,17 @@ namespace SkyCore.Game
 				Console.WriteLine(e);
 				throw;
 			}
+		}
+
+		public static string GetFormattedPlayerCount(string gameName)
+		{
+			int playerCount = -1;
+			if(ExternalGameHandler.GameRegistrations.TryGetValue(gameName, out var gamePool))
+			{
+				playerCount = gamePool.GetCurrentPlayers();
+			}
+
+			return $"§6({playerCount})";
 		}
 
 	}
