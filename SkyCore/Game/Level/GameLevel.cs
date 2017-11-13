@@ -111,13 +111,11 @@ namespace SkyCore.Game.Level
             Initialize();
 
 			SpawnPoint = GameLevelInfo.LobbyLocation;
-		    SkyUtil.log($"Spawn Point Initialized As {SpawnPoint}");
 
 			SetupWorldTime();
 
 			if (!plugin.Server.LevelManager.Levels.Contains(this))
             {
-                SkyUtil.log($"Adding {gameId} to Main LevelManager");
                 plugin.Server.LevelManager.Levels.Add(this);
             }
 
@@ -142,7 +140,6 @@ namespace SkyCore.Game.Level
 	    {
 			//Override Time / Freeze Time 
 		    WorldTime = GameLevelInfo.WorldTime;
-		    SkyUtil.log($"Set world time to {WorldTime}");
 		    DoDaylightcycle = false; //Freeze Time
 		}
 
@@ -335,7 +332,7 @@ namespace SkyCore.Game.Level
             GameTeam defaultTeam = GetDefaultTeam();
 
 			SetPlayerTeam(player, defaultTeam);
-            SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName} in game {GameId}");
+            //SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName} in game {GameId}");
 
 	        if (player.Level != this)
 	        {
@@ -395,7 +392,7 @@ namespace SkyCore.Game.Level
         
         public new virtual void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
         {
-	        SkyUtil.log($"Attempting to remove {player.Username} from {GameId}");
+	        //SkyUtil.log($"Attempting to remove {player.Username} from {GameId}");
 	        if (((SkyPlayer) player).GameTeam == null)
 	        {
 				return; //Shouldn't be in the/any game.
@@ -454,7 +451,7 @@ namespace SkyCore.Game.Level
 
 		        player.GameTeam = team; //Attach to the player
 
-		        SkyUtil.log($"Updating {player.Username}'s team from {(oldTeam == null ? "null" : oldTeam.DisplayName)} to {(team == null ? "null" : team.DisplayName)}");
+		        //SkyUtil.log($"Updating {player.Username}'s team from {(oldTeam == null ? "null" : oldTeam.DisplayName)} to {(team == null ? "null" : team.DisplayName)}");
 
 		        SetPlayerTeam(player, oldTeam, team);
 			}
@@ -494,8 +491,8 @@ namespace SkyCore.Game.Level
 		                });
 
 						//TODO: Convert to scaled down invisible players?
-		                SkyUtil.log(
-			                $"Spawning {player.Username} to ({string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())})");
+		                //SkyUtil.log(
+			            //    $"Spawning {player.Username} to ({string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())})");
 		                player.SpawnToPlayers(gamePlayers.ToArray());
 	                }
 
@@ -585,7 +582,7 @@ namespace SkyCore.Game.Level
 				}
 			});
 
-			SkyUtil.log($"Despawning {player.Username} from {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
+			//SkyUtil.log($"Despawning {player.Username} from {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
 			player.DespawnFromPlayers(gamePlayers.ToArray());
 
             player.SetEffect(new Invisibility
@@ -701,7 +698,7 @@ namespace SkyCore.Game.Level
 				new GameRule<bool>(GameRulesEnum.Falldamage, false),
 				new GameRule<bool>(GameRulesEnum.Firedamage, false),
 				new GameRule<bool>(GameRulesEnum.Mobgriefing, false),
-				new GameRule<bool>(GameRulesEnum.ShowCoordinates, true),
+				new GameRule<bool>(GameRulesEnum.ShowCoordinates, false),
 				new GameRule<bool>(GameRulesEnum.NaturalRegeneration, false),
 				new GameRule<bool>(GameRulesEnum.TntExplodes, false),
 				new GameRule<bool>(GameRulesEnum.SendCommandfeedback, false)

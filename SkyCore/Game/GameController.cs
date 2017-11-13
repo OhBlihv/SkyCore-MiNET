@@ -182,7 +182,6 @@ namespace SkyCore.Game
             //If we're running out of free slots, create a new game lobby
             if (!QueuedPlayers.IsEmpty)
             {
-                SkyUtil.log("Attempting to create a game to satisfy demand");
                 //Register a fresh controller
                 InitializeNewGame();
             }
@@ -227,7 +226,7 @@ namespace SkyCore.Game
 			    GameLevelInfo gameLevelInfo;
 				if (File.Exists(levelInfoFilename))
 			    {
-				    SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
+				    //SkyUtil.log($"Found '{levelInfoFilename}' for level. Loading...");
 
 				    gameLevelInfo = (GameLevelInfo) JsonConvert.DeserializeObject(File.ReadAllText(levelInfoFilename),
 					    GetGameLevelInfoType(), new GameLevelInfoJsonConverter());
@@ -253,18 +252,18 @@ namespace SkyCore.Game
 				    {
 						File.WriteAllText(levelInfoFilename, JsonConvert.SerializeObject(gameLevelInfo, Formatting.Indented));
 
-					    SkyUtil.log($"Updating '{levelInfoFilename}' for level. Saving...");
+					    //SkyUtil.log($"Updating '{levelInfoFilename}' for level. Saving...");
 					}
 				}
 				else
 				{
-					SkyUtil.log($"Could not find '{levelInfoFilename} for level. Generating from base.");
+					//SkyUtil.log($"Could not find '{levelInfoFilename} for level. Generating from base.");
 
 					gameLevelInfo = new GameLevelInfo(RawName, levelName, 6000, new PlayerLocation(255.5, 15, 268.5, 180, 180));
 
 					File.WriteAllText(levelInfoFilename, JsonConvert.SerializeObject(gameLevelInfo, Formatting.Indented));
 
-					SkyUtil.log($"Updating '{levelInfoFilename}' for level. Saving...");
+					//SkyUtil.log($"Updating '{levelInfoFilename}' for level. Saving...");
 				}
 
 			    return gameLevelInfo;
@@ -311,7 +310,7 @@ namespace SkyCore.Game
 			    return null;
 		    }
 		    
-			SkyUtil.log($"Trying to add {player.Username} player to {GameLevels.Count} games");
+			//SkyUtil.log($"Trying to add {player.Username} player to {GameLevels.Count} games");
 		    lock (GameLevels)
 		    {
 			    foreach (GameLevel gameLevel in GetMostViableGames())
@@ -325,7 +324,7 @@ namespace SkyCore.Game
 
 				    if (join)
 				    {
-						SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
+						//SkyUtil.log($"Adding {player.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
 						gameLevel.AddPlayer(player);
 					}
 
@@ -338,7 +337,7 @@ namespace SkyCore.Game
 
 		public virtual bool InstantQueuePlayer(SkyPlayer player, GameInfo gameInfo)
 		{
-			SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
+			//SkyUtil.log($"Trying to add {QueuedPlayers.Count} players to {GameLevels.Count} games");
 			lock (GameLevels)
 			{
 				if (!GameLevels.TryGetValue(gameInfo.GameId, out var targetedGame) || !targetedGame.CurrentState.CanAddPlayer(targetedGame))
@@ -346,7 +345,7 @@ namespace SkyCore.Game
 					return false;
 				}
 
-				SkyUtil.log($"(TARGETED) Adding {player.Username} to game {targetedGame.GameId}-({targetedGame.LevelId}-{targetedGame.LevelName})");
+				//SkyUtil.log($"(TARGETED) Adding {player.Username} to game {targetedGame.GameId}-({targetedGame.LevelId}-{targetedGame.LevelName})");
 				targetedGame.AddPlayer(player);
 
 				return true;
@@ -377,7 +376,7 @@ namespace SkyCore.Game
 			{
 				foreach (GameLevel gameLevel in closingGames)
 				{
-					SkyUtil.log($"Closing game {gameLevel.GameId}...");
+					//SkyUtil.log($"Closing game {gameLevel.GameId}...");
 					gameLevel.Close();
 
 					GameLevels.TryRemove(gameLevel.GameId, out _);
@@ -470,12 +469,12 @@ namespace SkyCore.Game
 	        if (nextGameIdVal.HasValue && int.TryParse(nextGameIdVal, out var nextGameIdResult))
 	        {
 		        nextGameId = nextGameIdResult;
-				SkyUtil.log($"Loaded Redis Cached GameId As {nextGameId}");
+				//SkyUtil.log($"Loaded Redis Cached GameId As {nextGameId}");
 			}
-	        else
+	        /*else
 	        {
-				SkyUtil.log($"No Redis Cached Value Found. Using {nextGameId}");
-			}
+				//SkyUtil.log($"No Redis Cached Value Found. Using {nextGameId}");
+			}*/
 
 			if (nextGameId + 1 > MaxGameIdVal)
 			{
