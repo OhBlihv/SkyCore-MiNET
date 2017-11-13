@@ -16,7 +16,7 @@ namespace SkyCore.Game.State.Impl
     public abstract class LobbyState : GameState
     {
 
-	    private List<Entity> spawnedEntities = null;
+	    private List<Entity> _spawnedEntities;
 
         public override void EnterState(GameLevel gameLevel)
         {
@@ -36,7 +36,7 @@ namespace SkyCore.Game.State.Impl
 		        SkyUtil.log($"LobbyNPCLocation Updated with default value for {gameLevel.LevelName}");
 	        }
 
-	        spawnedEntities = PlayerNPC.SpawnLobbyNPC(gameLevel, gameLevelInfo.GameType, gameLevel.GameLevelInfo.LobbyNPCLocation);
+	        _spawnedEntities = PlayerNPC.SpawnLobbyNPC(gameLevel, gameLevelInfo.GameType, gameLevel.GameLevelInfo.LobbyNPCLocation);
 
 	        //Spawn Lobby Map/Image
 	        if (gameLevelInfo.LobbyMapLocation.Y < 0) //Default == -1
@@ -46,17 +46,17 @@ namespace SkyCore.Game.State.Impl
 		        File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
 	        }
 
-			spawnedEntities.AddRange(MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation));
+			_spawnedEntities.AddRange(MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation));
 		}
 
 	    public override void LeaveState(GameLevel gameLevel)
 	    {
-		    foreach (Entity entity in spawnedEntities)
+		    foreach (Entity entity in _spawnedEntities)
 		    {
 			    entity.DespawnEntity();
 		    }
 
-			spawnedEntities.Clear();
+			_spawnedEntities.Clear();
 	    }
 
 		public override bool CanAddPlayer(GameLevel gameLevel)
@@ -131,14 +131,56 @@ namespace SkyCore.Game.State.Impl
                 }
             }
 
-            outTick = currentTick;
+			/*
+			 * Portal Handler
+			 */
+	        if (currentTick % 2 == 0)
+	        {
+		        foreach (var player in gameLevel.Players.Values)
+		        {
+			        //Player is not initialized yet.
+			        if (player == null || !player.IsConnected || player.KnownPosition == null)
+			        {
+				        continue;
+			        }
+
+			        if (IsInPortal(player.KnownPosition))
+			        {
+				        PlayerLocation teleportLocation = player.KnownPosition;
+				        teleportLocation.Z -= 2;
+
+				        player.Teleport(teleportLocation);
+
+				        try
+				        {
+					        GameUtil.ShowGameList(player as SkyPlayer);
+				        }
+				        catch (Exception e)
+				        {
+					        Console.WriteLine(e);
+					        throw;
+				        }
+			        }
+		        }
+	        }
+
+			outTick = currentTick;
         }
 
-        /*
-         *  Lobby Countdown/Management methods
-         */ 
 
-        private int _startCountdownTick = -1;
+	    private static bool IsInPortal(PlayerLocation playerLocation)
+	    {
+		    return
+			    playerLocation.X >= 253 && playerLocation.X <= 257 &&
+			    playerLocation.Y >= 15 && playerLocation.Y <= 20 &&
+			    playerLocation.Z >= 263 && playerLocation.Z <= 264;
+	    }
+
+		/*
+         *  Lobby Countdown/Management methods
+         */
+
+		private int _startCountdownTick = -1;
 
         protected int GetCountdownTicks()
         {
