@@ -493,14 +493,10 @@ namespace SkyCore.Game.Level
 			                }
 		                });
 
+						//TODO: Convert to scaled down invisible players?
 		                SkyUtil.log(
 			                $"Spawning {player.Username} to ({string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())})");
 		                player.SpawnToPlayers(gamePlayers.ToArray());
-
-		                foreach (MiNET.Player gamePlayer in gamePlayers)
-		                {
-			                gamePlayer.SendPackage(player.CachedSkin);
-		                }
 	                }
 
 	                player.IsGameSpectator = false;

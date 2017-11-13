@@ -43,7 +43,7 @@ namespace SkyCore.Commands
 
 		[Command(Name = "findworld")]
 		[Authorize(Permission = CommandPermission.Normal)]
-		public void CommandGiveIronIngot(MiNET.Player player)
+		public void CommandFindWorld(MiNET.Player player)
 		{
 			player.SendMessage($"In Game World {((GameLevel) player.Level).GameId}");
 		}

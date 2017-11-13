@@ -146,6 +146,7 @@
     <Compile Include="Punishments\PunishCore.cs" />
     <Compile Include="Punishments\PunishmentCommands.cs" />
     <Compile Include="Restart\RestartHandler.cs" />
+    <Compile Include="Server\Whitelist.cs" />
     <Compile Include="SkyCoreAPI.cs" />
     <Compile Include="SkyUtil.cs" />
     <Compile Include="Statistics\StatisticsCore.cs" />

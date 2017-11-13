@@ -20,6 +20,7 @@ using SkyCore.Util;
 using Bugsnag;
 using MiNET.Blocks;
 using SkyCore.Games.Hub;
+using SkyCore.Server;
 
 namespace SkyCore.Player
 {
@@ -143,7 +144,7 @@ namespace SkyCore.Player
 					return;
                 }
 
-	            switch (Username.ToLower())
+	            /*switch (Username.ToLower())
 	            {
 					case "donnas wraps":
 					case "ohblihv":
@@ -153,6 +154,11 @@ namespace SkyCore.Player
 					default:
 						Disconnect("§7What could this be...?");
 						return;
+	            }*/
+	            if (Whitelist.IsEnabled() && !Whitelist.OnWhitelist(Username))
+	            {
+					Disconnect(Whitelist.GetWhitelistMessage());
+		            return;
 	            }
 
 				StatisticsCore.AddPlayer(CertificateData.ExtraData.Xuid, Username);
@@ -621,14 +627,6 @@ namespace SkyCore.Player
 		        SetNoAi(false);
 	        }
         }
-
-		public McpePlayerSkin CachedSkin { get; set; }
-
-	    public override void HandleMcpePlayerSkin(McpePlayerSkin message)
-	    {
-		    SkyUtil.log("Caching player skin");
-		    CachedSkin = message;
-	    }
 
 	    public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)
 		{

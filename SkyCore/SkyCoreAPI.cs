@@ -26,6 +26,7 @@ using SkyCore.Permissions;
 using SkyCore.Player;
 using SkyCore.Punishments;
 using SkyCore.Restart;
+using SkyCore.Server;
 using SkyCore.Statistics;
 using SkyCore.Util;
 
@@ -79,6 +80,7 @@ namespace SkyCore
 			context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
 	        context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
 			context.PluginManager.LoadCommands(new GameCommands());		//Initialize GameController Commands (/gameedit)
+			context.PluginManager.LoadCommands(new Whitelist());		//Initialize Whitelist Commands (/whitelist)
 
 	        //Register listeners
 	        context.Server.PlayerFactory.PlayerCreated += (sender, args) =>

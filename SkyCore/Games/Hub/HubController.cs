@@ -45,13 +45,10 @@ namespace SkyCore.Games.Hub
 			Tick = 1;
 
 			//Register all hubs
-			/*for (int i = 0; i < MaxHubCount; i++)
+			for (int i = 0; i < MaxHubCount; i++)
 			{
 				InitializeNewGame();
-			}*/
-
-			//TODO: Remove - Initialize one hub for testing
-			InitializeNewGame();
+			}
 		}
 
 		public override string GetNextGameId()
