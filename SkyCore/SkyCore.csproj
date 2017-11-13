@@ -89,7 +89,6 @@
     <Compile Include="Commands\Commands.cs" />
     <Compile Include="Database\DatabaseAction.cs" />
     <Compile Include="Entities\Holograms\Hologram.cs" />
-    <Compile Include="Entities\Holograms\HologramController.cs" />
     <Compile Include="Entities\Holograms\PlayerCountHologram.cs" />
     <Compile Include="Entities\Holograms\TickingHologram.cs" />
     <Compile Include="Entities\PlayerNPC.cs" />
