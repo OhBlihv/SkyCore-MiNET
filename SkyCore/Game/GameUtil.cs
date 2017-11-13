@@ -26,7 +26,7 @@ namespace SkyCore.Game
 					{
 						new Button
 						{
-							Text = $"Hub",
+							Text = $"Hub\n{GetFormattedPlayerCount("hub")}",
 							Image = new Image
 							{
 								Type = "url",
