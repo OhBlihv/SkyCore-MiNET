@@ -88,7 +88,7 @@ namespace SkyCore.Game.Level
 
 	    protected GameLevel(SkyCoreAPI plugin, string gameType, string gameId, String levelPath, GameLevelInfo gameLevelInfo, bool modifiable = false)
                 : base(plugin.Server.LevelManager, gameId, 
-					AnvilProviderFactory.GetLevelProvider(plugin.Server.LevelManager, levelPath, modifiable, true, !modifiable),
+					AnvilProviderFactory.GetLevelProvider(plugin.Server.LevelManager, levelPath, !modifiable, true, !modifiable),
                     plugin.Server.LevelManager.EntityManager, GameMode.Creative)
 	    {
 	        string levelName;
@@ -196,7 +196,7 @@ namespace SkyCore.Game.Level
         public List<SkyPlayer> GetPlayers()
         {
             List<SkyPlayer> allPlayers = new List<SkyPlayer>();
-            foreach (List<SkyPlayer> teamPlayers in TeamPlayerDict.Values)
+            foreach (var teamPlayers in TeamPlayerDict.Values)
             {
                 allPlayers.AddRange(teamPlayers);
             }
@@ -701,7 +701,7 @@ namespace SkyCore.Game.Level
 				new GameRule<bool>(GameRulesEnum.Falldamage, false),
 				new GameRule<bool>(GameRulesEnum.Firedamage, false),
 				new GameRule<bool>(GameRulesEnum.Mobgriefing, false),
-				new GameRule<bool>(GameRulesEnum.ShowCoordinates, false),
+				new GameRule<bool>(GameRulesEnum.ShowCoordinates, true),
 				new GameRule<bool>(GameRulesEnum.NaturalRegeneration, false),
 				new GameRule<bool>(GameRulesEnum.TntExplodes, false),
 				new GameRule<bool>(GameRulesEnum.SendCommandfeedback, false)

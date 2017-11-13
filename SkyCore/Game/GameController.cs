@@ -49,8 +49,8 @@ namespace SkyCore.Game
             
             foreach(var levelName in levelNames)
             {
-                string fullLevelPath = "C:\\Users\\Administrator\\Desktop\\worlds\\" + gameName + "\\" + levelName;
-	            if (File.Exists(fullLevelPath))
+                string fullLevelPath = $@"C:\Users\Administrator\Desktop\worlds\{gameName}\{levelName}";
+	            if (!Directory.Exists(fullLevelPath))
 	            {
 					SkyUtil.log($"Unable to find world at ({fullLevelPath})");
 				}
@@ -60,8 +60,11 @@ namespace SkyCore.Game
 
 		            SkyUtil.log($"Added world at ({fullLevelPath})");
 
-		            //Pre-load GameLevelInfo
-		            LoadGameLevelInfo(levelName);
+					//Pre-load GameLevelInfo
+		            GetGameLevelInfo(levelName);
+
+					//Pre-cache the WorldProvider
+		            AnvilProviderFactory.GetLevelProvider(plugin.Server.LevelManager, fullLevelPath);
 	            }
             }
 
@@ -143,10 +146,12 @@ namespace SkyCore.Game
 				foreach (GameLevel gameLevel in GetMostViableGames())
 				{
 					//Update player counts
-					instanceInfo.CurrentPlayers += gameLevel.GetPlayerCount();
+					int playerCount = gameLevel.GetPlayerCount();
+
+					instanceInfo.CurrentPlayers += playerCount;
 					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
 					{
-						availableGames.Add(new GameInfo(gameLevel.GameId, gameLevel.GetPlayerCount(), gameLevel.GetMaxPlayers()));
+						availableGames.Add(new GameInfo(gameLevel.GameId, playerCount, gameLevel.GetMaxPlayers()));
 					}
 
 					while (!QueuedPlayers.IsEmpty)
