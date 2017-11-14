@@ -111,11 +111,12 @@ namespace SkyCore.Game.State.Impl
 		        {
 			        foreach (SkyPlayer player in remainingPlayers)
 			        {
-						player.BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to New Game..."), 20, 7);
+						player.BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to Network Lobby..."), 20, 7);
 
 				        gameLevel.RemovePlayer(player);
 
-				        ExternalGameHandler.RequeuePlayer(player, gameLevel.GameType);
+				        //ExternalGameHandler.RequeuePlayer(player, gameLevel.GameType);
+						ExternalGameHandler.AddPlayer(player, "hub");
 					}
 		        }
 
