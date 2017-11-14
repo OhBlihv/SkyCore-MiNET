@@ -42,7 +42,7 @@ namespace SkyCore.Commands
 			_skyCoreApi = skyCoreApi;
 		}
 
-		[Command(Name = "maptest")]
+		/*[Command(Name = "maptest")]
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandSpawnMap(MiNET.Player player)
 		{
@@ -55,7 +55,7 @@ namespace SkyCore.Commands
 		public void CommandFindWorld(MiNET.Player player)
 		{
 			player.SendMessage($"In Game World {((GameLevel) player.Level).GameId}");
-		}
+		}*/
 
 		[Command(Name = "hub")]
 		[Authorize(Permission = CommandPermission.Normal)]
@@ -102,7 +102,7 @@ namespace SkyCore.Commands
 			ExternalGameHandler.AddPlayer((SkyPlayer) player, "hub");
 		}
 
-		[Command(Name = "popuptest")]
+		/*[Command(Name = "popuptest")]
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandPopupTest(MiNET.Player player, string popup, string actionbar)
 		{
@@ -116,9 +116,9 @@ namespace SkyCore.Commands
 
 			skyPlayer.BarHandler.AddMajorLine(popup);
 			skyPlayer.BarHandler.AddMinorLine(actionbar);
-		}
+		}*/
 
-		[Command(Name = "subtitletest")]
+		/*[Command(Name = "subtitletest")]
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandSubtitle(MiNET.Player player, int lineCount)
 		{
@@ -137,9 +137,9 @@ namespace SkyCore.Commands
 			player.SendTitle(lines, TitleType.SubTitle);
 			//player.SendTitle("1\n2\n3\n4\n5", TitleType.SubTitle);
 			player.SendTitle(" ");
-		}
+		}*/
 
-		[Command(Name = "actionbartest")]
+		/*[Command(Name = "actionbartest")]
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandActionBar(MiNET.Player player, int lineCount)
 		{
@@ -158,9 +158,9 @@ namespace SkyCore.Commands
 			player.SendTitle(lines, TitleType.ActionBar);
 			//player.SendTitle("1\n2\n3\n4\n5", TitleType.ActionBar);
 			player.SendTitle(" ");
-		}
+		}*/
 
-		[Command(Name = "titletest")]
+		/*[Command(Name = "titletest")]
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandTitle(MiNET.Player player, int lineCount)
 		{
@@ -179,7 +179,7 @@ namespace SkyCore.Commands
 
 			player.SendTitle(lines, TitleType.Title);
 			//player.SendTitle(" ");
-		}
+		}*/
 
 		[Command(Name = "speed")]
 		[Authorize(Permission = CommandPermission.Normal)]
@@ -207,7 +207,7 @@ namespace SkyCore.Commands
 				return;
 			}
 
-			int time = 0;
+			int time;
 			switch (timeString.ToLower())
 			{
 				case "day":
@@ -226,11 +226,12 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "stop")]
-		[Authorize(Permission = CommandPermission.Admin)]
+		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandStop(MiNET.Player player)
 		{
 			if (((SkyPlayer) player).PlayerGroup != PlayerGroup.Admin)
 			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
 			}
 
@@ -313,16 +314,16 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Admin)]
 		public void CommandFly(MiNET.Player player, string targetName = "")
 		{
-			if (player.CommandPermission < PlayerGroup.Mvp.PermissionLevel)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mvp))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
 			}
 
-			MiNET.Player targetPlayer;
-			if (String.IsNullOrEmpty(targetName))
+			SkyPlayer targetPlayer;
+			if (string.IsNullOrEmpty(targetName))
 			{
-				targetPlayer = player;
+				targetPlayer = (SkyPlayer) player;
 			}
 			else
 			{
@@ -433,17 +434,17 @@ namespace SkyCore.Commands
 					}
 					default:
 					{
-						player.SendMessage($"{ChatColors.Red}Unable to resolve game '{gameName}'.");
+						player.SendMessage($"§c§l(!)§r §cCould not find game '{gameName}'.");
 						return;
 					}
 				}
 
-				player.SendMessage($"{ChatColors.Yellow}Joining {gameName}...");
+				player.SendMessage($"§e§l(!)§r §eJoining Game {gameName}...");
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
-				player.SendMessage("Unable to join " + gameName);
+				player.SendMessage($"§c§l(!)§r §cUnable to Join Game '{gameName}'.");
 			}
 		}
 
@@ -552,11 +553,16 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandSpawnMob(MiNET.Player player, string entityName, string mobName = "", string mobScale = "")
 		{
+			if (player.CommandPermission < CommandPermission.Admin)
+			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+				return;
+			}
+
 			entityName = entityName.ToLower();
 			entityName = entityName.Substring(0, 1).ToUpper() + entityName.Substring(1);
 
-			EntityType entityType;
-			if (!EntityType.TryParse(entityName, out entityType))
+			if (!Enum.TryParse(entityName, out EntityType entityType))
 			{
 				player.SendMessage($"§c§l(!) §r§cUnknown EntityType '{entityName}'");
 				return;

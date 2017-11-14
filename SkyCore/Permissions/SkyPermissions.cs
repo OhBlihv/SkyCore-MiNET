@@ -113,17 +113,17 @@ namespace SkyCore.Permissions
     public class SkyPermissions
     {
 
-        private readonly SkyCoreAPI skyCoreApi;
+        private readonly SkyCoreAPI _skyCoreApi;
 
         public SkyPermissions(SkyCoreAPI skyCoreApi)
         {
-            this.skyCoreApi = skyCoreApi;
+            _skyCoreApi = skyCoreApi;
         }
 
         public PlayerGroup GetPlayerGroup(string playerName)
         {
             PlayerGroup playerGroup = PlayerGroup.Player;
-	        if (SkyCoreAPI.Instance.GetPlayer(playerName) is SkyPlayer player)
+	        if (_skyCoreApi.GetPlayer(playerName) is SkyPlayer player)
 	        {
 		        return player.PlayerGroup;
 	        }
@@ -141,14 +141,13 @@ namespace SkyCore.Permissions
 		        return;
 	        }
 
-			MiNET.Player target;
-            if (String.IsNullOrEmpty(targetName))
+	        if (String.IsNullOrEmpty(targetName))
             {
                 player.SendMessage($"{ChatColors.Red}Enter a valid player name.");
                 return;
             }
 
-            target = skyCoreApi.GetPlayer(targetName);
+            SkyPlayer target = _skyCoreApi.GetPlayer(targetName);
 
             if (target == null || !target.IsConnected)
             {
@@ -173,7 +172,7 @@ namespace SkyCore.Permissions
                 return;
             }
 
-            ((SkyPlayer) target).SetPlayerGroup(targetGroup);
+            target.SetPlayerGroup(targetGroup);
 
 	        RunnableTask.RunTask(() =>
 	        {
@@ -208,14 +207,13 @@ namespace SkyCore.Permissions
 		        return;
 	        }
 
-			MiNET.Player target;
-            if (String.IsNullOrEmpty(targetName))
+	        if (string.IsNullOrEmpty(targetName))
             {
                 player.SendMessage($"{ChatColors.Red}Enter a valid player name.");
                 return;
             }
 
-            target = skyCoreApi.GetPlayer(targetName);
+            SkyPlayer target = _skyCoreApi.GetPlayer(targetName);
 
             if (target == null || !target.IsConnected)
             {
