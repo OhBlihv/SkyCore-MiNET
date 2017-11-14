@@ -143,7 +143,18 @@ namespace SkyCore.Games.BuildBattle.State
 
 			ITickableInformation tickableInformation = GetTickableInformation(null);
 
-			gameLevel.DoForAllPlayers((player) => SendTickableMessage(gameLevel, player, tickableInformation));
+			gameLevel.DoForAllPlayers(player =>
+			{
+				if (player.KnownPosition.Y < 64)
+				{
+					PlayerLocation resetLocation = ((BuildBattleTeam) player.GameTeam).SpawnLocation;
+					resetLocation.Z -= 15; //Spawn just outside buildable area
+
+					player.Teleport(resetLocation);
+				}
+
+				SendTickableMessage(gameLevel, player, tickableInformation);
+			});
 		}
 
 		public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
