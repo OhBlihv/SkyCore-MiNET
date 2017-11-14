@@ -24,7 +24,7 @@ namespace SkyCore.Games.Murder.Level
 
 	        foreach (PlayerLocation playerSpawnLocation in ((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations)
 	        {
-				playerSpawnLocation.Y += 0.2f; //Ensure this spawn is not inside the ground
+				playerSpawnLocation.Y += 0.1f; //Ensure this spawn is not inside the ground
 
 				//Round to the centre of the block.
 		        playerSpawnLocation.X = (float) (Math.Floor(playerSpawnLocation.X) + 0.5f);
