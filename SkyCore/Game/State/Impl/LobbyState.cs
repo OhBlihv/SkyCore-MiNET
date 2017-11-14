@@ -41,15 +41,18 @@ namespace SkyCore.Game.State.Impl
 
 	        _spawnedEntities = PlayerNPC.SpawnLobbyNPC(gameLevel, gameLevelInfo.GameType, gameLevel.GameLevelInfo.LobbyNPCLocation);
 
-	        //Spawn Lobby Map/Image
-	        if (gameLevelInfo.LobbyMapLocation.Y < 0) //Default == -1
+	        gameLevel.AddPendingTask(() =>
 	        {
-		        gameLevelInfo.LobbyMapLocation = new BlockCoordinates(252, 15, 249);
+		        //Spawn Lobby Map/Image
+		        if (gameLevelInfo.LobbyMapLocation.Y < 0) //Default == -1
+		        {
+			        gameLevelInfo.LobbyMapLocation = new BlockCoordinates(252, 15, 249);
 
-		        File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
-	        }
+			        File.WriteAllText(GameController.GetGameLevelInfoLocation(gameLevel.GameType, gameLevel.LevelName), JsonConvert.SerializeObject(gameLevel.GameLevelInfo, Formatting.Indented));
+		        }
 
-			_spawnedEntities.AddRange(MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation));
+		        _spawnedEntities.AddRange(MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\TestImage.png", 7, 4, gameLevel, gameLevelInfo.LobbyMapLocation));
+			});
 		}
 
 	    public override void LeaveState(GameLevel gameLevel)
