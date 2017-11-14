@@ -144,17 +144,6 @@ namespace SkyCore.Player
 					return;
                 }
 
-	            /*switch (Username.ToLower())
-	            {
-					case "donnas wraps":
-					case "ohblihv":
-					case "ohblihv2":
-					case "erictigerawr":
-						break;
-					default:
-						Disconnect("§7What could this be...?");
-						return;
-	            }*/
 	            if (Whitelist.IsEnabled() && !Whitelist.OnWhitelist(Username))
 	            {
 					Disconnect(Whitelist.GetWhitelistMessage());
@@ -254,7 +243,6 @@ namespace SkyCore.Player
 	            GameInfo targetedGame = ExternalGameHandler.GetGameForIncomingPlayer(Username);
 	            if (targetedGame != null && (!(Level is GameLevel) || !((GameLevel) Level).GameId.Equals(targetedGame.GameId)))
 	            {
-					SkyUtil.log("Game Count: " + SkyCoreAPI.Instance.GameModes.Count);
 		            SkyCoreApi.GameModes[SkyCoreApi.GameType].InstantQueuePlayer(this, targetedGame);
 				}
 			}
@@ -332,8 +320,6 @@ namespace SkyCore.Player
 			    if (Math.Abs(message.x - KnownPosition.X) > 0.1 ||
 			        Math.Abs(message.z - KnownPosition.Z) > 0.1)
 			    {
-				    SkyUtil.log($"{Username} - X: {Math.Abs(message.x - KnownPosition.X)} " + 
-								$"Z: {Math.Abs(message.z - KnownPosition.Z)} ");
 				    Teleport(KnownPosition);
 				    return;
 			    }
@@ -465,25 +451,26 @@ namespace SkyCore.Player
 				    }
 
 					//Containers (Block)
-				    case 54: //Chest
+				    case 54:  //Chest
 					case 146: //Trapped Chest
-				    case 61: //Furnace (Unlit)
-				    case 62: //Furnace (Lit)
+				    case 61:  //Furnace (Unlit)
+				    case 62:  //Furnace (Lit)
 				    case 117: //Brewing Stand
 				    case 130: //EnderChest
 				    case 138: //Beacon
 				    case 125: //Dropper
-				    case 23: //Dispenser
-				    case 25: //Noteblock
-				    case 84: //Jukebox
-				    case 58: //Crafting Bench
+				    case 23:  //Dispenser
+				    case 25:  //Noteblock
+				    case 84:  //Jukebox
+				    case 58:  //Crafting Bench
+					case 145: // Anvil
 				    {
 					    return; //Ignore handling
 				    }
 
 					//Doors
 					case 64:	//Door (Wood)
-					//case 71:  //Door (Iron)
+					case 71:  //Door (Iron)
 				    case 193:
 				    case 194:
 				    case 195:

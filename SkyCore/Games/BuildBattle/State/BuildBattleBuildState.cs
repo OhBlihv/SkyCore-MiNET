@@ -31,7 +31,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 		public BuildBattleBuildState()
 		{
-			MaxGameTime = 60 * 2;
+			MaxGameTime = 300 * 2;
 		}
 
 		public override void EnterState(GameLevel gameLevel)

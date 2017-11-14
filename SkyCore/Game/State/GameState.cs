@@ -67,16 +67,28 @@ namespace SkyCore.Game.State
 
 		    message = TextUtils.RemoveFormatting(message);
 
+		    if (message.Length > 200)
+		    {
+			    player.SendMessage("§c§l(!)§r §cYour message is too long!");
+			    return;
+		    }
+
+		    foreach (char character in message)
+		    {
+			    if (!char.IsLetterOrDigit(character) && !char.IsPunctuation(character) && !char.IsSymbol(character))
+			    {
+				    player.SendMessage("§c§l(!)§r §cYour message contains invalid characters!");
+					return;
+			    }
+		    }
+
 		    string chatColor = ChatColors.White;
 		    if (player.PlayerGroup == PlayerGroup.Player)
 		    {
 			    chatColor = ChatColors.Gray;
 		    }
 
-		    string formattedText = $"{player.GetNameTag(player)}{ChatColors.Gray}: {chatColor}{message}";
-		    SkyUtil.log($"Broadcasting to {player.Level.LevelId}: {formattedText}");
-		    player.Level.BroadcastMessage(formattedText, MessageType.Raw);
-
+		    player.Level.BroadcastMessage($"{player.GetNameTag(player)}{ChatColors.Gray}: {chatColor}{message}", MessageType.Raw);
 		}
 
 		public virtual bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)

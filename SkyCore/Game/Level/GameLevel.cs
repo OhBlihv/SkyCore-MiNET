@@ -10,14 +10,12 @@ using SkyCore.Player;
 using SkyCore.Util;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Threading;
 using Bugsnag;
 using MiNET.Blocks;
 using MiNET.Net;
 using SkyCore.BugSnag;
-using SkyCore.Entities;
 using Button = MiNET.UI.Button;
 
 namespace SkyCore.Game.Level
@@ -167,7 +165,7 @@ namespace SkyCore.Game.Level
 
 			DoForAllPlayers(player =>
 			{
-				RemovePlayer(player);
+				ExternalGameHandler.AddPlayer(player, "hub");
 			});
 
 			base.Close();
@@ -175,7 +173,7 @@ namespace SkyCore.Game.Level
 	        Plugin.Server.LevelManager.Levels.Remove(this);
         }
 
-        public int GetPlayerCount()
+        public virtual int GetPlayerCount()
         {
             return PlayerTeamDict.Count + _incomingPlayers.Count;
         }
@@ -571,6 +569,11 @@ namespace SkyCore.Game.Level
 
         public virtual void AddSpectator(SkyPlayer player)
         {
+	        if (player.IsGameSpectator)
+	        {
+		        return; //Avoid double-adding spectators
+	        }
+
 			player.IsGameSpectator = true;
 
 			List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
@@ -582,7 +585,6 @@ namespace SkyCore.Game.Level
 				}
 			});
 
-			//SkyUtil.log($"Despawning {player.Username} from {string.Join(",", gamePlayers.Select(x => x.ToString()).ToArray())}");
 			player.DespawnFromPlayers(gamePlayers.ToArray());
 
             player.SetEffect(new Invisibility

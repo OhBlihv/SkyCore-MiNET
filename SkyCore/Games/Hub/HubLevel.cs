@@ -18,8 +18,6 @@ namespace SkyCore.Games.Hub
 	public class HubLevel : GameLevel
 	{
 
-		private static readonly ILog Log = LogManager.GetLogger(typeof(HubLevel));
-
 		public readonly ISet<string> CurrentlySpawnedNPCs = new HashSet<string>();
 	
 		public HubLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo, bool modifiable = false) : 
@@ -52,6 +50,12 @@ namespace SkyCore.Games.Hub
 			});
 		}
 
+		//Avoid tracking IncomingPlayers
+		public override int GetPlayerCount()
+		{
+			return GetGamePlayerCount();
+		}
+
 		protected override void SetupWorldTime()
 		{
 			WorldTime = 22000; //Sunrise?
@@ -74,7 +78,6 @@ namespace SkyCore.Games.Hub
 
 		public override void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
 		{
-			SkyUtil.log($"Attempting to remove {player.Username} from {GameId}");
 			if (((SkyPlayer)player).GameTeam == null)
 			{
 				return; //Shouldn't be in the/any game.

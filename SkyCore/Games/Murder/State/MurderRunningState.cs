@@ -590,7 +590,7 @@ namespace SkyCore.Games.Murder.State
 		    {
 				player.BarHandler.AddMajorLine($"§9§lDETECTIVE§r §7| {murderInformation.NeatTimeRemaining} Remaining §7| §dUnlimited §fBullets...", 2);
 			}
-			else if (player.GameTeam == HubTeam.Spectator)
+			else if (player.IsGameSpectator)
 		    {
 			    player.BarHandler.AddMajorLine($"§7§lSPECTATOR §7 | {murderInformation.NeatTimeRemaining} §fRemaining...", 2);
 			}

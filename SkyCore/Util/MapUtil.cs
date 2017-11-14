@@ -240,6 +240,7 @@ namespace SkyCore.Util
 
 			world.SetBlockEntity(itemFrameBlockEntity);
 		}
+
 	}
 
 	public class FullyLuminousItemFrame : ItemFrame
