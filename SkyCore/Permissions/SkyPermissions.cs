@@ -123,19 +123,25 @@ namespace SkyCore.Permissions
         public PlayerGroup GetPlayerGroup(string playerName)
         {
             PlayerGroup playerGroup = PlayerGroup.Player;
-            if (playerName.Equals("OhBlihv") || playerName.Equals("OhBlihv2") || playerName.Equals("Donnas Wraps"))
-            {
-                playerGroup = PlayerGroup.Admin;
-            }
+	        if (SkyCoreAPI.Instance.GetPlayer(playerName) is SkyPlayer player)
+	        {
+		        return player.PlayerGroup;
+	        }
 
             return playerGroup;
         }
 
         [Command(Name = "perm set")]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandPermSet(MiNET.Player player, string targetName, string targetGroupName)
         {
-            MiNET.Player target;
+	        if (player.CommandPermission < CommandPermission.Admin)
+	        {
+		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+		        return;
+	        }
+
+			MiNET.Player target;
             if (String.IsNullOrEmpty(targetName))
             {
                 player.SendMessage($"{ChatColors.Red}Enter a valid player name.");
@@ -193,10 +199,16 @@ namespace SkyCore.Permissions
         }
 
         [Command(Name = "perm get")]
-        [Authorize(Permission = CommandPermission.Admin)]
+        [Authorize(Permission = CommandPermission.Normal)]
         public void CommandPermGet(MiNET.Player player, string targetName)
         {
-            MiNET.Player target;
+	        if (player.CommandPermission < CommandPermission.Admin)
+	        {
+		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+		        return;
+	        }
+
+			MiNET.Player target;
             if (String.IsNullOrEmpty(targetName))
             {
                 player.SendMessage($"{ChatColors.Red}Enter a valid player name.");
