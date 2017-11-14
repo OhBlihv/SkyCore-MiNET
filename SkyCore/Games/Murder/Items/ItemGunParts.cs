@@ -22,14 +22,7 @@ namespace SkyCore.Games.Murder.Items
                 {
                     new NbtCompound("display")
                     {
-                        //new NbtString("Name", "§r§d§lGun Parts§r"),
                         new NbtString("Name", "§r"),
-                        new NbtList("Lore")
-                        {
-                            new NbtString("§r§7Collect 5 Gun Parts to craft a Gun."),
-                            //new NbtString(),
-                            //new NbtString(),
-                        }
                     }
                 };
             }

@@ -69,7 +69,7 @@ namespace SkyCore.Game.State
 
 		    if (message.Length > 200)
 		    {
-			    player.SendMessage("§c§l(!)§r §cYour message is too long!");
+			    player.SendMessage("§c§l(!)§r §cYour message is too long, please shorten it.");
 			    return;
 		    }
 

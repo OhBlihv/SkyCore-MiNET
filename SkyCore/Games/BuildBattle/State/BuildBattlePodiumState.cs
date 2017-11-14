@@ -61,7 +61,7 @@ namespace SkyCore.Games.BuildBattle.State
 				}
 			}
 
-			string winningPlayerName = winningPlayer == null ? "NO-ONE" : winningPlayer.Username;
+			string winningPlayerName = winningPlayer == null ? "Unknown..." : winningPlayer.Username;
 
 			List<PlayerLocation> podiumLocations;
 			if (winningPlayer == null)
@@ -95,7 +95,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 				player.Inventory.Clear();
 
-				TitleUtil.SendCenteredSubtitle(player, $"§a§lWinner:§r §d{winningPlayerName}");
+				TitleUtil.SendCenteredSubtitle(player, $"§a§lWinning Builder\n§7{winningPlayerName}");
 
 				if (player == winningPlayer)
 				{

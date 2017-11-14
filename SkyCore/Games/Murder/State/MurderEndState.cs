@@ -3,6 +3,7 @@ using SkyCore.Game.Level;
 using SkyCore.Game.State.Impl;
 using SkyCore.Games.Murder.Level;
 using SkyCore.Player;
+using SkyCore.Util;
 
 namespace SkyCore.Games.Murder.State
 {
@@ -18,64 +19,41 @@ namespace SkyCore.Games.Murder.State
 				player.AddExperience(-1000, true); //Reset gun cooldowns
 			});
 
-            //MurderVictoryType victoryType;
+			//MurderVictoryType victoryType;
 
-            //Innocents Win (Murderer Dead)
-            if (gameLevel.GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
+
+			SkyPlayer murderer = ((MurderLevel)gameLevel).Murderer;
+
+			//Innocents Win (Murderer Dead)
+			if (gameLevel.GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
             {
                 //victoryType = MurderVictoryType.MURDERER_DEAD;
-
-				MiNET.Player murderer = ((MurderLevel)gameLevel).Murderer;
-
-	            ((SkyPlayer) murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 20, 8);
-	            murderer.SendTitle("§e§lYOU LOSE§r");
-
-				gameLevel.DoForPlayersIn(player =>
+				
+				gameLevel.DoForAllPlayers(player =>
                 {
-	                if (player == murderer)
-	                {
-		                return;
-	                }
-
-	                ((SkyPlayer)murderer).BarHandler.AddMajorLine("§7The §aINNOCENTS §7have killed the §cMURDERER!§r", 20, 8);
-                    player.SendTitle("§a§lYOU WIN§r");
-                }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
+					TitleUtil.SendCenteredSubtitle(player, $"§a§lInnocents §r§7Win\n§7{murderer?.Username ?? "An Unknown Player"} §fwas the Murderer!");
+                });
             }
             //Murderer Wins (Innocents + Detective Dead)
             else if(gameLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0)
             {
-                //victoryType = MurderVictoryType.CONQUEST;
+				//victoryType = MurderVictoryType.CONQUEST;
 
-                gameLevel.DoForPlayersIn(player =>
-                {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 20, 8);
-					player.SendTitle("§a§lYOU WIN§r");
-                }, MurderTeam.Murderer);
-
-                //TODO: DO properly
-                gameLevel.DoForPlayersIn(player =>
-                {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7have killed all §aINNOCENTS!§r", 20, 8);
-                    player.SendTitle("§c§lYOU LOSE");
-                }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
-            }
+				gameLevel.DoForAllPlayers(player =>
+				{
+					TitleUtil.SendCenteredSubtitle(player, $"§c§lMurderer §r§7Wins\n§7{murderer?.Username ?? "An Unknown Player"} §fwas the Murderer!");
+				});
+			}
             //Innocents Win (Timeout)
             else
             {
-                //victoryType = MurderVictoryType.TIMEOUT;
+				//victoryType = MurderVictoryType.TIMEOUT;
 
-                gameLevel.DoForPlayersIn(player =>
-                {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 20, 8);
-					player.SendTitle("§a§lYOU WIN");
-                }, MurderTeam.Spectator, MurderTeam.Innocent, MurderTeam.Detective);
-
-                gameLevel.DoForPlayersIn(player =>
-                {
-	                player.BarHandler.AddMajorLine("§7The §cMURDERER §7has run out of time!§r", 20, 8);
-                    player.SendTitle("§c§lYOU LOSE");
-                }, MurderTeam.Murderer);
-            }
+				gameLevel.DoForAllPlayers(player =>
+				{
+					TitleUtil.SendCenteredSubtitle(player, $"§a§lInnocents §r§7Win\n§7{murderer?.Username ?? "An Unknown Player"} §fwas the Murderer!");
+				});
+			}
         }
 
     }

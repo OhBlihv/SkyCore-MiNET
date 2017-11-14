@@ -123,37 +123,51 @@ namespace SkyCore.Games.Murder.Level
             
         }
 
-	    public override string GetGameModalTitle()
+	    private MurderTeam GetWinningTeam()
 	    {
-		    return "§d§lMURDER MYSTERY";
-	    }
-
-		public override string GetEndOfGameContent(SkyPlayer player)
-	    {
-		    GameTeam winningTeam = null;
+		    MurderTeam winningTeam = null;
 
 		    int innocentPlayers = GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count;
 
 		    if (innocentPlayers > 0)
 		    {
 			    if (CurrentState is MurderRunningState runningState && runningState.GetSecondsLeft() <= 0 ||
-					GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
+			        GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
 			    {
-					winningTeam = MurderTeam.Innocent;
-				}
-				//Else, null / Game is still running
+				    winningTeam = MurderTeam.Innocent;
+			    }
+			    //Else, null / Game is still running
 		    }
 		    else
 		    {
-				winningTeam = MurderTeam.Murderer;
-			}
+			    winningTeam = MurderTeam.Murderer;
+		    }
 
+		    return winningTeam;
+	    }
+
+	    public override string GetGameModalTitle()
+	    {
+		    MurderTeam winningTeam = GetWinningTeam();
+
+			//Game still running
 		    if (winningTeam == null)
 		    {
-			    return
-				    "\n" +
-				    TextUtils.Center("", 205) + "\n" +
-				    TextUtils.Center("§cYou are dead!", 205) + "\n";
+				return "§d§lMURDER MYSTERY";
+			}
+
+		    return "§lGame Finished";
+
+	    }
+
+		public override string GetEndOfGameContent(SkyPlayer player)
+		{
+			MurderTeam winningTeam = GetWinningTeam();
+
+			//Game still running
+		    if (winningTeam == null)
+		    {
+			    return "";
 		    }
 
 		    return

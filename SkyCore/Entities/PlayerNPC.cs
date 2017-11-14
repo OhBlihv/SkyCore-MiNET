@@ -230,16 +230,23 @@ namespace SkyCore.Entities
 				KnownPosition = spawnLocation
 			};
 
-			PlayerLocation gameNameLocation = (PlayerLocation)spawnLocation.Clone();
-			gameNameLocation.Y += 3.1f;
+			PlayerLocation changeGameLocation = (PlayerLocation)spawnLocation.Clone();
+			changeGameLocation.Y += 3.1f;
 
-			Hologram changeGameHologram = new Hologram("§eChange Game", level, gameNameLocation);
+			Hologram changeGameHologram = new Hologram("§d§lChange Game", level, changeGameLocation);
+
+			PlayerLocation clickHereLocation = (PlayerLocation)spawnLocation.Clone();
+			clickHereLocation.Y += 2.8f;
+
+			Hologram clickHereHologram = new Hologram("§e(Click Here)", level, clickHereLocation);
 
 			SkyCoreAPI.Instance.AddPendingTask(() =>
 			{
 				npc.SpawnEntity();
 
 				changeGameHologram.SpawnEntity();
+
+				clickHereHologram.SpawnEntity();
 			});
 
 			List<Entity> spawnedEntities = new List<Entity> {npc, changeGameHologram};

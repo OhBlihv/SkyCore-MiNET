@@ -235,6 +235,7 @@ namespace SkyCore.Games.Murder.State
 		    TitleUtil.SendCenteredSubtitle(player, "§c§l  Murderer§r\n§7Kill all innocent players!");
 
 		    player.Inventory.SetInventorySlot(0, new ItemMurderKnife());
+			player.Inventory.SetInventorySlot(8, new ItemGunParts());
 			player.Inventory.SetHeldItemSlot(1); //Avoid holding the knife on spawn/select
 
 		    player.HungerManager.Hunger = 20; //Set food to 'able to run' level.
@@ -514,7 +515,7 @@ namespace SkyCore.Games.Murder.State
 			}
 			else
 			{
-				player.SendTitle("§c§lYOU DIED§r");
+				TitleUtil.SendCenteredSubtitle(player, "§c§lYou Died§r\n§fYou are now in §7spectator §fmode!");
 
 				player.SetAllowFly(true);
 				player.IsFlying = true;
@@ -555,10 +556,11 @@ namespace SkyCore.Games.Murder.State
         public int AddPlayerGunParts(MurderLevel gameLevel, SkyPlayer player)
         {
             //Allow gameLevel to be null if we're 100% sure this player isn't a Murderer
-            if (gameLevel != null && gameLevel.Murderer == player)
-            {
-                return -1; //Murderer cannot pick up gun parts
-            }
+	        if (gameLevel != null && gameLevel.Murderer == player)
+	        {
+				player.BarHandler.AddMinorLine("§6(Stolen Gun Parts)");
+		        return -1; //Murderer cannot pick up gun parts
+			}
 
 	        McpeLevelEvent levelEvent = McpeLevelEvent.CreateObject();
 	        levelEvent.eventId = 1051;
@@ -628,13 +630,13 @@ namespace SkyCore.Games.Murder.State
 				int gunAmmo = GetPlayerAmmo((MurderLevel) gameLevel, player);
 			    player.BarHandler.AddMajorLine(
 				    gunAmmo > 0
-					    ? $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} Remaining §7| §d{GetPlayerAmmo((MurderLevel)gameLevel, player)}/{MaxGunAmmo} §fBullets..."
-					    : $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} Remaining §7| §d{GetPlayerGunParts((MurderLevel)gameLevel, player)}/{MaxGunParts} §fGun Parts...",
+					    ? $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} §fRemaining §7| §d{GetPlayerAmmo((MurderLevel)gameLevel, player)}/{MaxGunAmmo} §fBullets..."
+					    : $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} §fRemaining §7| §d{GetPlayerGunParts((MurderLevel)gameLevel, player)}/{MaxGunParts} §fGun Parts...",
 				    2);
 			}
 			else if (player.GameTeam == MurderTeam.Detective)
 		    {
-				player.BarHandler.AddMajorLine($"§9§lDETECTIVE§r §7| {murderInformation.NeatTimeRemaining} Remaining §7| §dUnlimited §fBullets...", 2);
+				player.BarHandler.AddMajorLine($"§9§lDETECTIVE§r §7| {murderInformation.NeatTimeRemaining} §fRemaining §7| §dUnlimited §fBullets...", 2);
 			}
 			else if (player.IsGameSpectator)
 		    {

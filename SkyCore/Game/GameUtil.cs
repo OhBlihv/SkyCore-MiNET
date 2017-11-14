@@ -20,13 +20,13 @@ namespace SkyCore.Game
 
 				var simpleForm = new SimpleForm
 				{
-					Title = "Game list",
+					Title = "§lSkytonia Network",
 					Content = "",
 					Buttons = new List<Button>
 					{
 						new Button
 						{
-							Text = $"Hub\n{GetFormattedPlayerCount("hub")}",
+							Text = $"§3§lNetwork Lobby\n{GetFormattedPlayerCount("hub")}",
 							Image = new Image
 							{
 								Type = "url",
@@ -36,7 +36,7 @@ namespace SkyCore.Game
 						},
 						new Button
 						{
-							Text = $"Murder\n{GetFormattedPlayerCount("murder")}",
+							Text = $"§c§lMurder Mystery\n{GetFormattedPlayerCount("murder")}",
 							Image = new Image
 							{
 								Type = "url",
@@ -46,7 +46,7 @@ namespace SkyCore.Game
 						},
 						new Button
 						{
-							Text = $"Build Battle\n{GetFormattedPlayerCount("build-battle")}",
+							Text = $"§6§l BuildBattle\n{GetFormattedPlayerCount("build-battle")}",
 							Image = new Image
 							{
 								Type = "url",
@@ -56,7 +56,7 @@ namespace SkyCore.Game
 						},
 						new Button
 						{
-							Text = $"Coming Soon",
+							Text = $"§d§lComing Soon...",
 							Image = new Image
 							{
 								Type = "url",
@@ -84,7 +84,7 @@ namespace SkyCore.Game
 				playerCount = gamePool.GetCurrentPlayers();
 			}
 
-			return $"§6({playerCount})";
+			return $"§r§8({playerCount} Player{(playerCount != 1 ? "s" : "")})";
 		}
 
 	}

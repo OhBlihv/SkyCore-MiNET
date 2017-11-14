@@ -155,12 +155,14 @@ namespace SkyCore.Games.BuildBattle
 
 		public override string GetGameModalTitle()
 		{
-			return "§5§lBUILD BATTLE";
+			//return "§5§lBUILD BATTLE";
+			return "§§lGame Finished";
 		}
 
 		public override string GetEndOfGameContent(SkyPlayer player)
 		{
-			return "TODO";
+			//No information. Given out with subtitles during podium phase
+			return "";
 		}
 	}
 }
