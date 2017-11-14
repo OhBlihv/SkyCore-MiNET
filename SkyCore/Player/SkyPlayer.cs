@@ -419,6 +419,7 @@ namespace SkyCore.Player
 					//Single-Block Interactables (Visible)
 				    case 92: //Cake
 				    {
+						//Instantly reset player hunger
 					    HungerManager.SendHungerAttributes();
 
 						goto case 107; //Dirty case fall-through
@@ -453,7 +454,8 @@ namespace SkyCore.Player
 					case 147:   //Light (Gold) Pressure Plate
 					case 148:   //Heavy (Iron) Pressure Plate*/
 				    case 77:	//Stone Button
-				    case 143:	//Wood Button
+				    case 143:   //Wood Button
+					case 199:	//Item Frame
 				    {
 					    return; //Ignore Handling
 				    }
@@ -478,7 +480,7 @@ namespace SkyCore.Player
 
 					//Doors
 					case 64:	//Door (Wood)
-					case 71:  //Door (Iron)
+					//case 71:   //Door (Iron)
 				    case 193:
 				    case 194:
 				    case 195:

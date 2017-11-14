@@ -23,6 +23,9 @@ namespace SkyCore.Games.Hub.State
 {
 	public class HubState : GameState
 	{
+
+		public const int MaxPlayers = 100;
+
 		public override void EnterState(GameLevel gameLevel)
 		{
 			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, gameLevel,
@@ -42,7 +45,7 @@ namespace SkyCore.Games.Hub.State
 
 		public override bool CanAddPlayer(GameLevel gameLevel)
 		{
-			return gameLevel.GetPlayerCount() < 100; //TODO: Add Constant
+			return gameLevel.GetPlayerCount() < MaxPlayers;
 		}
 
 		public override void InitializePlayer(GameLevel gameLevel, SkyPlayer player)
@@ -96,7 +99,7 @@ namespace SkyCore.Games.Hub.State
 					particleLocation.Z += (Random.Next(2) == 0 ? -1 : 1) * (float)(Random.NextDouble() * 25);
 
 					McpeLevelEvent particleEvent = McpeLevelEvent.CreateObject();
-					particleEvent.eventId = 0x4000 | (int)ParticleType.WitchSpell;
+					particleEvent.eventId = 0x4000 | (int) ParticleType.WitchSpell;
 					particleEvent.position = particleLocation;
 					particleEvent.data = 13369599;
 					gameLevel.RelayBroadcast(particleEvent);

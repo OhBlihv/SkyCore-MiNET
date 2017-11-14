@@ -189,17 +189,30 @@ namespace SkyCore.Game
 					}
 
 					InstanceInfo instanceInfo;
-
 					if (!GameRegistrations.TryGetValue(gameName, out var gamePool))
 					{
-						instanceInfo = new InstanceInfo { HostAddress = hostAddress, HostPort = hostPort };
+						if ((hostAddress + ":" + hostPort).Equals(SkyCoreAPI.Instance.CurrentIp))
+						{
+							instanceInfo = new InstanceInfo{ HostAddress = "local", HostPort = hostPort };
+						}
+						else
+						{
+							instanceInfo = new InstanceInfo { HostAddress = hostAddress, HostPort = hostPort };
+						}
 
 						SkyUtil.log($"Game {gameName} missing from GameRegistrations! Re-Registering...");
 						RegisterGame(gameName, instanceInfo);
 					}
 					else
 					{
-						instanceInfo = gamePool.GetInstance(hostAddress + ":" + hostPort);
+						if ((hostAddress + ":" + hostPort).Equals(SkyCoreAPI.Instance.CurrentIp))
+						{
+							instanceInfo = gamePool.GetLocalInstance();
+						}
+						else
+						{
+							instanceInfo = gamePool.GetInstance(hostAddress + ":" + hostPort);
+						}
 					}
 
 					int.TryParse(messageSplit[2], out var instancePlayers);

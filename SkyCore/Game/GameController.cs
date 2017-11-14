@@ -164,7 +164,7 @@ namespace SkyCore.Game
 						//Need to find something that indicates this player is loaded
 						if (nextPlayer.Level != null)
 						{
-							SkyUtil.log($"Adding {nextPlayer.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
+							//SkyUtil.log($"Adding {nextPlayer.Username} to game {gameLevel.GameId}-({gameLevel.LevelId}-{gameLevel.LevelName})");
 							gameLevel.AddPlayer(nextPlayer);
 						}
 						else

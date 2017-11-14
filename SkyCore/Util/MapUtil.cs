@@ -126,10 +126,8 @@ namespace SkyCore.Util
 						{
 							Coordinates = frambc,
 							Metadata = (byte)mapDirection,
-							BlockLight = 15,
-							SkyLight = 15
 						};
-						level.SetBlock(itemFrame, true, false, true);
+						level.SetBlock(itemFrame, true, false);
 						level.SetBlockEntity(itemFrameBlockEntity);
 
 						spawnedEntities.Add(frame);
