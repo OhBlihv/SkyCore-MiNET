@@ -10,6 +10,7 @@ using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.Game.Items;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
@@ -275,7 +276,9 @@ namespace SkyCore.Games.Murder.State
 		    }
 	    }
 
-	    public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
+	    private readonly IDictionary<string, int> _modalCountdownDict = new Dictionary<string, int>();
+
+		public override void OnTick(GameLevel gameLevel, int currentTick, out int outTick)
         {
 	        base.OnTick(gameLevel, currentTick, out outTick);
 
@@ -297,9 +300,48 @@ namespace SkyCore.Games.Murder.State
 			{
 				SendTickableMessage(gameLevel, player, tickableInformation);
 
-				if (player.IsSprinting && gameLevel.GetPlayerTeam(player)!= MurderTeam.Murderer)
+				if (player.IsSprinting && player.GameTeam != MurderTeam.Murderer)
 				{
 					player.SetSprinting(false);
+				}
+
+				if (player.IsGameSpectator)
+				{
+					if (player.Inventory.InHandSlot == 4)
+					{
+						if (_modalCountdownDict.TryGetValue(player.Username, out var countdownValue))
+						{
+							if (countdownValue == 1)
+							{
+								if (player.Level is GameLevel level)
+								{
+									level.ShowEndGameMenu(player);
+									_modalCountdownDict[player.Username] = 6; //Reset to default
+									player.Inventory.SetHeldItemSlot(3); //Shift off slot.
+
+									player.BarHandler.AddMinorLine("§r", 1);
+									return;
+								}
+							}
+							else
+							{
+								_modalCountdownDict[player.Username] = (countdownValue = (countdownValue - 1));
+							}
+						}
+						else
+						{
+							_modalCountdownDict.Add(player.Username, 6); //Default to 3 seconds
+							countdownValue = 6;
+						}
+
+						int visibleCountdown = (int)Math.Ceiling(countdownValue / 2D);
+
+						player.BarHandler.AddMinorLine($"§dContinue Holding for {visibleCountdown} Second{(visibleCountdown == 1 ? "" : "s")} to Open Menu", 1);
+					}
+					else
+					{
+						_modalCountdownDict.Remove(player.Username);
+					}
 				}
 			});
 
@@ -481,7 +523,11 @@ namespace SkyCore.Games.Murder.State
 
 				player.Knockback(new Vector3(0, 1.5f, 0));
 
-				RunnableTask.RunTaskLater(() => murderLevel.ShowEndGameMenu(player), 5000);
+				RunnableTask.RunTaskLater(() =>
+				{
+					murderLevel.ShowEndGameMenu(player);
+					player.Inventory.SetInventorySlot(4, new ItemEndNav()); //Modal Navigator
+				}, 5000);
 			}
         }
 
