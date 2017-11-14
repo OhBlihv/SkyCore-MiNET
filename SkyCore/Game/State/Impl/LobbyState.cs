@@ -187,14 +187,14 @@ namespace SkyCore.Game.State.Impl
 
         protected int GetCountdownTicks()
         {
-            return 30; //15 seconds by default
+            return 30 * 2; //30 seconds by default
         }
 
         protected int GetRequiredPlayers(GameLevel gameLevel)
         {
-            return 2;
-            //return (int) (gameLevel.GetMaxPlayers() * 0.8D);
-	    }
+	        return 8;
+	        //return (int) (gameLevel.GetMaxPlayers() * 0.8D);
+        }
 
         /*
          * End
