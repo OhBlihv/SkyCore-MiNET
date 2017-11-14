@@ -24,6 +24,7 @@ using SkyCore.Permissions;
 using SkyCore.Player;
 using System.Threading;
 using log4net;
+using SkyCore.Util;
 
 namespace SkyCore.Commands
 {
@@ -39,6 +40,14 @@ namespace SkyCore.Commands
 			Instance = this;
 
 			_skyCoreApi = skyCoreApi;
+		}
+
+		[Command(Name = "maptest")]
+		[Authorize(Permission = CommandPermission.Normal)]
+		public void CommandSpawnMap(MiNET.Player player)
+		{
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, player.Level,
+				player.KnownPosition.GetCoordinates3D(), MapUtil.MapDirection.West);
 		}
 
 		[Command(Name = "findworld")]

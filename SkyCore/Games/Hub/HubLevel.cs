@@ -40,6 +40,15 @@ namespace SkyCore.Games.Hub
 					{
 						SkyUtil.log("Spawning all NPCs for " + GameId);
 						PlayerNPC.SpawnAllHubNPCs(this);
+
+						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
+							new BlockCoordinates(249, 77, 268), MapUtil.MapDirection.West);
+						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\buildbattlemapimage.png", 1, 1, this,
+							new BlockCoordinates(252, 77, 270), MapUtil.MapDirection.West);
+						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\murdermapimage.png", 1, 1, this,
+							new BlockCoordinates(260, 77, 270), MapUtil.MapDirection.West);
+						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
+							new BlockCoordinates(263, 77, 268), MapUtil.MapDirection.West);
 					}
 					catch (Exception e)
 					{

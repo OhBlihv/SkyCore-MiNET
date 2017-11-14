@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MiNET.Blocks;
 using MiNET.Effects;
@@ -28,14 +29,7 @@ namespace SkyCore.Games.Hub.State
 
 		public override void EnterState(GameLevel gameLevel)
 		{
-			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, gameLevel,
-									new BlockCoordinates(249, 77, 268), MapUtil.MapDirection.West);
-			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\buildbattlemapimage.png", 1, 1, gameLevel,
-									new BlockCoordinates(252, 77, 270), MapUtil.MapDirection.West);
-			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\murdermapimage.png", 1, 1, gameLevel,
-									new BlockCoordinates(260, 77, 270), MapUtil.MapDirection.West);
-			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, gameLevel,
-									new BlockCoordinates(263, 77, 268), MapUtil.MapDirection.West);
+			
 		}
 
 		public override void LeaveState(GameLevel gameLevel)
@@ -194,13 +188,13 @@ namespace SkyCore.Games.Hub.State
 			if (player.Inventory.GetItemInHand() is ItemNavigationCompass)
 			{
 				GameUtil.ShowGameList(player);
-				RunnableTask.RunTaskLater(() => player.Inventory.SetInventorySlot(player.Inventory.InHandSlot, new ItemNavigationCompass()), 250);
+				//RunnableTask.RunTaskLater(() => player.Inventory.SetInventorySlot(player.Inventory.InHandSlot, new ItemNavigationCompass()), 250);
 			}
 
-			return false;
+			return true;
 		}
 
-		public override bool HandleBlockBreak(GameLevel gameLevel, SkyPlayer player, Block block, List<Item> drops)
+		/*public override bool HandleBlockBreak(GameLevel gameLevel, SkyPlayer player, Block block, List<Item> drops)
 		{
 			return !player.PlayerGroup.IsAtLeast(PlayerGroup.Admin);
 		}
@@ -208,7 +202,7 @@ namespace SkyCore.Games.Hub.State
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
 		{
 			return !player.PlayerGroup.IsAtLeast(PlayerGroup.Admin);
-		}
+		}*/
 
 	}
 }

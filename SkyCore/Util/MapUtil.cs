@@ -62,7 +62,7 @@ namespace SkyCore.Util
 		 */
 		public static List<Entity> SpawnMapImage(string imageLocation, int width, int height, Level level, BlockCoordinates spawnLocation, MapDirection mapDirection = MapDirection.South)
 		{
-			List<Entity> spawnedEntities = new List<Entity>();
+			var spawnedEntities = new List<Entity>();
 			try
 			{
 				Bitmap image;
@@ -75,16 +75,20 @@ namespace SkyCore.Util
 
 					//Dodgily ensure the building flag is disabled
 					cachedMap.IsBuilding = false;
+					//SkyUtil.log($"Using Cached Image for {imageLocation}");
 				}
 				else
 				{
 					if (!File.Exists(imageLocation))
 					{
+						SkyUtil.log($"File doesn't exist for Map ({imageLocation})");
 						return spawnedEntities;
 					}
 
 					image = new Bitmap((Bitmap)Image.FromFile(imageLocation), width * 128, height * 128);
 					cachedMap = new CachedMap(image);
+
+					//SkyUtil.log($"Loading Image for {imageLocation}");
 				}
 
 				BlockCoordinates center = spawnLocation;

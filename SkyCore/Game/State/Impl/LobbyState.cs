@@ -147,7 +147,6 @@ namespace SkyCore.Game.State.Impl
 				        continue;
 			        }
 
-
 			        if (IsInPortal(player.KnownPosition))
 			        {
 				        PlayerLocation teleportLocation = player.KnownPosition;
