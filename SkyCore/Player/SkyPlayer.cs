@@ -391,6 +391,7 @@ namespace SkyCore.Player
 				    {
 					    if (Level is GameLevel level && level.DropItem(this, record.NewItem))
 					    {
+							SendPlayerInventory(); //Reset inventory to what is tracked
 						    return; //Avoid default handling
 					    }
 				    }
@@ -416,7 +417,14 @@ namespace SkyCore.Player
 				switch (clickedBlock.Id)
 			    {
 					//Single-Block Interactables (Visible)
-				    case 107:   //Fence Gate
+				    case 92: //Cake
+				    {
+					    HungerManager.SendHungerAttributes();
+
+						goto case 107; //Dirty case fall-through
+				    }
+
+					case 107:   //Fence Gate
 					case 183:   //Fence Gate (Spruce)
 					case 184:   //Fence Gate (Birch)
 					case 185:   //Fence Gate (Jungle)
@@ -429,7 +437,7 @@ namespace SkyCore.Player
 				    case 94:    //Repeater (Powered)
 					case 96:    //Trap Door (Wood)
 					//case 167:	//Trap Door (Iron)
-				    {
+					{
 						var blockUpdate = McpeUpdateBlock.CreateObject();
 					    blockUpdate.blockId = clickedBlock.Id;
 					    blockUpdate.coordinates = clickedBlock.Coordinates;
@@ -528,7 +536,7 @@ namespace SkyCore.Player
                 return false;
             }
 
-            SkyUtil.log($"Interact Id:{actionId} ({Username})");
+            //SkyUtil.log($"Interact Id:{actionId} ({Username})");
 
             if (target is PlayerNPC npc)
             {
@@ -607,12 +615,6 @@ namespace SkyCore.Player
 	        }
 
 	        base.SpawnLevel(toLevel, spawnPoint, useLoadingScreen, levelFunc, postSpawnAction);
-
-	        if (NoAi)
-	        {
-		        SkyUtil.log("(SPAWN) Re-enabling movement");
-		        SetNoAi(false);
-	        }
         }
 
 	    public override void HandleMcpeServerSettingsRequest(McpeServerSettingsRequest message)

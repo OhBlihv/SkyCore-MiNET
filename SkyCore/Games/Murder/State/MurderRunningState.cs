@@ -381,7 +381,7 @@ namespace SkyCore.Games.Murder.State
 				int currentAmmo = --PlayerAmmoCounts[player.Username];
 	            if (currentAmmo <= 0)
 	            {
-					player.Inventory.SetInventorySlot(0, null); //Remove Gun
+					player.Inventory.SetInventorySlot(0, new ItemAir()); //Remove Gun
 	            }
 	            else
 	            {
@@ -394,7 +394,7 @@ namespace SkyCore.Games.Murder.State
 	            player.Experience = 0;
 	            player.AddExperience(levelOneFullBarXp);
 
-	            player.Inventory.SetInventorySlot(9, null);
+	            player.Inventory.SetInventorySlot(9, new ItemAir());
 
 				const int updateTicks = 60;
 	            const int timerMillis = 50;

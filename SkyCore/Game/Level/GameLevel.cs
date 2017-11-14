@@ -335,8 +335,8 @@ namespace SkyCore.Game.Level
 	        if (player.Level != this)
 	        {
 				//Only show the level transition screen to players changing games on this instance
-		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
-		        //player.SpawnLevel(this, GameLevelInfo.LobbyLocation, true);
+		        //player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
+		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false); //Remove loading screen to prevent 'building terrain' issue
 			}
 	        else //Still teleport the player to the spawn location
 	        {
@@ -391,7 +391,7 @@ namespace SkyCore.Game.Level
         public new virtual void RemovePlayer(MiNET.Player player, bool removeFromWorld = false)
         {
 	        //SkyUtil.log($"Attempting to remove {player.Username} from {GameId}");
-	        if (((SkyPlayer) player).GameTeam == null)
+	        if (((SkyPlayer) player).GameTeam == null || player.Level != this)
 	        {
 				return; //Shouldn't be in the/any game.
 	        }
