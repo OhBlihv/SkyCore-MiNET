@@ -144,6 +144,7 @@ namespace SkyCore.Game.State.Impl
 				        continue;
 			        }
 
+
 			        if (IsInPortal(player.KnownPosition))
 			        {
 				        PlayerLocation teleportLocation = player.KnownPosition;
@@ -184,13 +185,14 @@ namespace SkyCore.Game.State.Impl
 
         protected int GetCountdownTicks()
         {
-            return 20; //10 seconds by default
+            return 30; //15 seconds by default
         }
 
         protected int GetRequiredPlayers(GameLevel gameLevel)
         {
-            return 2;
+            //return 2;
             //return (int) (gameLevel.GetMaxPlayers() * 0.8D);
+	        return 5;
         }
 
         /*

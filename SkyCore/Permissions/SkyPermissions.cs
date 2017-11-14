@@ -25,8 +25,8 @@ namespace SkyCore.Permissions
         public static readonly PlayerGroup Vip       = new PlayerGroup(1, "VIP", "§a", "§a[VIP]", CommandPermission.Normal);
         public static readonly PlayerGroup Pro       = new PlayerGroup(2, "PRO", "§b", "§b[PRO]", CommandPermission.Normal);
         public static readonly PlayerGroup Mvp       = new PlayerGroup(3, "MVP", "§d", "§d[MVP]", CommandPermission.Normal);
-        public static readonly PlayerGroup Helper    = new PlayerGroup(4, "Helper", "§d", "§d[HELPER]", CommandPermission.Operator);
-        public static readonly PlayerGroup Mod       = new PlayerGroup(5, "Mod", "§b", "§b[MOD]", CommandPermission.Operator);
+        public static readonly PlayerGroup Helper    = new PlayerGroup(4, "Helper", "§3", "§3[HELPER]", CommandPermission.Operator);
+        public static readonly PlayerGroup Mod       = new PlayerGroup(5, "Mod", "§6", "§6[MOD]", CommandPermission.Operator);
         public static readonly PlayerGroup Developer = new PlayerGroup(6, "Developer", "§e", "§e[DEVELOPER]", CommandPermission.Host);
         public static readonly PlayerGroup Youtuber  = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]", CommandPermission.Host);
         public static readonly PlayerGroup Admin     = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]", CommandPermission.Admin);
@@ -47,7 +47,7 @@ namespace SkyCore.Permissions
 			});
 		}
 
-		private int _enumVal { get; }
+		private int EnumVal { get; }
 
         public string GroupName { get; }
 
@@ -59,7 +59,7 @@ namespace SkyCore.Permissions
 
         private PlayerGroup(int enumVal, string groupName, string groupColour, string prefix, CommandPermission permissionLevel)
         {
-            _enumVal = enumVal;
+            EnumVal = enumVal;
 
             GroupName = groupName;
             GroupColour = groupColour;
@@ -71,7 +71,7 @@ namespace SkyCore.Permissions
 
         public int CompareTo(PlayerGroup playerGroup)
         {
-            return _enumVal.CompareTo(playerGroup._enumVal);
+            return EnumVal.CompareTo(playerGroup.EnumVal);
         }
 
         public bool IsAtLeast(PlayerGroup playerGroup)

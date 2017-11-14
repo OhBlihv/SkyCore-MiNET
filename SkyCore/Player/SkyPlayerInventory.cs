@@ -30,7 +30,7 @@ namespace SkyCore.Player
 						order.runtimeEntityId = EntityManager.EntityIdSelf;
 						order.item = GetItemInHand();
 						order.selectedSlot = (byte)selectedHotbarSlot;
-						order.slot = (byte)ItemHotbar[InHandSlot];
+						order.slot = (byte)(InHandSlot + HotbarSize);
 						Player.SendPackage(order);
 					}
 
@@ -38,7 +38,7 @@ namespace SkyCore.Player
 					broadcast.runtimeEntityId = Player.EntityId;
 					broadcast.item = new ItemAir();
 					broadcast.selectedSlot = 0;
-					broadcast.slot = (byte)ItemHotbar[InHandSlot];
+					broadcast.slot = (byte)(InHandSlot + HotbarSize);
 					Player.Level?.RelayBroadcast(Player, broadcast);
 				}
 				else

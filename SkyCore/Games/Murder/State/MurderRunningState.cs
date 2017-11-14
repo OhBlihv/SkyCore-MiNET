@@ -538,7 +538,7 @@ namespace SkyCore.Games.Murder.State
                 PlayerInventory inventory = player.Inventory;
 
                 int currentSlot = inventory.InHandSlot;
-                inventory.SetInventorySlot(8, null);
+                inventory.SetInventorySlot(8, new ItemAir());
                 inventory.SetInventorySlot(0, new ItemInnocentGun());
 	            inventory.SetInventorySlot(9, new ItemArrow());
 

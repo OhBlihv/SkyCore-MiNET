@@ -486,15 +486,8 @@ namespace SkyCore.Game
 
 			if (bestAvailableGame == null)
 			{
-				if (GetCurrentPlayers() > 0) //
-				{
-					TitleUtil.SendCenteredSubtitle(player, "  §c§lGAME FULL§r" + "\n" + "§7Try joining again soon!", false);
-				}
-				else //No players found, and all available servers unjoinable
-				{
-					TitleUtil.SendCenteredSubtitle(player, " §c§lGAME UNAVAILABLE§r" + "\n" + "§7Try joining again soon!", false);
-				}
-				
+				TitleUtil.SendCenteredSubtitle(player, $"§c§lGAME {(GetCurrentPlayers() > 0 ? "FULL" : "UNAVAILABLE")}§r\n§7Try joining again soon!", false);
+
 				player.Freeze(false); //Unfreeze
 			}
 			else
