@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using log4net;
-using MiNET.Effects;
+﻿using MiNET.Effects;
 using MiNET.Entities;
 using MiNET.Net;
 using MiNET.Utils;
@@ -11,6 +8,8 @@ using SkyCore.Game.State;
 using SkyCore.Games.Hub.State;
 using SkyCore.Player;
 using SkyCore.Util;
+using System;
+using System.Collections.Generic;
 using Hologram = SkyCore.Entities.Hologram;
 
 namespace SkyCore.Games.Hub
@@ -68,7 +67,6 @@ namespace SkyCore.Games.Hub
 		protected override void SetupWorldTime()
 		{
 			WorldTime = 22000; //Sunrise?
-			SkyUtil.log($"Set world time to {WorldTime}");
 			DoDaylightcycle = false; //Freeze Time
 		}
 

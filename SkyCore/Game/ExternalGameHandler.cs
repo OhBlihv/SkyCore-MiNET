@@ -439,7 +439,7 @@ namespace SkyCore.Game
 			InstanceInfo bestGameInstance = null;
 			GameInfo bestAvailableGame = null;
 			
-			SkyUtil.log($"Checking available games from all instances for {GameName} ({_gameInstances.Count} total instances to search)");
+			//SkyUtil.log($"Checking available games from all instances for {GameName} ({_gameInstances.Count} total instances to search)");
 
 			//Check current instance first
 			if (_gameInstances.ContainsKey("local"))
@@ -455,7 +455,7 @@ namespace SkyCore.Game
 				GameInfo nextBestGame = null;
 				foreach (GameInfo gameInfo in instanceInfo.AvailableGames)
 				{
-					SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");
+					//SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");
 					if ((bestAvailableGame == null || gameInfo.CurrentPlayers > bestAvailableGame.CurrentPlayers))
 					{
 						//Try to avoid placing the player in the game they just came from.
@@ -467,7 +467,7 @@ namespace SkyCore.Game
 							continue;
 						}
 
-						SkyUtil.log("Found best game!");
+						//SkyUtil.log("Found best game!");
 						bestGameInstance = instanceInfo;
 						bestAvailableGame = gameInfo;
 					}
@@ -483,13 +483,13 @@ namespace SkyCore.Game
 			{
 				foreach (InstanceInfo instanceInfo in _gameInstances.Values)
 				{
-					SkyUtil.log($"Checking instance {instanceInfo.HostAddress} Available Servers: {instanceInfo.AvailableGames.Count}");
+					//SkyUtil.log($"Checking instance {instanceInfo.HostAddress} Available Servers: {instanceInfo.AvailableGames.Count}");
 					foreach (GameInfo gameInfo in instanceInfo.AvailableGames)
 					{
-						SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");
+						//SkyUtil.log($"Checking {gameInfo.GameId} on {instanceInfo.HostAddress}");
 						if (bestAvailableGame == null || gameInfo.CurrentPlayers > bestAvailableGame.CurrentPlayers)
 						{
-							SkyUtil.log("Found best game!");
+							//SkyUtil.log("Found best game!");
 							bestGameInstance = instanceInfo;
 							bestAvailableGame = gameInfo;
 						}
@@ -499,9 +499,9 @@ namespace SkyCore.Game
 
 			if (bestAvailableGame == null)
 			{
-				TitleUtil.SendCenteredSubtitle(player, $"§c§lGAME {(GetCurrentPlayers() > 0 ? "FULL" : "UNAVAILABLE")}§r\n§7Try joining again soon!", false);
-
 				player.Freeze(false); //Unfreeze
+
+				TitleUtil.SendCenteredSubtitle(player, $"§c§lGAME {(GetCurrentPlayers() > 0 ? "FULL" : "UNAVAILABLE")}§r\n§7Try joining again soon!", false);
 			}
 			else
 			{

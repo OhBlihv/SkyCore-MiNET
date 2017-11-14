@@ -517,12 +517,16 @@ namespace SkyCore.Games.Murder.State
 			{
 				TitleUtil.SendCenteredSubtitle(player, "§c§lYou Died§r\n§fYou are now in §7spectator §fmode!");
 
-				player.SetAllowFly(true);
-				player.IsFlying = true;
+				//Only indicate if they aren't the last one alive
+				if (murderLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count > 0)
+				{
+					player.SetAllowFly(true);
+					player.IsFlying = true;
 
-				player.SendAdventureSettings();
+					player.SendAdventureSettings();
 
-				player.Knockback(new Vector3(0, 1.5f, 0));
+					player.Knockback(new Vector3(0, 1.5f, 0));
+				}
 
 				RunnableTask.RunTaskLater(() =>
 				{
