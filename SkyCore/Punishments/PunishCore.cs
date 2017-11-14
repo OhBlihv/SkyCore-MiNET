@@ -218,12 +218,10 @@ namespace SkyCore.Punishments
 		{
 			if (Punishments.ContainsKey(punishmentType))
 			{
-				SkyUtil.log("Contains at least one ban");
 				SortedSet<Punishment> punishments = Punishments[punishmentType];
-				SkyUtil.log($"Punishments (in order):\n -{string.Join("\n -", (from o in punishments select o.ToString()).ToArray())}");
+				//SkyUtil.log($"Punishments (in order):\n -{string.Join("\n -", (from o in punishments select o.ToString()).ToArray())}");
 				if (punishments.Count == 0)
 				{
-					SkyUtil.log("Doesnt?");
 					return null;
 				}
 
@@ -231,17 +229,16 @@ namespace SkyCore.Punishments
 				Punishment punishment = punishments.Min;
 				if (punishment != null && punishment.IsActive())
 				{
-					SkyUtil.log("Returning active ban");
 					return punishment;
 				}
 
-				if (punishment != null)
+				/*if (punishment != null)
 				{
 					SkyUtil.log("Ban Found, not active? " + punishment);
-				}
+				}*/
 			}
 
-			SkyUtil.log("Nothing found. Keys: " + Punishments.Keys.ToArray());
+			//SkyUtil.log("Nothing found. Keys: " + Punishments.Keys.ToArray());
 
 			return null;
 		}
