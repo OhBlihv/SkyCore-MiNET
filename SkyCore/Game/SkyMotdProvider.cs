@@ -9,8 +9,8 @@ namespace SkyCore.Game
 
 		public SkyMotdProvider()
 		{
-			Motd = Config.GetProperty("motd", "MiNET: MCPE Server");
-			SecondLine = Config.GetProperty("motd-2nd", "MiNET");
+			Motd = Config.GetProperty("motd", "§d§lSkytonia Network");
+			SecondLine = Config.GetProperty("motd-2nd", " ");
 		}
 
 		public override string GetMotd(ServerInfo serverInfo, IPEndPoint caller, bool eduMotd = false)
@@ -19,7 +19,7 @@ namespace SkyCore.Game
 			MaxNumberOfPlayers = serverInfo.MaxNumberOfPlayers;
 
 			var protocolVersion = "137";
-			var clientVersion = "1.2.0";
+			var clientVersion = "1.2";
 			var edition = "MCPE";
 
 			if (eduMotd)

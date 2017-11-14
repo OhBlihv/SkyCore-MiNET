@@ -21,7 +21,7 @@ namespace SkyCore.Games.BuildBattle.State
 
 			foreach (SkyPlayer existingPlayer in gameController.GetPlayers())
 			{
-				existingPlayer.UpdateGameMode(GameMode.Creative, true);
+				existingPlayer.UpdateGameMode(GameMode.Adventure, true);
 			}
 		}
 
@@ -30,10 +30,5 @@ namespace SkyCore.Games.BuildBattle.State
 			return new BuildBattleBuildState();
 		}
 
-		public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
-		{
-			//No Handling
-			return true;
-		}
 	}
 }

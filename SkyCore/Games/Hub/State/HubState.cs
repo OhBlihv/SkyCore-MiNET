@@ -137,12 +137,12 @@ namespace SkyCore.Games.Hub.State
 							continue;
 						}
 						
-						SkyUtil.log($"Isnt Game Spectator in team {player.GameTeam.DisplayName}. Setting to Spectator");
+						//SkyUtil.log($"Isnt Game Spectator in team {player.GameTeam.DisplayName}. Setting to Spectator");
 						gameLevel.SetPlayerTeam(player, HubTeam.Spectator);
 					}
 					else if (player.IsGameSpectator)
 					{
-						SkyUtil.log($"Is Game Spectator in team {player.GameTeam.DisplayName}. Setting to Player");
+						//SkyUtil.log($"Is Game Spectator in team {player.GameTeam.DisplayName}. Setting to Player");
 						gameLevel.SetPlayerTeam(player, HubTeam.Player);
 					}
 				}
@@ -187,7 +187,7 @@ namespace SkyCore.Games.Hub.State
 
 		private bool DoInteract(GameLevel gameLevel, SkyPlayer player, int interactId)
 		{
-			SkyUtil.log($"Handling Hub Interacting from {player.Username} ID:{interactId}");
+			//SkyUtil.log($"Handling Hub Interacting from {player.Username} ID:{interactId}");
 			if (player.Inventory.GetItemInHand() is ItemNavigationCompass)
 			{
 				GameUtil.ShowGameList(player);

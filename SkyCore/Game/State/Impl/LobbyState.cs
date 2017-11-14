@@ -4,6 +4,7 @@ using System.IO;
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
+using MiNET.Worlds;
 using Newtonsoft.Json;
 using SkyCore.Entities;
 using SkyCore.Game.Level;
@@ -23,6 +24,8 @@ namespace SkyCore.Game.State.Impl
             gameLevel.DoForAllPlayers(player =>
 			{
 				player.RemoveAllEffects();
+
+				player.SetGameMode(GameMode.Adventure);
 			});
 
 	        GameLevelInfo gameLevelInfo = gameLevel.GameLevelInfo;

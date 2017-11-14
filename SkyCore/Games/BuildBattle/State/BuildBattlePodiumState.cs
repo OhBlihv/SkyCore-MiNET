@@ -71,7 +71,6 @@ namespace SkyCore.Games.BuildBattle.State
 				{
 					//Pick a random team
 					podiumCentre = ((BuildBattleLevel) gameLevel).BuildTeams[0];
-					
 				}
 				else
 				{

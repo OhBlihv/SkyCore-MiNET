@@ -17,8 +17,6 @@ namespace SkyCore.Games.Murder.Level
 
         public MurderLevel(SkyCoreAPI plugin, string gameId, string levelPath, GameLevelInfo gameLevelInfo) : base(plugin, "murder", gameId, levelPath, gameLevelInfo)
         {
-			SkyUtil.log($"Initializing level '{LevelName}'");
-
 	        if (!(gameLevelInfo is MurderLevelInfo))
 	        {
 		        throw new Exception($"Could not load MurderLevelInfo for level {LevelName}");
@@ -42,8 +40,8 @@ namespace SkyCore.Games.Murder.Level
 				throw new Exception("Defined spawns below range!");
 	        }
 			
-			SkyUtil.log($"Initialized Player Spawns with {((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations.Count} unique locations");
-			SkyUtil.log($"Initialized Gun Part Locations with {((MurderLevelInfo)GameLevelInfo).GunPartLocations.Count} unique locations");
+			//SkyUtil.log($"Initialized Player Spawns with {((MurderLevelInfo) GameLevelInfo).PlayerSpawnLocations.Count} unique locations");
+			//SkyUtil.log($"Initialized Gun Part Locations with {((MurderLevelInfo)GameLevelInfo).GunPartLocations.Count} unique locations");
         }
 
         protected override void InitializeTeamMap()
@@ -56,7 +54,6 @@ namespace SkyCore.Games.Murder.Level
 
 	    public override void SetPlayerTeam(SkyPlayer player, GameTeam oldTeam, GameTeam team)
         {
-            SkyUtil.log("Using MurderLevel SetPlayerTeam");
             base.SetPlayerTeam(player, oldTeam, team);
 
             if (oldTeam == team)
@@ -82,7 +79,6 @@ namespace SkyCore.Games.Murder.Level
                     {
                         //TODO: End Game
                         UpdateGameState(new MurderEndState());
-                        return;
                     }
                     else
                     {
@@ -97,7 +93,6 @@ namespace SkyCore.Games.Murder.Level
                     {
                         //TODO: End Game
                         UpdateGameState(new MurderEndState());
-                        return;
                     }
                 }
             }
@@ -166,9 +161,9 @@ namespace SkyCore.Games.Murder.Level
 			    TextUtils.Center("§f§lWinner:§r " + ((MurderTeam) winningTeam).TeamPrefix + winningTeam.DisplayName.ToUpper(),
 				    205) + "\n" +
 			    TextUtils.Center("§8§m--------------------§r", 205) + "\n" +
-			    TextUtils.Center("§9§lDetective:§r §f" + Detective.Username, 205) +
+			    TextUtils.Center("§9§lDetective:§r §f" + Detective?.Username, 205) +
 			    "\n" +
-			    TextUtils.Center("§c§lMurderer:§r §f" + Murderer.Username, 205) +
+			    TextUtils.Center("§c§lMurderer:§r §f" + Murderer?.Username, 205) +
 			    "\n" +
 			    "\n";
 	    }

@@ -78,10 +78,5 @@ namespace SkyCore.Games.Murder.State
             }
         }
 
-        public override bool DoInteractAtEntity(GameLevel gameLevel, int interactId, SkyPlayer player, SkyPlayer target)
-        {
-            //No Handling
-            return true;
-        }
     }
 }
