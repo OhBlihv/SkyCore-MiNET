@@ -61,15 +61,7 @@ namespace SkyCore.Game.State.Impl
 	        if (TimeRemaining-- >= 0)
 	        {
 		        int timeRemaining = TimeRemaining / 2;
-		        string message;
-		        if (timeRemaining != 1)
-		        {
-			        message = $"§d§lGame Ended:§r §fNext Game starts in §7{timeRemaining} §fSeconds...";
-		        }
-		        else
-		        {
-			        message = $"§d§lGame Ended:§r §fNext Game starts in §7{timeRemaining} §fSecond...";
-		        }
+		        string message = $"§d§lGame Ended:§r §fGame closes in §7{timeRemaining} §fSecond{(timeRemaining != 1 ? "s" : "")}...";
 
 				gameLevel.DoForAllPlayers(player =>
 				{
