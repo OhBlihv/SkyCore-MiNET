@@ -152,7 +152,7 @@ namespace SkyCore.Games.BuildBattle.State
 		}
 
 		public const int PlotRadius = 13;
-		public const int MaxHeight = 92;
+		public const int MaxHeight = 90;
 
 		public override bool HandleBlockPlace(GameLevel gameLevel, SkyPlayer player, Block existingBlock, Block targetBlock)
 		{
@@ -178,9 +178,6 @@ namespace SkyCore.Games.BuildBattle.State
 			    interactLocation.Y < (centreLocation.Y - 5) ||
 			    interactLocation.Y > MaxHeight)
 			{
-				/*SkyUtil.log($"{interactLocation.X}:{interactLocation.Y}:{interactLocation.Z} vs {centreLocation.X}:{centreLocation.Y}:{centreLocation.Z} " +
-				            $"({Math.Abs(centreLocation.X - interactLocation.X)}, {Math.Abs(centreLocation.Z - interactLocation.Z)}, " +
-				            $"{interactLocation.Y < centreLocation.Y - 1}, {interactLocation.Y > 150})");*/
 				player.BarHandler.AddMinorLine("§c§l(!)§r §cYou can only build within your build zone §c§l(!)§r");
 				return true;
 			}

@@ -592,7 +592,7 @@ namespace SkyCore.Games.Murder.State
 			}
 			else if (player.IsGameSpectator)
 		    {
-			    player.BarHandler.AddMajorLine($"§7§lSPECTATOR §7 | {murderInformation.NeatTimeRemaining} §fRemaining...", 2);
+			    player.BarHandler.AddMajorLine($"§7§lSPECTATOR§r §7| {murderInformation.NeatTimeRemaining} §fRemaining...", 2);
 			}
 	    }
 
