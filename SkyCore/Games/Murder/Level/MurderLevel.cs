@@ -141,11 +141,12 @@ namespace SkyCore.Games.Murder.Level
 
 		    if (innocentPlayers > 0)
 		    {
-			    if (GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
+			    if (CurrentState is MurderRunningState runningState && runningState.GetSecondsLeft() <= 0 ||
+					GetPlayersInTeam(MurderTeam.Murderer).Count == 0)
 			    {
 					winningTeam = MurderTeam.Innocent;
 				}
-				//Else, null
+				//Else, null / Game is still running
 		    }
 		    else
 		    {
