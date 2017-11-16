@@ -195,7 +195,7 @@ namespace SkyCore.Game.State.Impl
 
         protected int GetRequiredPlayers(GameLevel gameLevel)
         {
-	        return 8;
+	        return 4;
 	        //return (int) (gameLevel.GetMaxPlayers() * 0.8D);
         }
 

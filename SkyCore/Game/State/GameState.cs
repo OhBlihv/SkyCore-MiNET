@@ -73,14 +73,14 @@ namespace SkyCore.Game.State
 			    return;
 		    }
 
-		    foreach (char character in message)
+		    /*foreach (char character in message)
 		    {
 			    if (!char.IsLetterOrDigit(character) && !char.IsPunctuation(character) && !char.IsSymbol(character))
 			    {
 				    player.SendMessage("§c§l(!)§r §cYour message contains invalid characters!");
 					return;
 			    }
-		    }
+		    }*/
 
 		    string chatColor = ChatColors.White;
 		    if (player.PlayerGroup == PlayerGroup.Player)
