@@ -579,7 +579,7 @@ namespace SkyCore.Game.Level
 			List<MiNET.Player> gamePlayers = new List<MiNET.Player>();
 			DoForAllPlayers(gamePlayer =>
 			{
-				if (!gamePlayer.IsGameSpectator)
+				if (gamePlayer != null && !gamePlayer.IsGameSpectator)
 				{
 					gamePlayers.Add(gamePlayer);
 				}
