@@ -523,7 +523,7 @@ namespace SkyCore.Punishments
 
 			if (playerPunishments == null)
 			{
-				SkyUtil.log($"No punishments for '{xuid}'. Providing fresh object.");
+				//SkyUtil.log($"No punishments for '{xuid}'. Providing fresh object.");
 				playerPunishments = new PlayerPunishments();
 			}
 

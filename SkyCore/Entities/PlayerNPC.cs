@@ -56,7 +56,7 @@ namespace SkyCore.Entities
         {
             if (_action != null)
             {
-                SkyUtil.log($"(2) Processing NPC Interact as {player.Username}");
+                //SkyUtil.log($"(2) Processing NPC Interact as {player.Username}");
                 _action((SkyPlayer)player);
             }
         }

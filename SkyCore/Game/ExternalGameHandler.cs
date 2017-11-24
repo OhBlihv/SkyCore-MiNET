@@ -328,12 +328,9 @@ namespace SkyCore.Game
 							{
 								IncomingPlayers[messageSplit[0]] = gameInfo;
 							}
-							else
+							else if (!IncomingPlayers.TryAdd(messageSplit[0], gameInfo))
 							{
-								if (!IncomingPlayers.TryAdd(messageSplit[0], gameInfo))
-								{
-									return; //Cannot process?
-								}
+								return; //Cannot process?
 							}
 
 							foreach (GameLevel gameLevel in SkyCoreAPI.Instance.GameModes[messageSplit[1]].GameLevels.Values)

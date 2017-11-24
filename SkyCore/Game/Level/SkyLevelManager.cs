@@ -21,7 +21,7 @@ namespace SkyCore.Game.Level
 			//'Get Default World' - Find a game for the player
 			if (name.Equals(Dimension.Overworld.ToString()))
 			{
-				SkyUtil.log("Instantly queuing player using default GetLevel");
+				//SkyUtil.log("Instantly queuing player using default GetLevel");
 
 				return SkyCoreApi.GameModes[SkyCoreApi.GameType].InstantQueuePlayer(player as SkyPlayer, false);
 			}
