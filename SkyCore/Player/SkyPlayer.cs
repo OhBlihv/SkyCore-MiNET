@@ -221,6 +221,15 @@ namespace SkyCore.Player
 									SkyUtil.log($"Overriding {Username}'s group to Admin");
 								}
 							}
+
+							RunnableTask.RunTaskLater(() =>
+							{
+								SendTitle("§f", TitleType.Clear);
+								SendTitle("§f", TitleType.AnimationTimes, 6, 6, 20 * 10);
+								SendTitle("§f", TitleType.ActionBar, 6, 6, 20 * 10);
+								SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
+								SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
+							}, 500);
 						})
 					);
 				});

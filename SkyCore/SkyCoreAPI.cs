@@ -252,26 +252,6 @@ namespace SkyCore
 			StatisticsCore.Close();
         }
 
-        private void OnPlayerJoin(object o, PlayerEventArgs eventArgs)
-        {
-            Console.Write("Processing join");
-            Level level = eventArgs.Level;
-            if (level == null) throw new ArgumentNullException(nameof(eventArgs.Level));
-
-            SkyPlayer player = (SkyPlayer) eventArgs.Player;
-            if (player == null) throw new ArgumentNullException(nameof(eventArgs.Player));
-            Console.Write(" for " + player.Username + "\n");
-
-	        RunnableTask.RunTaskLater(() =>
-	        {
-		        player.SendTitle("§f", TitleType.Clear);
-		        player.SendTitle("§f", TitleType.AnimationTimes, 6, 6, 20 * 10);
-		        player.SendTitle("§f", TitleType.ActionBar, 6, 6, 20 * 10);
-		        player.SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
-		        player.SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
-			}, 500);
-		}
-
         private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
         {
 	        if (o == null)
