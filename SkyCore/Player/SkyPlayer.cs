@@ -60,7 +60,9 @@ namespace SkyCore.Player
             PlayerGroup = playerGroup;
 
             //Initialize Player UserPermission level for commands
-            CommandPermission = playerGroup.PermissionLevel;
+	        PermissionLevel = playerGroup.PermissionLevel;
+            CommandPermission = playerGroup.CommandPermission;
+	        ActionPermissions = playerGroup.ActionPermission;
 
 	        SetHideNameTag(false);
 			UpdatePlayerName();

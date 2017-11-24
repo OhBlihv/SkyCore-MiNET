@@ -21,15 +21,24 @@ namespace SkyCore.Permissions
 
 	    public static readonly List<PlayerGroup> Values = new List<PlayerGroup>();
 
-		public static readonly PlayerGroup Player    = new PlayerGroup(0, "Player", "§7", "§7", CommandPermission.Normal);
-        public static readonly PlayerGroup Vip       = new PlayerGroup(1, "VIP", "§a", "§a[VIP]", CommandPermission.Normal);
-        public static readonly PlayerGroup Pro       = new PlayerGroup(2, "PRO", "§b", "§b[PRO]", CommandPermission.Normal);
-        public static readonly PlayerGroup Mvp       = new PlayerGroup(3, "MVP", "§d", "§d[MVP]", CommandPermission.Normal);
-        public static readonly PlayerGroup Helper    = new PlayerGroup(4, "Helper", "§3", "§3[HELPER]", CommandPermission.Operator);
-        public static readonly PlayerGroup Mod       = new PlayerGroup(5, "Mod", "§6", "§6[MOD]", CommandPermission.Operator);
-        public static readonly PlayerGroup Developer = new PlayerGroup(6, "Developer", "§e", "§e[DEVELOPER]", CommandPermission.Host);
-        public static readonly PlayerGroup Youtuber  = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]", CommandPermission.Host);
-        public static readonly PlayerGroup Admin     = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]", CommandPermission.Admin);
+		public static readonly PlayerGroup Player    = new PlayerGroup(0, "Player", "§7", "§7", 
+			PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Vip       = new PlayerGroup(1, "VIP", "§a", "§a[VIP]",
+	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Pro       = new PlayerGroup(2, "PRO", "§b", "§b[PRO]",
+	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Mvp       = new PlayerGroup(3, "MVP", "§d", "§d[MVP]",
+	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Helper    = new PlayerGroup(4, "Helper", "§3", "§3[HELPER]",
+	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Mod       = new PlayerGroup(5, "Mod", "§6", "§6[MOD]",
+	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Developer = new PlayerGroup(6, "Developer", "§e", "§e[DEVELOPER]",
+	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Youtuber  = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]",
+	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
+        public static readonly PlayerGroup Admin     = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]",
+	        PermissionLevel.Operator, CommandPermission.Operator, ActionPermissions.All);
 
 		//
 
@@ -55,16 +64,24 @@ namespace SkyCore.Permissions
 
         public string Prefix { get; }
 
-        public CommandPermission PermissionLevel { get; }
+	    public PermissionLevel PermissionLevel { get; }
 
-        private PlayerGroup(int enumVal, string groupName, string groupColour, string prefix, CommandPermission permissionLevel)
+		public CommandPermission CommandPermission { get; }
+
+		public ActionPermissions ActionPermission { get; }
+
+        private PlayerGroup(int enumVal, string groupName, string groupColour, string prefix,
+			PermissionLevel permissionLevel, CommandPermission commandPermission, ActionPermissions actionPermission)
         {
             EnumVal = enumVal;
 
             GroupName = groupName;
             GroupColour = groupColour;
             Prefix = prefix;
+
+	        CommandPermission = commandPermission;
             PermissionLevel = permissionLevel;
+	        ActionPermission = actionPermission;
 
 			Values.Add(this);
         }
