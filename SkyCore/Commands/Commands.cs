@@ -758,6 +758,43 @@ namespace SkyCore.Commands
 				$"Pos: {player.Level.LevelId}:{knownLocation.X},{knownLocation.Y},{knownLocation.Z}:{knownLocation.HeadYaw}:{knownLocation.Pitch}");
 		}
 
+		[Command(Name = "admin")]
+		[Authorize(Permission = CommandPermission.Normal)]
+		public void CommandAdmin(MiNET.Player player, params string[] args)
+		{
+			if (((SkyPlayer)player).PlayerGroup != PlayerGroup.Admin)
+			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+				return;
+			}
+
+			if (args.Length > 0)
+			{
+				if (args[0].Equals("players"))
+				{
+					player.SendMessage("§6Retrieving Game Player Counts...");
+					foreach (var entry in ExternalGameHandler.GameRegistrations)
+					{
+						int lobbyPlayers = 0;
+						foreach (InstanceInfo instance in entry.Value.GetAllInstances())
+						{
+							foreach (GameInfo gameInfo in instance.AvailableGames)
+							{
+								lobbyPlayers += gameInfo.CurrentPlayers;
+							}
+						}
+
+						int gamePlayers = entry.Value.GetCurrentPlayers() - lobbyPlayers;
+
+						player.SendMessage($"§e({entry.Key}) - Lobby({lobbyPlayers}) Game({gamePlayers})");
+					}
+					return;
+				}
+			}
+
+			player.SendMessage("§c/admin players - Lists player counts for all games");
+		}
+
 		/*[Command(Name = "transfer")]
         [Authorize(Permission = CommandPermission.Admin)]
         public void CommandTransfer(MiNET.Player player, string address, ushort serverPort = 19132)
