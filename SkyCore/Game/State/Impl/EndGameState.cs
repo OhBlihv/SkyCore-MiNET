@@ -12,7 +12,7 @@ namespace SkyCore.Game.State.Impl
 	    
         public override void EnterState(GameLevel gameLevel)
         {
-	        TimeRemaining = 10 * 2; //10 Seconds
+	        TimeRemaining = 5 * 2; //5 Seconds
 		}
 
         public override void LeaveState(GameLevel gameLevel)
@@ -46,8 +46,16 @@ namespace SkyCore.Game.State.Impl
 
 	        if (TimeRemaining-- >= 0)
 	        {
-		        int timeRemaining = TimeRemaining / 2;
-		        string message = $"§d§lGame Ended:§r §fNext Game in §7{timeRemaining} §fSecond{(timeRemaining != 1 ? "s" : "")}...";
+		        string message;
+		        if (TimeRemaining == 0)
+		        {
+			        message = "§r§f §r";
+		        }
+		        else
+		        {
+					int timeRemaining = TimeRemaining / 2;
+			        message = $"§d§lGame Ended:§r §fNext Game in §7{timeRemaining} §fSecond{(timeRemaining != 1 ? "s" : "")}...";
+				}
 
 				gameLevel.DoForAllPlayers(player =>
 				{
