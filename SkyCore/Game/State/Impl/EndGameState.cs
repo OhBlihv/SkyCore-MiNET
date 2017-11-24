@@ -17,7 +17,7 @@ namespace SkyCore.Game.State.Impl
 
         public override void EnterState(GameLevel gameLevel)
         {
-	        TimeRemaining = 30 * 2; //30 Seconds
+	        TimeRemaining = 10 * 2; //10 Seconds
 
 			RunnableTask.RunTaskLater(() =>
 			{
