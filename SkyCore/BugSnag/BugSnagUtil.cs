@@ -25,18 +25,25 @@ namespace SkyCore.BugSnag
 
 		public static void ReportBug(IBugSnagMetadatable metadatable, Exception e)
 		{
-			//Console.WriteLine(e);
-
-			Metadata metadata = new Metadata();
-
-			//metadatable?.PopulateMetadata(metadata);
-
-			lock (BugSnagLock)
+			try
 			{
-				_bugSnagClient.Notify(e, metadata);
+				//Console.WriteLine(e);
+
+				Metadata metadata = new Metadata();
+
+				//metadatable?.PopulateMetadata(metadata);
+
+				lock (BugSnagLock)
+				{
+					_bugSnagClient.Notify(e, metadata);
+				}
+
+				//SkyUtil.log("Reported 1 Bug to BugSnag");
 			}
-			
-			//SkyUtil.log("Reported 1 Bug to BugSnag");
+			catch (Exception exception)
+			{
+				Console.WriteLine(exception);
+			}
 		}
 
 	}
