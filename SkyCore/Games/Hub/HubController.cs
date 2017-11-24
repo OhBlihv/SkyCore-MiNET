@@ -14,21 +14,14 @@ using SkyCore.Player;
 
 namespace SkyCore.Games.Hub
 {
-	
-	class HubWorldRandomiser : IComparer<GameLevel>
+	internal class HubWorldRandomiser : IComparer<GameLevel>
 	{
 
 		private static readonly Random Random = new Random();
 
 		public int Compare(GameLevel x, GameLevel y)
 		{
-			int rolledNumber = Random.Next(2);
-			if (rolledNumber == 0)
-			{
-				return 1;
-			}
-
-			return (Random.Next(2) == 0 ? 1 : -1) * rolledNumber;
+			return Random.Next(2) == 0 ? 1 : -1;
 		}
 	}
 

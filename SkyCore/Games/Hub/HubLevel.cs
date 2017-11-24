@@ -37,7 +37,6 @@ namespace SkyCore.Games.Hub
 				{
 					try
 					{
-						SkyUtil.log("Spawning all NPCs for " + GameId);
 						PlayerNPC.SpawnAllHubNPCs(this);
 
 						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,

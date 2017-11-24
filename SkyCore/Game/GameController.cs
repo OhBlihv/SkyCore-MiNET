@@ -139,19 +139,21 @@ namespace SkyCore.Game
 			lock (GameLevels)
 			{
 				InstanceInfo instanceInfo = ExternalGameHandler.GameRegistrations[RawName].GetLocalInstance();
-				instanceInfo.CurrentPlayers = 0;
+				int instancePlayers = 0;
+
+				//Update player/instance counts
+				foreach (GameLevel gameLevel in GameLevels.Values)
+				{
+					instancePlayers += gameLevel.GetPlayerCount();
+				}
 
 				//Show higher player count games first
-				List<GameInfo> availableGames = new List<GameInfo>();
+				var availableGames = new List<GameInfo>();
 				foreach (GameLevel gameLevel in GetMostViableGames())
 				{
-					//Update player counts
-					int playerCount = gameLevel.GetPlayerCount();
-
-					instanceInfo.CurrentPlayers += playerCount;
 					if (gameLevel.CurrentState.CanAddPlayer(gameLevel))
 					{
-						availableGames.Add(new GameInfo(gameLevel.GameId, playerCount, gameLevel.GetMaxPlayers()));
+						availableGames.Add(new GameInfo(gameLevel.GameId, gameLevel.GetPlayerCount(), gameLevel.GetMaxPlayers()));
 					}
 
 					while (!QueuedPlayers.IsEmpty)
@@ -174,7 +176,8 @@ namespace SkyCore.Game
 						}
 					}
 				}
-				
+
+				instanceInfo.CurrentPlayers = instancePlayers;
 				instanceInfo.AvailableGames = availableGames;
 				instanceInfo.Update(); //Set last update time
 			}
