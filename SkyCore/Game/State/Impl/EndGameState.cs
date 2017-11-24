@@ -27,7 +27,7 @@ namespace SkyCore.Game.State.Impl
 				}
 				else
 				{
-					gameLevel.DoForAllPlayers(gameLevel.ShowEndGameMenu);
+					//gameLevel.DoForAllPlayers(gameLevel.ShowEndGameMenu);
 
 					//Re-enable the player nametags
 					gameLevel.DoForAllPlayers(player =>
@@ -45,7 +45,7 @@ namespace SkyCore.Game.State.Impl
 			{
 				player.RemoveAllEffects();
 
-				ExternalGameHandler.AddPlayer(player, "hub");
+				ExternalGameHandler.AddPlayer(player, gameLevel.GameType);
 			});
 		}
 
