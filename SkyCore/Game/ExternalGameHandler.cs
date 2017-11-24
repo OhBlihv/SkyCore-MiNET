@@ -26,15 +26,8 @@ namespace SkyCore.Game
 
 		//
 
-		private static readonly bool IsDevelopmentServer;
-
 		static ExternalGameHandler()
 		{
-			if (Config.GetProperty("dev-server", "false").Equals("true"))
-			{
-				IsDevelopmentServer = true;
-			}
-
 			RedisPool = ConnectionMultiplexer.Connect("localhost");
 
 			RedisPool.PreserveAsyncOrder = false; //Allow Concurrency
@@ -42,11 +35,16 @@ namespace SkyCore.Game
 
 		private static string GetDevelopmentPrefix()
 		{
-			return IsDevelopmentServer ? "dev_" : "";
+			return SkyCoreAPI.IsDevelopmentServer ? "dev_" : "";
 		}
 
 		public static void Init(MiNetServer server)
 		{
+			if (SkyCoreAPI.IsDevelopmentServer)
+			{
+				SkyUtil.log("Initializing Redis Channels as Development variants");
+			}
+
 			server.MotdProvider = new SkyMotdProvider();
 			new Thread(() =>
 			{

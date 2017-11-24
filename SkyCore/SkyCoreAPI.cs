@@ -69,7 +69,13 @@ namespace SkyCore
 			}
 		}
 
-        public void OnEnable(PluginContext context)
+		//
+
+	    public static bool IsDevelopmentServer { get; set; }
+
+	    //
+
+		public void OnEnable(PluginContext context)
         {
 			BugSnagUtil.Init();
 
@@ -85,7 +91,6 @@ namespace SkyCore
 
 		        MiNET.Player player = args.Player;
 
-		        player.PlayerJoin += OnPlayerJoin;
 		        player.PlayerLeave += OnPlayerLeave;
 
 		        if (_pendingTasks.Count > 0)
@@ -136,6 +141,30 @@ namespace SkyCore
 
 			Instance = this;
 			SkyUtil.log("SkyCore Initializing...");
+
+	        SkyUtil.log($"Dev Mode: ({Config.GetProperty("dev-server", "false")})");
+	        try
+	        {
+		        if (Config.GetProperty("dev-server", "false").Equals("true"))
+		        {
+			        IsDevelopmentServer = true;
+			        SkyUtil.log("Initializing Server In Development Mode");
+
+			        //Forcefully Enable Whitelist
+			        Whitelist.LoadWhitelist();
+
+			        if (!Whitelist.WhitelistContent.Enabled)
+			        {
+				        SkyUtil.log("Enforcing Whitelist");
+				        Whitelist.WhitelistContent.Enabled = true;
+				        Whitelist.SaveWhitelist();
+			        }
+		        }
+			}
+	        catch (Exception e)
+	        {
+		        Console.WriteLine(e);
+	        }
 
 			ServerPath = Environment.CurrentDirectory;
 			SkyUtil.log($"Registered Server Path at '{ServerPath}'");
@@ -252,7 +281,7 @@ namespace SkyCore
 			StatisticsCore.Close();
         }
 
-        private void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
+        private static void OnPlayerLeave(object o, PlayerEventArgs eventArgs)
         {
 	        if (o == null)
 	        {
@@ -314,6 +343,5 @@ namespace SkyCore
 
 		    return players;
 	    }
-
     }
 }

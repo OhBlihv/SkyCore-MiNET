@@ -14,23 +14,26 @@ namespace SkyCore.Server
 
 		public bool Enabled { get; set; } = true;
 
-		public string WhitelistMessage { get; set; } = "§7What could this be...?";
+		public string WhitelistMessage { get; set; } = SkyCoreAPI.IsDevelopmentServer 
+			? "§cThis server is restricted to whitelisted players only."
+			: "§7What could this be...?";
 
 		public ISet<string> WhitelistedNames { get; set; } = new HashSet<string>();
-
-		public WhitelistContent()
-		{
-
-		}
 
 	}
 
 	public class Whitelist
 	{
 
-		private const string WhitelistFilename = @"C:\Users\Administrator\Desktop\config\whitelist.json";
+		private static string WhitelistFilename { get; }
 
-		private static WhitelistContent _whitelist = new WhitelistContent();
+		static Whitelist()
+		{
+			//Separate Dev/Live whitelists for obvious reasons
+			WhitelistFilename = $@"C:\Users\Administrator\Desktop\config\{(SkyCoreAPI.IsDevelopmentServer ? "dev-" : "")}whitelist.json";
+		}
+
+		public static WhitelistContent WhitelistContent { get; private set; } = new WhitelistContent();
 
 		public Whitelist()
 		{
@@ -41,31 +44,31 @@ namespace SkyCore.Server
 		{
 			if (!File.Exists(WhitelistFilename))
 			{
-				_whitelist.WhitelistedNames.Add("OhBlihv");
+				WhitelistContent.WhitelistedNames.Add("OhBlihv");
 				SaveWhitelist();
 			}
 
-			_whitelist = JsonConvert.DeserializeObject<WhitelistContent>(File.ReadAllText(WhitelistFilename));
+			WhitelistContent = JsonConvert.DeserializeObject<WhitelistContent>(File.ReadAllText(WhitelistFilename));
 		}
 
-		private static void SaveWhitelist()
+		public static void SaveWhitelist()
 		{
-			File.WriteAllText(WhitelistFilename, JsonConvert.SerializeObject(_whitelist, Formatting.Indented));
+			File.WriteAllText(WhitelistFilename, JsonConvert.SerializeObject(WhitelistContent, Formatting.Indented));
 		}
 
 		public static bool IsEnabled()
 		{
-			return _whitelist.Enabled;
+			return WhitelistContent.Enabled;
 		}
 
 		public static string GetWhitelistMessage()
 		{
-			return _whitelist.WhitelistMessage;
+			return WhitelistContent.WhitelistMessage;
 		}
 
 		public static bool OnWhitelist(string username)
 		{
-			return _whitelist.WhitelistedNames.Contains(username);
+			return WhitelistContent.WhitelistedNames.Contains(username);
 		}
 
 		public static bool AddToWhitelist(string username)
@@ -73,7 +76,7 @@ namespace SkyCore.Server
 			//Ensure the whitelist is syncronized with other servers before updating it
 			LoadWhitelist();
 
-			if (_whitelist.WhitelistedNames.Add(username))
+			if (WhitelistContent.WhitelistedNames.Add(username))
 			{
 				SaveWhitelist();
 				return true;
@@ -87,7 +90,7 @@ namespace SkyCore.Server
 			//Ensure the whitelist is syncronized with other servers before updating it
 			LoadWhitelist();
 
-			if (_whitelist.WhitelistedNames.Remove(username))
+			if (WhitelistContent.WhitelistedNames.Remove(username))
 			{
 				SaveWhitelist();
 				return true;
@@ -152,7 +155,7 @@ namespace SkyCore.Server
 				}
 				else if (args[0].Equals("list"))
 				{
-					player.SendMessage($"§e§lWhitelist:\n{String.Join(",", _whitelist.WhitelistedNames.ToArray())}");
+					player.SendMessage($"§e§lWhitelist:\n{String.Join(",", WhitelistContent.WhitelistedNames.ToArray())}");
 					return;
 				}
 				else if (args[0].Equals("reload"))
@@ -165,13 +168,13 @@ namespace SkyCore.Server
 				{
 					LoadWhitelist();
 
-					if (_whitelist.Enabled)
+					if (WhitelistContent.Enabled)
 					{
 						player.SendMessage("§eWhitelist is already enabled.");
 					}
 					else
 					{
-						_whitelist.Enabled = true;
+						WhitelistContent.Enabled = true;
 						SaveWhitelist();
 
 						player.SendMessage("§eWhitelist enabled.");
@@ -182,13 +185,13 @@ namespace SkyCore.Server
 				{
 					LoadWhitelist();
 
-					if (!_whitelist.Enabled)
+					if (!WhitelistContent.Enabled)
 					{
 						player.SendMessage("§eWhitelist is already disabled.");
 					}
 					else
 					{
-						_whitelist.Enabled = false;
+						WhitelistContent.Enabled = false;
 						SaveWhitelist();
 
 						player.SendMessage("§eWhitelist disabled.");
