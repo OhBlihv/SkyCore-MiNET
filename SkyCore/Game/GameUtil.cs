@@ -46,7 +46,7 @@ namespace SkyCore.Game
 						},
 						new Button
 						{
-							Text = $"§6§l BuildBattle\n{GetFormattedPlayerCount("build-battle")}",
+							Text = $"§6§l Build Battle\n{GetFormattedPlayerCount("build-battle")}",
 							Image = new Image
 							{
 								Type = "url",

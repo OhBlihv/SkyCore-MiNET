@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
-using SkyCore.Game.Items;
 using SkyCore.Game.Level;
 using SkyCore.Player;
-using SkyCore.Util;
 
 namespace SkyCore.Game.State.Impl
 {
@@ -13,30 +10,9 @@ namespace SkyCore.Game.State.Impl
 
 	    protected int TimeRemaining { get; set; }
 	    
-	    private readonly IDictionary<string, int> _modalCountdownDict = new Dictionary<string, int>(); 
-
         public override void EnterState(GameLevel gameLevel)
         {
 	        TimeRemaining = 10 * 2; //10 Seconds
-
-			RunnableTask.RunTaskLater(() =>
-			{
-				if (SkyCoreAPI.IsRebootQueued)
-				{
-					gameLevel.DoForAllPlayers((player) => ExternalGameHandler.AddPlayer(player, "hub"));
-				}
-				else
-				{
-					//gameLevel.DoForAllPlayers(gameLevel.ShowEndGameMenu);
-
-					//Re-enable the player nametags
-					gameLevel.DoForAllPlayers(player =>
-					{
-						player.HideNameTag = false;
-						player.Inventory.SetInventorySlot(4, new ItemEndNav());
-					});
-				}
-			}, 5000);
 		}
 
         public override void LeaveState(GameLevel gameLevel)
@@ -45,7 +21,17 @@ namespace SkyCore.Game.State.Impl
 			{
 				player.RemoveAllEffects();
 
-				ExternalGameHandler.AddPlayer(player, gameLevel.GameType);
+				player.SetHideNameTag(false);
+				player.SetNameTagVisibility(true);
+
+				if (SkyCoreAPI.IsRebootQueued)
+				{
+					ExternalGameHandler.AddPlayer(player, "hub");
+				}
+				else
+				{
+					ExternalGameHandler.AddPlayer(player, gameLevel.GameType);
+				}
 			});
 		}
 
@@ -61,47 +47,11 @@ namespace SkyCore.Game.State.Impl
 	        if (TimeRemaining-- >= 0)
 	        {
 		        int timeRemaining = TimeRemaining / 2;
-		        string message = $"§d§lGame Ended:§r §fGame closes in §7{timeRemaining} §fSecond{(timeRemaining != 1 ? "s" : "")}...";
+		        string message = $"§d§lGame Ended:§r §fNext Game in §7{timeRemaining} §fSecond{(timeRemaining != 1 ? "s" : "")}...";
 
 				gameLevel.DoForAllPlayers(player =>
 				{
 					player.BarHandler.AddMajorLine(message, 4, 3);
-
-					if (player.Inventory.InHandSlot == 4)
-					{
-						if (_modalCountdownDict.TryGetValue(player.Username, out var countdownValue))
-						{
-							if (countdownValue == 1)
-							{
-								if (player.Level is GameLevel level)
-								{
-									level.ShowEndGameMenu(player);
-									_modalCountdownDict[player.Username] = 6; //Reset to default
-									player.Inventory.SetHeldItemSlot(3); //Shift off slot.
-
-									player.BarHandler.AddMinorLine("§r", 1);
-									return;
-								}
-							}
-							else
-							{
-								_modalCountdownDict[player.Username] = (countdownValue = (countdownValue - 1));
-							}
-						}
-						else
-						{
-							_modalCountdownDict.Add(player.Username, 6); //Default to 3 seconds
-							countdownValue = 6;
-						}
-
-						int visibleCountdown = (int) Math.Ceiling(countdownValue / 2D);
-
-						player.BarHandler.AddMinorLine($"§dContinue Holding for {visibleCountdown} Second{(visibleCountdown == 1 ? "" : "s")} to Open Menu", 1);
-					}
-					else
-					{
-						_modalCountdownDict.Remove(player.Username);
-					}
 				});
 			}
 	        else
@@ -111,12 +61,17 @@ namespace SkyCore.Game.State.Impl
 		        {
 			        foreach (SkyPlayer player in remainingPlayers)
 			        {
-						player.BarHandler.AddMajorLine(($"§d§lGame Ending: §r§fMoving to Network Lobby..."), 20, 7);
-
 				        gameLevel.RemovePlayer(player);
 
-				        //ExternalGameHandler.RequeuePlayer(player, gameLevel.GameType);
-						ExternalGameHandler.AddPlayer(player, "hub");
+						if (SkyCoreAPI.IsRebootQueued)
+						{
+							player.BarHandler.AddMajorLine(("§d§lGame Ending: §r§fMoving to Network Lobby..."), 20, 7);
+							ExternalGameHandler.AddPlayer(player, "hub");
+						}
+						else
+						{
+							ExternalGameHandler.AddPlayer(player, gameLevel.GameType);
+						}
 					}
 		        }
 

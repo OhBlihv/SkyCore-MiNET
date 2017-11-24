@@ -19,9 +19,9 @@ namespace SkyCore.Punishments
 		[Authorize(Permission = CommandPermission.Operator)]
 		public void CommandBan(MiNET.Player player, string playerName, params string[] args)
 		{
-			if (!((SkyPlayer) player).PlayerGroup.IsAtLeast(PlayerGroup.Mod))
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mod))
 			{
-				player.SendMessage("§cInsufficient Permission.");
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
 			}
 
@@ -35,9 +35,9 @@ namespace SkyCore.Punishments
 		[Authorize(Permission = CommandPermission.Operator)]
 		public void CommandUnban(MiNET.Player player, string playerName)
 		{
-			if (!((SkyPlayer)player).PlayerGroup.IsAtLeast(PlayerGroup.Mod))
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mod))
 			{
-				player.SendMessage("§cInsufficient Permission.");
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
 			}
 
@@ -65,9 +65,9 @@ namespace SkyCore.Punishments
 		[Authorize(Permission = CommandPermission.Operator)]
 		public void CommandKick(MiNET.Player player, string playerName, string[] reason)
 		{
-			if (!((SkyPlayer)player).PlayerGroup.IsAtLeast(PlayerGroup.Helper))
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Helper))
 			{
-				player.SendMessage("§cInsufficient Permission.");
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
 			}
 
@@ -96,9 +96,9 @@ namespace SkyCore.Punishments
 		[Authorize(Permission = CommandPermission.Operator)]
 		public void CommandMute(MiNET.Player player, string playerName, params string[] args)
 		{
-			if (!((SkyPlayer)player).PlayerGroup.IsAtLeast(PlayerGroup.Helper))
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Helper))
 			{
-				player.SendMessage("§cInsufficient Permission.");
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
 			}
 
@@ -112,9 +112,9 @@ namespace SkyCore.Punishments
 		[Authorize(Permission = CommandPermission.Operator)]
 		public void CommandUnmute(MiNET.Player player, string playerName)
 		{
-			if (!((SkyPlayer)player).PlayerGroup.IsAtLeast(PlayerGroup.Mod))
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mod))
 			{
-				player.SendMessage("§cInsufficient Permission.");
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
 			}
 

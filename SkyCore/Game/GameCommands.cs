@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using MiNET.Net;
 using MiNET.Plugins.Attributes;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Game.State.Impl;
+using SkyCore.Permissions;
 using SkyCore.Player;
 
 namespace SkyCore.Game
@@ -19,7 +16,7 @@ namespace SkyCore.Game
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandGameEdit(MiNET.Player player, params string[] args)
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;

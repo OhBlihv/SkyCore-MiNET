@@ -249,9 +249,7 @@ namespace SkyCore.Entities
 				clickHereHologram.SpawnEntity();
 			});
 
-			List<Entity> spawnedEntities = new List<Entity> {npc, changeGameHologram};
-
-			return spawnedEntities;
+			return new List<Entity> {npc, changeGameHologram, clickHereHologram};
 		}
 
 	}

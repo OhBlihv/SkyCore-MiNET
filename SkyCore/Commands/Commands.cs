@@ -186,7 +186,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandSpeed(MiNET.Player player, float speed = 0.1f)
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -202,7 +202,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandTime(MiNET.Player player, string timeString)
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -230,7 +230,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandStop(MiNET.Player player, params string[] args)
 		{
-			if (((SkyPlayer) player).PlayerGroup != PlayerGroup.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -268,7 +268,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandGamemode(MiNET.Player player, string targetName = "", int gamemodeId = 0)
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -329,7 +329,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Admin)]
 		public void CommandFly(MiNET.Player player, string targetName = "")
 		{
-			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mvp))
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -529,7 +529,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandScale(MiNET.Player player, string scaleString, string targetName = "")
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -568,7 +568,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandSpawnMob(MiNET.Player player, string entityName, string mobName = "", string mobScale = "")
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -762,7 +762,7 @@ namespace SkyCore.Commands
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandAdmin(MiNET.Player player, params string[] args)
 		{
-			if (((SkyPlayer)player).PlayerGroup != PlayerGroup.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;

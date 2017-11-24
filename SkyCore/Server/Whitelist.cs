@@ -5,6 +5,8 @@ using System.Linq;
 using MiNET.Net;
 using MiNET.Plugins.Attributes;
 using Newtonsoft.Json;
+using SkyCore.Permissions;
+using SkyCore.Player;
 
 namespace SkyCore.Server
 {
@@ -105,7 +107,7 @@ namespace SkyCore.Server
 		[Authorize(Permission = CommandPermission.Normal)]
 		public void CommandGameEdit(MiNET.Player player, params string[] args)
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -125,13 +127,13 @@ namespace SkyCore.Server
 						{
 							player.SendMessage($"§e'{args[1]}' is already on the whitelist.");
 						}
-						return;
 					}
 					else
 					{
 						player.SendMessage("§e/whitelist add <name>");
-						return;
 					}
+
+					return;
 				}
 				else if (args[0].Equals("remove"))
 				{
@@ -145,13 +147,13 @@ namespace SkyCore.Server
 						{
 							player.SendMessage($"§e'{args[1]}' was not on the whitelist.");
 						}
-						return;
 					}
 					else
 					{
 						player.SendMessage("§e/whitelist remove <name>");
-						return;
 					}
+
+					return;
 				}
 				else if (args[0].Equals("list"))
 				{

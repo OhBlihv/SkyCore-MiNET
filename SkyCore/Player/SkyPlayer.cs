@@ -183,13 +183,18 @@ namespace SkyCore.Player
 
 							if (playerGroup == null)
 							{
-								playerGroup = PlayerGroup.Player;
+								//Simply set, then update perms in the post-delegate
+								PlayerGroup = PlayerGroup.Player;
 							}
-
-							SetPlayerGroup(playerGroup);
 						},
 						new Action(delegate
 						{
+							if (PlayerGroup == PlayerGroup.Player)
+							{
+								//Update permission levels
+								SetPlayerGroup(PlayerGroup.Player);
+							}
+
 							_isRankLoaded = true;
 							//SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommandPermission})");
 
@@ -213,12 +218,12 @@ namespace SkyCore.Player
 							}
 							_postLoginActions.Clear();
 
-							if (Username.Equals("OhBlihv") || Username.Equals("Donnas Wraps"))
+							if (Username.Equals("OhBlihv") || Username.Equals("Erazeo"))
 							{
 								if (PlayerGroup != PlayerGroup.Admin)
 								{
 									SetPlayerGroup(PlayerGroup.Admin);
-									SkyUtil.log($"Overriding {Username}'s group to Admin");
+									//SkyUtil.log($"Overriding {Username}'s group to Admin");
 								}
 							}
 

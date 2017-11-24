@@ -1,5 +1,4 @@
-﻿using SkyCore.Game;
-using SkyCore.Game.Level;
+﻿using SkyCore.Game.Level;
 using SkyCore.Game.State.Impl;
 using SkyCore.Games.Murder.Level;
 using SkyCore.Player;
@@ -21,7 +20,6 @@ namespace SkyCore.Games.Murder.State
 
 			//MurderVictoryType victoryType;
 
-
 			SkyPlayer murderer = ((MurderLevel)gameLevel).Murderer;
 
 			//Innocents Win (Murderer Dead)
@@ -31,7 +29,7 @@ namespace SkyCore.Games.Murder.State
 				
 				gameLevel.DoForAllPlayers(player =>
                 {
-					TitleUtil.SendCenteredSubtitle(player, $"§a§lInnocents §r§7Win\n§7{murderer?.Username ?? "An Unknown Player"} §fwas the Murderer!");
+					TitleUtil.SendCenteredSubtitle(player, $"§a§lInnocents §r§7§lWin§r\n§7{murderer?.Username ?? "An Unknown Player"} §fwas the Murderer!");
                 });
             }
             //Murderer Wins (Innocents + Detective Dead)
@@ -41,7 +39,7 @@ namespace SkyCore.Games.Murder.State
 
 				gameLevel.DoForAllPlayers(player =>
 				{
-					TitleUtil.SendCenteredSubtitle(player, $"§c§lMurderer §r§7Wins\n§7{murderer?.Username ?? "An Unknown Player"} §fwas the Murderer!");
+					TitleUtil.SendCenteredSubtitle(player, $"§c§lMurderer §r§7§lWins§r\n§7{murderer?.Username ?? "An Unknown Player"} §fwas the Murderer!");
 				});
 			}
             //Innocents Win (Timeout)

@@ -145,7 +145,7 @@ namespace SkyCore.Games.Murder.State
 						//
 					}
 
-					Console.WriteLine($"Rolled Murderer as {murdererIdx} Detective as {detectiveIdx} with 0-{players.Count - 1} possible indexes");
+					//Console.WriteLine($"Rolled Murderer as {murdererIdx} Detective as {detectiveIdx} with 0-{players.Count - 1} possible indexes");
 
 					idx = 0;
 					foreach (SkyPlayer player in players)
@@ -354,7 +354,7 @@ namespace SkyCore.Games.Murder.State
 			// V Avoid spawning gun parts on the first possible spawn tick
             if (secondsLeft < (MaxGameTime / 2) - 10 && currentTick % 30 == 0 && GunParts.Count != GunPartLocations.Count)
             {
-				SkyUtil.log("Attempting to spawn gun parts at tick " + currentTick);
+				//SkyUtil.log("Attempting to spawn gun parts at tick " + currentTick);
                 PlayerLocation spawnLocation = null;
 
 	            int maxSpawnAmount = gameLevel.GetPlayerCount();
@@ -508,8 +508,10 @@ namespace SkyCore.Games.Murder.State
 		        particle.Spawn();
 			}
 
-	        if (player == murderLevel.Murderer) //||
-				/*murderLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0*///) //TODO: Uncomment for better presentation
+	        player.Knockback(new Vector3(0, 1.5f, 0));
+
+			if (player == murderLevel.Murderer ||
+				murderLevel.GetPlayersInTeam(MurderTeam.Innocent, MurderTeam.Detective).Count == 0)
 			{
 				//Message appears once game ends
 			}
@@ -524,8 +526,6 @@ namespace SkyCore.Games.Murder.State
 					player.IsFlying = true;
 
 					player.SendAdventureSettings();
-
-					player.Knockback(new Vector3(0, 1.5f, 0));
 				}
 
 				RunnableTask.RunTaskLater(() =>
