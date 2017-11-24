@@ -24,11 +24,25 @@ namespace SkyCore.Game
 
 		public static string CurrentHostAddress { get; set; }
 
+		//
+
+		private static readonly bool IsDevelopmentServer;
+
 		static ExternalGameHandler()
 		{
+			if (Config.GetProperty("dev-server", "false").Equals("true"))
+			{
+				IsDevelopmentServer = true;
+			}
+
 			RedisPool = ConnectionMultiplexer.Connect("localhost");
 
 			RedisPool.PreserveAsyncOrder = false; //Allow Concurrency
+		}
+
+		private static string GetDevelopmentPrefix()
+		{
+			return IsDevelopmentServer ? "dev_" : "";
 		}
 
 		public static void Init(MiNetServer server)
@@ -68,7 +82,7 @@ namespace SkyCore.Game
 
 			}).Start();
 
-			RedisPool.GetSubscriber().SubscribeAsync("game_register", (channel, message) =>
+			RedisPool.GetSubscriber().SubscribeAsync($"{GetDevelopmentPrefix()}game_register", (channel, message) =>
 			{
 				/*
 				 * Channel game_register
@@ -175,7 +189,7 @@ namespace SkyCore.Game
 			 * Format:
 			 * {ip-address}:{port}:{current-players}:{available-servers}
 			 */
-			subscriber.SubscribeAsync($"{gameName}_info", (channel, message) =>
+			subscriber.SubscribeAsync($"{GetDevelopmentPrefix()}{gameName}_info", (channel, message) =>
 			{
 				try
 				{
@@ -270,7 +284,7 @@ namespace SkyCore.Game
 					if (++threadTick % 15 == 0)
 					{
 						//Temp - Sending server is gameName
-						RedisPool.GetSubscriber().PublishAsync("game_register",
+						RedisPool.GetSubscriber().PublishAsync($"{GetDevelopmentPrefix()}game_register",
 							$"{gameName}:{gameName}:{CurrentHostAddress}");
 					}
 
@@ -293,14 +307,14 @@ namespace SkyCore.Game
 						SkyCoreAPI.Instance.CurrentIp + ":" + instanceInfo.CurrentPlayers + ":" + availableGameConcat;
 
 					//SkyUtil.log($"Sending update on {gameName}_info as {messageContents}");
-					RedisPool.GetSubscriber().PublishAsync($"{gameName}_info", messageContents);
+					RedisPool.GetSubscriber().PublishAsync($"{GetDevelopmentPrefix()}{gameName}_info", messageContents);
 				}
 
 			}).Start();
 
 			RegisterGame(gameName, new InstanceInfo{HostAddress = "local"});
 
-			RedisPool.GetSubscriber().SubscribeAsync($"{gameName}_join", (channel, message) =>
+			RedisPool.GetSubscriber().SubscribeAsync($"{GetDevelopmentPrefix()}{gameName}_join", (channel, message) =>
 			{
 				string[] messageSplit = ((string)message).Split(':');
 

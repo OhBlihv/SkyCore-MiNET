@@ -786,7 +786,7 @@ namespace SkyCore.Commands
 
 						int gamePlayers = entry.Value.GetCurrentPlayers() - lobbyPlayers;
 
-						player.SendMessage($"§e({entry.Key}) - Lobby({lobbyPlayers}) Game({gamePlayers})");
+						player.SendMessage($"§e({entry.Key}) - §eLobby§6(§e{lobbyPlayers}§6) §eGame§6(§e{gamePlayers}§6)");
 					}
 					return;
 				}
