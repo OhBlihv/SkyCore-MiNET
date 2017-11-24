@@ -44,7 +44,7 @@ namespace SkyCore.Restart
 			});
 		}
 
-		public static void TriggerReboot()
+		public static void TriggerReboot(bool force = false)
 		{
 			if (Timer != null)
 			{
@@ -87,7 +87,8 @@ namespace SkyCore.Restart
 			{
 				SkyCoreAPI.IsRebootQueued = true;
 
-				if (SkyCoreAPI.Instance.GameModes.TryGetValue(gameType, out GameController localGameController) && 
+				//Force will ignore this and kick all players immediately
+				if (!force && SkyCoreAPI.Instance.GameModes.TryGetValue(gameType, out GameController localGameController) && 
 				    !localGameController.GameLevels.IsEmpty)
 				{
 					ICollection<GameLevel> gameLevels = localGameController.GameLevels.Values;

@@ -24,6 +24,7 @@ using SkyCore.Permissions;
 using SkyCore.Player;
 using System.Threading;
 using log4net;
+using SkyCore.Restart;
 using SkyCore.Util;
 
 namespace SkyCore.Commands
@@ -227,7 +228,7 @@ namespace SkyCore.Commands
 
 		[Command(Name = "stop")]
 		[Authorize(Permission = CommandPermission.Normal)]
-		public void CommandStop(MiNET.Player player)
+		public void CommandStop(MiNET.Player player, params string[] args)
 		{
 			if (((SkyPlayer) player).PlayerGroup != PlayerGroup.Admin)
 			{
@@ -235,11 +236,25 @@ namespace SkyCore.Commands
 				return;
 			}
 
-			SkyCoreAPI.Instance.OnDisable();
-			SkyCoreAPI.Instance.Server.PluginManager.Plugins.Remove(SkyCoreAPI.Instance);
-			SkyCoreAPI.Instance.Server.StopServer();
+			if (args.Length > 0)
+			{
+				if (args[0].Equals("now"))
+				{
+					player.SendMessage("§cRebooting Server...");
+					RestartHandler.TriggerReboot(false);
+					return;
+				}
+				if (args[0].Equals("queue"))
+				{
+					player.SendMessage("§cQueueing reboot...");
+					player.SendMessage("§7* Server should reboot after all games have finished their games.");
+					RestartHandler.TriggerReboot(true);
+					return;
+				}
+			}
 
-			Environment.Exit(0);
+			player.SendMessage("§c/stop now (Immediately stops the server)");
+			player.SendMessage("§c/stop queue (Queues a reboot once all games are free to reboot)");
 		}
 
 		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
