@@ -189,27 +189,17 @@ namespace SkyCore.Player
 						},
 						new Action(delegate
 						{
-							if (PlayerGroup == PlayerGroup.Player)
-							{
-								//Update permission levels
-								SetPlayerGroup(PlayerGroup.Player);
-							}
+							//Update permission levels
+							SetPlayerGroup(PlayerGroup.Player);
 
 							_isRankLoaded = true;
 							//SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommandPermission})");
 
-							if (PlayerGroup == PlayerGroup.Admin)
-							{
-								SetGameMode(GameMode.Adventure);
-							}
-							else
-							{
-								SetGameMode(GameMode.Adventure);
+							SetGameMode(GameMode.Adventure);
 
-								if (SkyCoreApi.GameType.Equals("hub") && PlayerGroup.IsAtLeast(PlayerGroup.Mvp))
-								{
-									SetAllowFly(true);
-								}
+							if (SkyCoreApi.GameType.Equals("hub") && PlayerGroup.IsAtLeast(PlayerGroup.Mvp))
+							{
+								SetAllowFly(true);
 							}
 
 							foreach (Action action in _postLoginActions)

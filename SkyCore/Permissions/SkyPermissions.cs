@@ -146,13 +146,13 @@ namespace SkyCore.Permissions
         [Authorize(Permission = CommandPermission.Normal)]
         public void CommandPermSet(MiNET.Player player, string targetName, string targetGroupName)
         {
-	        if (player.CommandPermission < CommandPermission.Admin)
-	        {
-		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
-		        return;
-	        }
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
+			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+				return;
+			}
 
-	        if (String.IsNullOrEmpty(targetName))
+			if (String.IsNullOrEmpty(targetName))
             {
                 player.SendMessage($"{ChatColors.Red}Enter a valid player name.");
                 return;
@@ -212,13 +212,13 @@ namespace SkyCore.Permissions
         [Authorize(Permission = CommandPermission.Normal)]
         public void CommandPermGet(MiNET.Player player, string targetName)
         {
-	        if (player.CommandPermission < CommandPermission.Admin)
-	        {
-		        player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
-		        return;
-	        }
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
+			{
+				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
+				return;
+			}
 
-	        if (string.IsNullOrEmpty(targetName))
+			if (string.IsNullOrEmpty(targetName))
             {
                 player.SendMessage($"{ChatColors.Red}Enter a valid player name.");
                 return;
