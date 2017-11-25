@@ -16,6 +16,7 @@ using Bugsnag;
 using MiNET.Blocks;
 using MiNET.Net;
 using SkyCore.BugSnag;
+using SkyCore.Game.State.Impl;
 using Button = MiNET.UI.Button;
 
 namespace SkyCore.Game.Level
@@ -503,11 +504,49 @@ namespace SkyCore.Game.Level
         {
 	        lock (_tickLock)
 	        {
-		        CurrentState.LeaveState(this);
+		        try
+		        {
+			        CurrentState.LeaveState(this);
+				}
+		        catch (Exception e)
+		        {
+			        BugSnagUtil.ReportBug(null, e);
+		        }
 
 		        CurrentState = gameState;
 
-		        CurrentState.EnterState(this);
+		        try
+		        {
+					CurrentState.EnterState(this);
+				}
+		        catch (Exception e)
+		        {
+			        BugSnagUtil.ReportBug(null, e);
+
+					//Move all players to a new game.
+					DoForAllPlayers(player =>
+					{
+						try
+						{
+							if (player == null)
+							{
+								return;
+							}
+
+							ExternalGameHandler.AddPlayer(player, GameType);
+						}
+						catch (Exception e2)
+						{
+							//Ignore
+							BugSnagUtil.ReportBug(null, e);
+						}
+					});
+
+			        if (gameState.GetEnumState(this) != StateType.Closing)
+			        {
+				        UpdateGameState(new VoidGameState());
+			        }
+		        }
 			}
         }
 
