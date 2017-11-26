@@ -184,13 +184,15 @@ namespace SkyCore.Player
 							if (playerGroup == null)
 							{
 								//Simply set, then update perms in the post-delegate
-								PlayerGroup = PlayerGroup.Player;
+								playerGroup = PlayerGroup.Player;
 							}
+
+							PlayerGroup = playerGroup;
 						},
 						new Action(delegate
 						{
 							//Update permission levels
-							SetPlayerGroup(PlayerGroup.Player);
+							SetPlayerGroup(PlayerGroup);
 
 							_isRankLoaded = true;
 							//SkyUtil.log($"Initialized as {PlayerGroup.GroupName}({CommandPermission})");
