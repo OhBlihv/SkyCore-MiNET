@@ -77,8 +77,6 @@ namespace SkyCore
 
 		public void OnEnable(PluginContext context)
         {
-			BugSnagUtil.Init();
-
 			context.PluginManager.LoadCommands(new SkyCommands(this));  //Initialize Generic Commands
 	        context.PluginManager.LoadCommands(Permissions);            //Initialize Permission Commands
 			context.PluginManager.LoadCommands(new GameCommands());		//Initialize GameController Commands (/gameedit)
@@ -105,8 +103,12 @@ namespace SkyCore
 					        }
 					        catch (Exception e)
 					        {
-						        Console.WriteLine(e);
-					        }
+								BugSnagUtil.ReportBug(e, new AnonMetadatable((metadata) =>
+								{
+									metadata.AddToTab("PendingTask", "Target", pendingTask.Target);
+									metadata.AddToTab("PendingTask", "Method", pendingTask.Method);
+								}));
+							}
 
 				        }, 5000);
 			        }
@@ -142,7 +144,10 @@ namespace SkyCore
 			Instance = this;
 			SkyUtil.log("SkyCore Initializing...");
 
-	        SkyUtil.log($"Dev Mode: ({Config.GetProperty("dev-server", "false")})");
+			//Initialize Bugsnag Exception Reporting
+	        BugSnagUtil.Init();
+
+			SkyUtil.log($"Dev Mode: ({Config.GetProperty("dev-server", "false")})");
 	        try
 	        {
 		        if (Config.GetProperty("dev-server", "false").Equals("true"))
@@ -163,8 +168,8 @@ namespace SkyCore
 			}
 	        catch (Exception e)
 	        {
-		        Console.WriteLine(e);
-	        }
+				BugSnagUtil.ReportBug(e);
+			}
 
 			ServerPath = Environment.CurrentDirectory;
 			SkyUtil.log($"Registered Server Path at '{ServerPath}'");
@@ -237,7 +242,7 @@ namespace SkyCore
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e);
+				BugSnagUtil.ReportBug(e);
 				//TODO: Prevent players joining
 			}
 
@@ -290,7 +295,7 @@ namespace SkyCore
 
             if (eventArgs.Level is GameLevel level)
             {
-                level.RemovePlayer((SkyPlayer) eventArgs.Player);
+                level.RemovePlayer((SkyPlayer) eventArgs.Player, true);
             }
         }
 

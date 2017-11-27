@@ -10,6 +10,7 @@ using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.BugSnag;
 using SkyCore.Game.Items;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
@@ -207,8 +208,8 @@ namespace SkyCore.Games.Murder.State
 			}
             catch (Exception e)
             {
-                Console.WriteLine(e);
-            }
+				BugSnagUtil.ReportBug(e, this, gameLevel);
+			}
         }
 
         public override void LeaveState(GameLevel gameLevel)

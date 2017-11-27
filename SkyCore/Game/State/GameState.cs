@@ -1,5 +1,7 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using Bugsnag;
 using MiNET;
 using MiNET.Blocks;
 using MiNET.Entities;
@@ -32,7 +34,7 @@ namespace SkyCore.Game.State
 
 	//
 
-    public abstract class GameState
+    public abstract class GameState : IBugSnagMetadatable
     {
 
         public abstract void EnterState(GameLevel gameLevel);
@@ -131,7 +133,7 @@ namespace SkyCore.Game.State
 				}
 			    catch (Exception e)
 			    {
-					BugSnagUtil.ReportBug(null, e);
+					BugSnagUtil.ReportBug(e, this, gameLevel, player);
 			    }
 		    }
 	    }
@@ -141,5 +143,20 @@ namespace SkyCore.Game.State
             return gameController.CurrentState == this;
         }
 
+	    public void PopulateMetadata(Metadata metadata)
+	    {
+		    metadata.AddToTab("GameState", "StateType", GetType());
+
+			//This method doesn't really need the gameLevel to function
+			//Wrap it just in-case something does in the future
+		    try
+		    {
+			    metadata.AddToTab("GameState", "StateEnum", GetEnumState(null));
+			}
+		    catch (Exception e)
+		    {
+			    //
+		    }
+		}
     }
 }

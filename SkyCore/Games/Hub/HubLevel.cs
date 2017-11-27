@@ -10,6 +10,7 @@ using SkyCore.Player;
 using SkyCore.Util;
 using System;
 using System.Collections.Generic;
+using SkyCore.BugSnag;
 using Hologram = SkyCore.Entities.Hologram;
 
 namespace SkyCore.Games.Hub
@@ -39,22 +40,27 @@ namespace SkyCore.Games.Hub
 					{
 						PlayerNPC.SpawnAllHubNPCs(this);
 
-						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
-							new BlockCoordinates(249, 77, 268), MapUtil.MapDirection.West);
-						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\buildbattlemapimage.png", 1, 1, this,
-							new BlockCoordinates(252, 77, 270), MapUtil.MapDirection.West);
-						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\murdermapimage.png", 1, 1, this,
-							new BlockCoordinates(260, 77, 270), MapUtil.MapDirection.West);
-						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
-							new BlockCoordinates(263, 77, 268), MapUtil.MapDirection.West);
+						SpawnHubMaps();
 					}
 					catch (Exception e)
 					{
-						Console.WriteLine(e);
+						BugSnagUtil.ReportBug(e, this);
 					}
 				}, 250);
 				
 			});
+		}
+
+		private void SpawnHubMaps()
+		{
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
+				new BlockCoordinates(249, 77, 268), MapUtil.MapDirection.West);
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\buildbattlemapimage.png", 1, 1, this,
+				new BlockCoordinates(252, 77, 270), MapUtil.MapDirection.West);
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\murdermapimage.png", 1, 1, this,
+				new BlockCoordinates(260, 77, 270), MapUtil.MapDirection.West);
+			MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
+				new BlockCoordinates(263, 77, 268), MapUtil.MapDirection.West);
 		}
 
 		//Avoid tracking IncomingPlayers

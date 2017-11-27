@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using SkyCore.Game.State;
-using SkyCore.Util;
+﻿using SkyCore.Game.State;
 
 namespace SkyCore.Games.Murder
 {

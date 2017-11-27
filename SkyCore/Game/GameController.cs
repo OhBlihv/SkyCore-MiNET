@@ -118,7 +118,7 @@ namespace SkyCore.Game
             }
             catch (Exception e)
             {
-	            BugSnagUtil.ReportBug(this, e);
+	            BugSnagUtil.ReportBug(e, this);
 			}
         }
 
@@ -273,8 +273,8 @@ namespace SkyCore.Game
 			}
 		    catch (Exception e)
 		    {
-			    Console.WriteLine(e);
-			    return null;
+				BugSnagUtil.ReportBug(e, this);
+				return null;
 		    }
 	    }
 	    
@@ -320,9 +320,7 @@ namespace SkyCore.Game
 			    {
 				    if (!gameLevel.CurrentState.CanAddPlayer(gameLevel))
 				    {
-					    //Player shouldn't be here if no games are accessible
-						ExternalGameHandler.AddPlayer(player, "hub");
-					    return null;
+					    continue;
 				    }
 
 				    if (join)
@@ -333,7 +331,10 @@ namespace SkyCore.Game
 
 				    return gameLevel;
 			    }
-		    }
+
+				//Player shouldn't be here if no games are accessible
+			    ExternalGameHandler.AddPlayer(player, "hub");
+			}
 
 		    return null;
 	    }

@@ -105,8 +105,7 @@ namespace SkyCore.Entities
 		    }
 		    catch (Exception e)
 		    {
-			    Console.WriteLine(e);
-			    throw;
+			    
 		    }
 	    }
 
@@ -203,7 +202,6 @@ namespace SkyCore.Entities
 				catch (Exception e)
 				{
 					Console.WriteLine(e);
-					throw;
 				}
 			};
 

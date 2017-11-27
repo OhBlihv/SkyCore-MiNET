@@ -6,6 +6,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SkyCore.BugSnag;
 
 namespace SkyCore.Util
 {
@@ -151,7 +152,7 @@ namespace SkyCore.Util
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e);
+				BugSnagUtil.ReportBug(e);
 			}
 		}
 

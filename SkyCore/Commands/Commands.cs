@@ -1,31 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.IO.Compression;
-using System.Numerics;
-using System.Threading.Tasks;
-using MiNET;
-using MiNET.BlockEntities;
-using MiNET.Blocks;
 using MiNET.Entities;
 using MiNET.Entities.Hostile;
-using MiNET.Entities.ImageProviders;
 using MiNET.Entities.Passive;
-using MiNET.Entities.World;
-using MiNET.Items;
 using MiNET.Net;
 using MiNET.Plugins.Attributes;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.BugSnag;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Permissions;
 using SkyCore.Player;
-using System.Threading;
-using log4net;
 using SkyCore.Restart;
-using SkyCore.Util;
 
 namespace SkyCore.Commands
 {
@@ -241,14 +227,14 @@ namespace SkyCore.Commands
 				if (args[0].Equals("now"))
 				{
 					player.SendMessage("§cRebooting Server...");
-					RestartHandler.TriggerReboot(false);
+					RestartHandler.TriggerReboot(true);
 					return;
 				}
 				if (args[0].Equals("queue"))
 				{
 					player.SendMessage("§cQueueing reboot...");
 					player.SendMessage("§7* Server should reboot after all games have finished their games.");
-					RestartHandler.TriggerReboot(true);
+					RestartHandler.TriggerReboot(false);
 					return;
 				}
 			}
@@ -789,6 +775,10 @@ namespace SkyCore.Commands
 						player.SendMessage($"§e({entry.Key}) - §eLobby§6(§e{lobbyPlayers}§6) §eGame§6(§e{gamePlayers}§6)");
 					}
 					return;
+				}
+				else if (args[0].Equals("bugtest"))
+				{
+					BugSnagUtil.ReportBug(new Exception("Test Exception"), player as SkyPlayer);
 				}
 			}
 

@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,6 +15,8 @@ using MiNET.Items;
 using MiNET.Net;
 using MiNET.Utils;
 using MiNET.Worlds;
+using SkyCore.BugSnag;
+using SkyCore.Game.Level;
 
 namespace SkyCore.Util
 {
@@ -56,6 +57,18 @@ namespace SkyCore.Util
 		}
 
 		private static readonly ConcurrentDictionary<string, CachedMap> CachedMaps = new ConcurrentDictionary<string, CachedMap>();
+
+		private static readonly ConcurrentDictionary<string, HashSet<long>> LevelMapIds = new ConcurrentDictionary<string, HashSet<long>>();
+
+		public static ISet<long> GetLevelMapIds(Level level)
+		{
+			if (LevelMapIds.TryGetValue(level is GameLevel gameLevel ? gameLevel.GameId : level.LevelId, out var mapIds))
+			{
+				return mapIds;
+			}
+
+			return null;
+		}
 
 		/**
 		 * Credit to @gurun, as what is below is based on his work.
@@ -120,6 +133,8 @@ namespace SkyCore.Util
 						frame.ImageProvider = new MapImageProvider { Batch = CreateCachedPacket(frame.EntityId, bitmapToBytes) };
 						frame.SpawnEntity();
 
+						AddMapIdToDictionary(level is GameLevel gameLevel ? gameLevel.GameId : level.LevelId, frame.EntityId);
+
 						BlockCoordinates frambc = new BlockCoordinates(xSpawnLoc, center.Y + height - y - 2, center.Z);
 						ItemFrameBlockEntity itemFrameBlockEntity = new ItemFrameBlockEntity
 						{
@@ -147,10 +162,15 @@ namespace SkyCore.Util
 			catch (Exception e)
 			{
 				SkyUtil.log("Aborted image generation");
-				Console.WriteLine(e);
+				BugSnagUtil.ReportBug(e);
 			}
 
 			return spawnedEntities;
+		}
+
+		private static void AddMapIdToDictionary(string levelId, long mapId)
+		{
+			LevelMapIds.GetOrAdd(levelId, new HashSet<long>()).Add(mapId);
 		}
 
 		private static McpeWrapper CreateCachedPacket(long mapId, byte[] bitmapToBytes)

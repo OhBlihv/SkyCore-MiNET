@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Bugsnag;
+using SkyCore.BugSnag;
 using SkyCore.Util;
 
 namespace SkyCore.Game.State
 {
-    public class GameTeam : Enumeration
+    public class GameTeam : Enumeration, IBugSnagMetadatable
     {
 
         public bool IsSpectator { get; }
@@ -17,5 +14,11 @@ namespace SkyCore.Game.State
             IsSpectator = isSpectator;
         }
 
+	    public void PopulateMetadata(Metadata metadata)
+	    {
+			metadata.AddToTab("GameTeam", "Username", DisplayName);
+			metadata.AddToTab("GameTeam", "Value", Value);
+			metadata.AddToTab("GameTeam", "IsSpectator", IsSpectator);
+		}
     }
 }

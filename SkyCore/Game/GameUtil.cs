@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MiNET.UI;
+using SkyCore.BugSnag;
 using SkyCore.Player;
 
 namespace SkyCore.Game
@@ -71,8 +72,7 @@ namespace SkyCore.Game
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e);
-				throw;
+				BugSnagUtil.ReportBug(e);
 			}
 		}
 

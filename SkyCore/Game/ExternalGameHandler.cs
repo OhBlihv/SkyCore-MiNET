@@ -5,6 +5,7 @@ using System.Threading;
 using MiNET;
 using MiNET.Net;
 using MiNET.Utils;
+using SkyCore.BugSnag;
 using SkyCore.Entities;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -229,7 +230,7 @@ namespace SkyCore.Game
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e);
+					BugSnagUtil.ReportBug(e);
 				}
 			});
 		}
@@ -398,7 +399,14 @@ namespace SkyCore.Game
 				return;
 			}
 
-			GameRegistrations[gameName].AddPlayer(player);
+			try
+			{
+				GameRegistrations[gameName].AddPlayer(player);
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(e);
+			}
 		}
 
 	}
@@ -447,7 +455,7 @@ namespace SkyCore.Game
 			//SkyUtil.log($"Checking available games from all instances for {GameName} ({_gameInstances.Count} total instances to search)");
 
 			//Check current instance first
-			if (_gameInstances.ContainsKey("local"))
+			if (_gameInstances.ContainsKey("local") && !SkyCoreAPI.IsRebootQueued) //Avoid moving players to this server if it's about to reboot
 			{
 				InstanceInfo instanceInfo = _gameInstances["local"];
 

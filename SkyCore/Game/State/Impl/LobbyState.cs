@@ -6,6 +6,7 @@ using MiNET.Items;
 using MiNET.Utils;
 using MiNET.Worlds;
 using Newtonsoft.Json;
+using SkyCore.BugSnag;
 using SkyCore.Entities;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -163,9 +164,8 @@ namespace SkyCore.Game.State.Impl
 				        }
 				        catch (Exception e)
 				        {
-					        Console.WriteLine(e);
-					        throw;
-				        }
+							BugSnagUtil.ReportBug(e, this, player as SkyPlayer);
+						}
 			        }
 		        }
 	        }

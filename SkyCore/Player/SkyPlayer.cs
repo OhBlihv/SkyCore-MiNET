@@ -58,11 +58,18 @@ namespace SkyCore.Player
         public void SetPlayerGroup(PlayerGroup playerGroup)
         {
             PlayerGroup = playerGroup;
+			
+	        if (PermissionLevel != playerGroup.PermissionLevel ||
+	            CommandPermission != playerGroup.CommandPermission ||
+	            ActionPermissions != playerGroup.ActionPermission)
+	        {
+				//Initialize Player UserPermission level for commands
+		        PermissionLevel = playerGroup.PermissionLevel;
+		        CommandPermission = playerGroup.CommandPermission;
+		        ActionPermissions = playerGroup.ActionPermission;
 
-            //Initialize Player UserPermission level for commands
-	        PermissionLevel = playerGroup.PermissionLevel;
-            CommandPermission = playerGroup.CommandPermission;
-	        ActionPermissions = playerGroup.ActionPermission;
+				SendAdventureSettings();
+			}
 
 	        SetHideNameTag(false);
 			UpdatePlayerName();
@@ -169,6 +176,8 @@ namespace SkyCore.Player
 
 				SetPlayerGroup(PlayerGroup.Player);
 
+	            _hasJoined = true;
+
 				RunnableTask.RunTask(() =>
 				{
 					new DatabaseAction().Query(
@@ -227,36 +236,33 @@ namespace SkyCore.Player
 								SendTitle("§f", TitleType.Title, 6, 6, 20 * 10);
 								SendTitle("§f", TitleType.SubTitle, 6, 6, 20 * 10);
 							}, 500);
+
+							//Traditional Loading
+
+							IsSpawned = true;
+
+							//Should already be in a 'GameLevel'.
+							//Check and force-spawn them in if they're missing.
+							if (Level is GameLevel level && !level.PlayerTeamDict.ContainsKey(Username))
+							{
+								level.AddPlayer(this);
+							}
+
+							GameInfo targetedGame = ExternalGameHandler.GetGameForIncomingPlayer(Username);
+							if (targetedGame != null && (!(Level is GameLevel) || !((GameLevel)Level).GameId.Equals(targetedGame.GameId)))
+							{
+								SkyCoreApi.GameModes[SkyCoreApi.GameType].InstantQueuePlayer(this, targetedGame);
+							}
 						})
 					);
 				});
 	            
 				//Initialize once we've loaded the group etc.
 	            base.InitializePlayer();
-
-				_hasJoined = true;
-
-                IsSpawned = true;
-
-	            //Should already be in a 'GameLevel'.
-				//Check and force-spawn them in if they're missing.
-	            if (Level is GameLevel level)
-	            {
-		            if (!level.PlayerTeamDict.ContainsKey(Username))
-		            {
-			            level.AddPlayer(this);
-		            }
-	            }
-
-	            GameInfo targetedGame = ExternalGameHandler.GetGameForIncomingPlayer(Username);
-	            if (targetedGame != null && (!(Level is GameLevel) || !((GameLevel) Level).GameId.Equals(targetedGame.GameId)))
-	            {
-		            SkyCoreApi.GameModes[SkyCoreApi.GameType].InstantQueuePlayer(this, targetedGame);
-				}
-			}
+            }
             catch (Exception e)
             {
-				BugSnagUtil.ReportBug(this, e);
+				BugSnagUtil.ReportBug(e, this);
 			}
         }
 
@@ -288,7 +294,7 @@ namespace SkyCore.Player
 				McpeSetEntityData mcpeSetEntityData = McpeSetEntityData.CreateObject();
 				mcpeSetEntityData.runtimeEntityId = EntityId;
 				mcpeSetEntityData.metadata = GetMetadata();
-				mcpeSetEntityData.metadata[(int)Entity.MetadataFlags.Scale] = new MetadataFloat(0.01f); // Scale
+				mcpeSetEntityData.metadata[(int) MetadataFlags.Scale] = new MetadataFloat(0.01f); // Scale
 
 				foreach (var gamePlayer in Level.GetAllPlayers())
 				{

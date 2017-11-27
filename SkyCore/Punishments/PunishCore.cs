@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MiNET.Utils;
 using MySql.Data.MySqlClient;
+using SkyCore.BugSnag;
 using SkyCore.Database;
 using SkyCore.Player;
 using SkyCore.Statistics;
@@ -506,7 +507,7 @@ namespace SkyCore.Punishments
 								catch (Exception e)
 								{
 									SkyUtil.log($"Failed to read punishment row for xuid='{xuid}'");
-									Console.WriteLine(e);
+									BugSnagUtil.ReportBug(e);
 								}
 							} while (reader.Read());
 

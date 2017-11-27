@@ -6,6 +6,7 @@ using MiNET.Blocks;
 using MiNET.Items;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SkyCore.BugSnag;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Player;
@@ -103,7 +104,10 @@ namespace SkyCore.Games.BuildBattle
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e);
+					BugSnagUtil.ReportBug(e, this, new AnonMetadatable((metadata) =>
+					{
+						metadata.AddToTab("JSON", "Theme List Content", jObject);
+					}));
 				}
 			}
 			else

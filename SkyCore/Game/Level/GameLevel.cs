@@ -11,12 +11,14 @@ using SkyCore.Util;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Security.Policy;
 using System.Threading;
 using Bugsnag;
 using MiNET.Blocks;
 using MiNET.Net;
 using SkyCore.BugSnag;
 using SkyCore.Game.State.Impl;
+using SkyCore.Games.Hub;
 using Button = MiNET.UI.Button;
 
 namespace SkyCore.Game.Level
@@ -303,7 +305,7 @@ namespace SkyCore.Game.Level
             }
             catch (Exception e)
             {
-                BugSnagUtil.ReportBug(this, e);
+                BugSnagUtil.ReportBug(e, this, CurrentState);
             }
         }
 
@@ -312,7 +314,7 @@ namespace SkyCore.Game.Level
         {
 	        if (player.Level != this && player.Level is GameLevel level)
 	        {
-		        level.RemovePlayer(player); //Clear from old world
+		        level.RemovePlayer(player, true); //Clear from old world
 	        }
 
 			//Remove a player from _incomingPlayers only if it's non-empty.
@@ -331,26 +333,29 @@ namespace SkyCore.Game.Level
             GameTeam defaultTeam = GetDefaultTeam();
 
 			SetPlayerTeam(player, defaultTeam);
-            //SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName} in game {GameId}");
+			//SkyUtil.log($"Added {player.Username} to team {defaultTeam.DisplayName} in game {GameId}");
 
-	        if (player.Level != this)
+			/*if (player.Level != this)
 	        {
 				//Only show the level transition screen to players changing games on this instance
 		        //player.SpawnLevel(this, GameLevelInfo.LobbyLocation, !_incomingPlayers.ContainsKey(player.Username));
 		        player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false); //Remove loading screen to prevent 'building terrain' issue
-			}
+	        }
 	        else //Still teleport the player to the spawn location
 	        {
 		        player.Teleport(GameLevelInfo.LobbyLocation);
-	        }
+	        }*/
 
-	        try
+			//Fix for maps on first join to an instance
+			player.SpawnLevel(this, GameLevelInfo.LobbyLocation, false); //Remove loading screen to prevent 'building terrain' issue
+
+			try
 	        {
 		        CurrentState.InitializePlayer(this, player);
 			}
 	        catch (Exception e)
 			{
-		        BugSnagUtil.ReportBug(this, e);
+		        BugSnagUtil.ReportBug(e, this, CurrentState, player);
 			}
 			
 	        //Update Time
@@ -378,8 +383,12 @@ namespace SkyCore.Game.Level
 					        }
 					        catch (Exception e)
 					        {
-						        Console.WriteLine(e);
-					        }
+								BugSnagUtil.ReportBug(e, new AnonMetadatable((metadata) =>
+								{
+									metadata.AddToTab("PendingTask", "Target", pendingTask.Target);
+									metadata.AddToTab("PendingTask", "Method", pendingTask.Method);
+								}));
+							}
 
 				        }, 250); //Small delay for the level to initialize
 			        }
@@ -394,6 +403,8 @@ namespace SkyCore.Game.Level
 	        //SkyUtil.log($"Attempting to remove {player.Username} from {GameId}");
 	        if (((SkyPlayer) player).GameTeam == null || player.Level != this)
 	        {
+				//Run base MiNET code even if our code shouldn't run.
+		        base.RemovePlayer(player, removeFromWorld);
 				return; //Shouldn't be in the/any game.
 	        }
 
@@ -410,7 +421,7 @@ namespace SkyCore.Game.Level
 
 			player.RemoveAllEffects();
 		
-			base.RemovePlayer(player); //Remove player from the 'world'
+			base.RemovePlayer(player, removeFromWorld); //Remove player from the 'world'
         }
 
         public GameTeam GetPlayerTeam(SkyPlayer player)
@@ -456,7 +467,7 @@ namespace SkyCore.Game.Level
 			}
 	        catch (Exception e)
 	        {
-		        Console.WriteLine(e);
+		        BugSnagUtil.ReportBug(e, this, player);
 	        }
         }
 
@@ -510,7 +521,7 @@ namespace SkyCore.Game.Level
 				}
 		        catch (Exception e)
 		        {
-			        BugSnagUtil.ReportBug(null, e);
+			        BugSnagUtil.ReportBug(e, this, CurrentState);
 		        }
 
 		        CurrentState = gameState;
@@ -521,7 +532,7 @@ namespace SkyCore.Game.Level
 				}
 		        catch (Exception e)
 		        {
-			        BugSnagUtil.ReportBug(null, e);
+			        BugSnagUtil.ReportBug(e, this, CurrentState);
 
 					//Move all players to a new game.
 					DoForAllPlayers(player =>
@@ -538,7 +549,7 @@ namespace SkyCore.Game.Level
 						catch (Exception e2)
 						{
 							//Ignore
-							BugSnagUtil.ReportBug(null, e);
+							BugSnagUtil.ReportBug(e, this, CurrentState);
 						}
 					});
 

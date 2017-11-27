@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using MiNET.Blocks;
 using MiNET.Effects;
-using MiNET.Items;
+using MiNET.Entities.ImageProviders;
+using MiNET.Entities.World;
 using MiNET.Net;
 using MiNET.Particles;
 using MiNET.Utils;
-using SkyCore.Entities;
+using MiNET.Worlds;
+using SkyCore.BugSnag;
 using SkyCore.Game;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;
 using SkyCore.Games.Hub.Items;
-using SkyCore.Permissions;
 using SkyCore.Player;
 using SkyCore.Util;
 
@@ -59,13 +56,57 @@ namespace SkyCore.Games.Hub.State
 			{
 				player.Inventory.SetInventorySlot(4, new ItemNavigationCompass());
 
-				player.Inventory.SetHeldItemSlot(4);
-
+				//Wait until the compass has appeared to change held slots
 				RunnableTask.RunTaskLater(() =>
 				{
 					player.Inventory.SetHeldItemSlot(4);
-				}, 1000);
+				}, 500);
 			}
+
+			/*try
+			{
+				ISet<long> mapIds = MapUtil.GetLevelMapIds(gameLevel);
+				if (mapIds == null)
+				{
+					SkyUtil.log(
+						$"Attempted to respawn missing maps for {player.Username}, but no maps were registered for {gameLevel.GameId}");
+				}
+				else
+				{
+					RunnableTask.RunTaskLater(() =>
+					{
+						//Murder one as example
+						Block block = gameLevel.GetBlock(new BlockCoordinates(260, 77, 270));
+
+						var message = McpeUpdateBlock.CreateObject();
+						message.blockId = block.Id;
+						message.coordinates = block.Coordinates;
+						message.blockMetaAndPriority = (byte)(0xb << 4 | (block.Metadata & 0xf));
+						player.SendPackage(message);
+
+						/*MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
+							new BlockCoordinates(249, 77, 268), MapUtil.MapDirection.West);
+						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\buildbattlemapimage.png", 1, 1, this,
+							new BlockCoordinates(252, 77, 270), MapUtil.MapDirection.West);
+						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\murdermapimage.png", 1, 1, this,
+							new BlockCoordinates(260, 77, 270), MapUtil.MapDirection.West);
+						MapUtil.SpawnMapImage(@"C:\Users\Administrator\Desktop\dl\map-images\comingsoonmapimage.png", 1, 1, this,
+							new BlockCoordinates(263, 77, 268), MapUtil.MapDirection.West);#1#
+
+						/*foreach (long mapEntityId in mapIds)
+						{
+							if (gameLevel.GetEntity(mapEntityId) is MapEntity mapEntity)
+							{
+								player.SendPackage(((MapImageProvider)mapEntity.ImageProvider).Batch);
+							}
+						}#1#
+					}, 1000);
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}*/
 		}
 
 		private const int ParticleEventCount = 10;
@@ -81,7 +122,8 @@ namespace SkyCore.Games.Hub.State
 			//Update BarHandlers for all online players every 500 milliseconds (1 tick)
 			gameLevel.DoForAllPlayers(player => player.BarHandler?.DoTick());
 
-			if (currentTick % 2 == 0)
+			//DISABLE PARTICLES UNTIL THE 0,0 BUG IS FIXED
+			/*if (currentTick % 2 == 0)
 			{
 				//Do Hub Particles
 				for (int i = 0; i < ParticleEventCount; i++)
@@ -98,7 +140,7 @@ namespace SkyCore.Games.Hub.State
 					particleEvent.data = 13369599;
 					gameLevel.RelayBroadcast(particleEvent);
 				}
-			}
+			}*/
 
 			if (currentTick % 2 == 0)
 			{
@@ -123,8 +165,7 @@ namespace SkyCore.Games.Hub.State
 						}
 						catch (Exception e)
 						{
-							Console.WriteLine(e);
-							throw;
+							BugSnagUtil.ReportBug(e, this, player);
 						}
 					}
 					else if (IsInInvisRegion(player.KnownPosition))

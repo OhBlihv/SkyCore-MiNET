@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using MiNET;
 using MiNET.Plugins;
-using MiNET.Utils;
 using SkyCore.BugSnag;
 using SkyCore.Game;
 using SkyCore.Game.Level;
@@ -61,11 +54,23 @@ namespace SkyCore.Restart
 			SkyUtil.log("Moving all players to first available hub");
 
 			//Remove this instance from the game pool
-			ushort.TryParse(Config.GetProperty("port", "19132"), out var hostPort);
 			string gameType = SkyCoreAPI.Instance.GameType;
 			if (ExternalGameHandler.GameRegistrations.TryGetValue(gameType, out GamePool gamePool))
 			{
-				gamePool.RemoveInstance(new InstanceInfo { HostAddress = "local", HostPort = hostPort });
+				List<InstanceInfo> toRemoveInstances = new List<InstanceInfo>();
+
+				foreach (InstanceInfo instanceInfo in gamePool.GetAllInstances())
+				{
+					if (instanceInfo.HostAddress.Equals("local"))
+					{
+						toRemoveInstances.Add(instanceInfo);
+					}
+				}
+
+				foreach (InstanceInfo toRemoveInstance in toRemoveInstances)
+				{
+					gamePool.RemoveInstance(toRemoveInstance);
+				}
 			}
 
 			//Remove ourselves from the list, and force players to a new hub
@@ -146,7 +151,7 @@ namespace SkyCore.Restart
 			}
 			catch (Exception e)
 			{
-				BugSnagUtil.ReportBug(null, e);
+				BugSnagUtil.ReportBug(e);
 			}
 
 			try
@@ -155,7 +160,7 @@ namespace SkyCore.Restart
 			}
 			catch (Exception e)
 			{
-				BugSnagUtil.ReportBug(null, e);
+				BugSnagUtil.ReportBug(e);
 			}
 
 			Environment.Exit(0);

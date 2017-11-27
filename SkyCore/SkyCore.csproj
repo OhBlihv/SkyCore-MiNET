@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blocks\SkyBlockFactory.cs" />
+    <Compile Include="BugSnag\AnonMetadatable.cs" />
     <Compile Include="BugSnag\BugSnagUtil.cs" />
     <Compile Include="BugSnag\IBugSnagMetadatable.cs" />
     <Compile Include="Commands\Commands.cs" />

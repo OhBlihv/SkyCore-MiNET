@@ -8,13 +8,13 @@ namespace SkyCore.BugSnag
 	public class BugSnagUtil
 	{
 
-		//private static BaseClient _bugSnagClient;
+		private static BaseClient _bugSnagClient;
 
-		//private static readonly object BugSnagLock = new object();
+		private static readonly object BugSnagLock = new object();
 
 		public static void Init()
 		{
-			//_bugSnagClient = new BaseClient("189d7e1ed0d5c11045f91967f0f3f32b");
+			_bugSnagClient = new BaseClient("189d7e1ed0d5c11045f91967f0f3f32b");
 			
 			/*lock (BugSnagLock)
 			{
@@ -23,20 +23,37 @@ namespace SkyCore.BugSnag
 			}*/
 		}
 
-		public static void ReportBug(IBugSnagMetadatable metadatable, Exception e)
+		public static void ReportBug(Exception e, params IBugSnagMetadatable[] metadatables)
 		{
 			try
 			{
-				//Console.WriteLine(e);
+				Console.WriteLine(e);
 
-				//Metadata metadata = new Metadata();
+				Metadata metadata = new Metadata();
 
-				//metadatable?.PopulateMetadata(metadata);
+				int i = 0;
+				foreach (IBugSnagMetadatable metadatable in metadatables)
+				{
+					i++;
+					try
+					{
+						if (metadatable == null)
+						{
+							throw new ArgumentNullException();
+						}
 
-				/*lock (BugSnagLock)
+						metadatable.PopulateMetadata(metadata);
+					}
+					catch (Exception exception)
+					{
+						metadata.AddToTab($"Metadatable #{i}", "Exception", exception);
+					}
+				}
+
+				lock (BugSnagLock)
 				{
 					_bugSnagClient.Notify(e, metadata);
-				}*/
+				}
 
 				//SkyUtil.log("Reported 1 Bug to BugSnag");
 			}
