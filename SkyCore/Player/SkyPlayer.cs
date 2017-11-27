@@ -57,21 +57,27 @@ namespace SkyCore.Player
 
         public void SetPlayerGroup(PlayerGroup playerGroup)
         {
-            PlayerGroup = playerGroup;
-			
 	        if (PermissionLevel != playerGroup.PermissionLevel ||
-	            CommandPermission != playerGroup.CommandPermission ||
+	            PlayerGroup.CommandPermission != playerGroup.CommandPermission ||
 	            ActionPermissions != playerGroup.ActionPermission)
 	        {
 				//Initialize Player UserPermission level for commands
 		        PermissionLevel = playerGroup.PermissionLevel;
-		        CommandPermission = playerGroup.CommandPermission;
+		        CommandPermission = (int) playerGroup.CommandPermission;
 		        ActionPermissions = playerGroup.ActionPermission;
 
 				SendAdventureSettings();
+
+				//Send Command Hint Changes if the group is possible going to receive more
+		        if (playerGroup.IsAtLeast(PlayerGroup.Vip))
+		        {
+			        SendAvailableCommands();
+				}
 			}
 
-	        SetHideNameTag(false);
+	        PlayerGroup = playerGroup;
+
+			SetHideNameTag(false);
 			UpdatePlayerName();
 		}
 

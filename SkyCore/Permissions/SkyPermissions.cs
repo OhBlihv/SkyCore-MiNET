@@ -10,29 +10,52 @@ using SkyCore.Util;
 namespace SkyCore.Permissions
 {
 
+	public enum PlayerGroupCommandPermissions
+	{
+		
+		Player = 1,
+		Vip = 2,
+		Pro = 3,
+		Mvp = 4,
+		Helper = 5,
+		Mod = 6,
+		Developer = 7,
+		Youtuber = 8,
+		Admin = 9
+
+	}
+
     public class PlayerGroup : Enumeration
     {
 
 	    public static readonly List<PlayerGroup> Values = new List<PlayerGroup>();
 
-		public static readonly PlayerGroup Player    = new PlayerGroup(0, "Player", "§7", "§7", 
-			PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Vip       = new PlayerGroup(1, "VIP", "§a", "§a[VIP]",
-	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Pro       = new PlayerGroup(2, "PRO", "§b", "§b[PRO]",
-	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Mvp       = new PlayerGroup(3, "MVP", "§d", "§d[MVP]",
-	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Helper    = new PlayerGroup(4, "Helper", "§3", "§3[HELPER]",
-	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Mod       = new PlayerGroup(5, "Mod", "§6", "§6[MOD]",
-	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Developer = new PlayerGroup(6, "Developer", "§e", "§e[DEVELOPER]",
-	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Youtuber  = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]",
-	        PermissionLevel.Member, CommandPermission.Normal, ActionPermissions.Default);
-        public static readonly PlayerGroup Admin     = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]",
-	        PermissionLevel.Operator, CommandPermission.Operator, ActionPermissions.All);
+	    public static readonly PlayerGroup Player = new PlayerGroup(0, "Player", "§7", "§7",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Player, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Vip = new PlayerGroup(1, "VIP", "§a", "§a[VIP]",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Vip, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Pro = new PlayerGroup(2, "PRO", "§b", "§b[PRO]",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Pro, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Mvp = new PlayerGroup(3, "MVP", "§d", "§d[MVP]",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Mvp, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Helper = new PlayerGroup(4, "Helper", "§3", "§3[HELPER]",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Helper, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Mod = new PlayerGroup(5, "Mod", "§6", "§6[MOD]",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Mod, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Developer = new PlayerGroup(6, "Developer", "§e", "§e[DEVELOPER]",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Developer, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Youtuber = new PlayerGroup(7, "Youtuber", "§c", "§c[YOUTUBE]",
+		    PermissionLevel.Member, PlayerGroupCommandPermissions.Youtuber, ActionPermissions.Default);
+
+	    public static readonly PlayerGroup Admin = new PlayerGroup(8, "Admin", "§c", "§c[ADMIN]",
+		    PermissionLevel.Operator, PlayerGroupCommandPermissions.Admin, ActionPermissions.All);
 
 		//
 
@@ -60,12 +83,12 @@ namespace SkyCore.Permissions
 
 	    public PermissionLevel PermissionLevel { get; }
 
-		public CommandPermission CommandPermission { get; }
+		public PlayerGroupCommandPermissions CommandPermission { get; }
 
 		public ActionPermissions ActionPermission { get; }
 
         private PlayerGroup(int enumVal, string groupName, string groupColour, string prefix,
-			PermissionLevel permissionLevel, CommandPermission commandPermission, ActionPermissions actionPermission)
+			PermissionLevel permissionLevel, PlayerGroupCommandPermissions commandPermission, ActionPermissions actionPermission)
         {
             EnumVal = enumVal;
 
@@ -143,7 +166,7 @@ namespace SkyCore.Permissions
         }
 
         [Command(Name = "perm set")]
-        [Authorize(Permission = CommandPermission.Normal)]
+        [Authorize(Permission = (int) PlayerGroupCommandPermissions.Admin)]
         public void CommandPermSet(MiNET.Player player, string targetName, string targetGroupName)
         {
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -209,8 +232,8 @@ namespace SkyCore.Permissions
         }
 
         [Command(Name = "perm get")]
-        [Authorize(Permission = CommandPermission.Normal)]
-        public void CommandPermGet(MiNET.Player player, string targetName)
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
+		public void CommandPermGet(MiNET.Player player, string targetName)
         {
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{

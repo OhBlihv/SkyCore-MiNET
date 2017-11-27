@@ -45,14 +45,14 @@ namespace SkyCore.Commands
 		}*/
 
 		[Command(Name = "hub")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int) PlayerGroupCommandPermissions.Player)]
 		public void CommandHub(MiNET.Player player, int hub = 0)
 		{
 			MoveToLobby(player, hub);
 		}
 
 		[Command(Name = "lobby")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Player)]
 		public void CommandLobby(MiNET.Player player, int hub = 0)
 		{
 			MoveToLobby(player, hub);
@@ -169,7 +169,7 @@ namespace SkyCore.Commands
 		}*/
 
 		[Command(Name = "speed")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int) PlayerGroupCommandPermissions.Admin)]
 		public void CommandSpeed(MiNET.Player player, float speed = 0.1f)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -185,7 +185,7 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "time")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandTime(MiNET.Player player, string timeString)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -213,7 +213,7 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "stop")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandStop(MiNET.Player player, params string[] args)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -244,14 +244,14 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandGamemode(MiNET.Player player, int gamemodeId = 0)
 		{
 			CommandGamemode(player, player.Username, gamemodeId);
 		}
 
 		[Command(Name = "gamemode", Aliases = new[] {"gm"})]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandGamemode(MiNET.Player player, string targetName = "", int gamemodeId = 0)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -312,7 +312,7 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "fly")]
-		[Authorize(Permission = CommandPermission.Admin)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandFly(MiNET.Player player, string targetName = "")
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -411,7 +411,7 @@ namespace SkyCore.Commands
 		}*/
 
 		[Command(Name = "join")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Player)]
 		public void CommandJoin(MiNET.Player player, string gameName)
 		{
 			try
@@ -512,7 +512,7 @@ namespace SkyCore.Commands
 		}*/
 
 		[Command(Name = "scale")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandScale(MiNET.Player player, string scaleString, string targetName = "")
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -551,7 +551,7 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "spawnmob")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandSpawnMob(MiNET.Player player, string entityName, string mobName = "", string mobScale = "")
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
@@ -729,10 +729,10 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "getpos")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandGetPos(MiNET.Player player)
 		{
-			if (player.CommandPermission < CommandPermission.Admin)
+			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
 			{
 				player.SendMessage("§c§l(!)§r §cYou do not have permission for this command.");
 				return;
@@ -745,7 +745,7 @@ namespace SkyCore.Commands
 		}
 
 		[Command(Name = "admin")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandAdmin(MiNET.Player player, params string[] args)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))

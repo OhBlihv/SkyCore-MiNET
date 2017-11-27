@@ -16,7 +16,7 @@ namespace SkyCore.Punishments
 	{
 
 		[Command(Name = "ban")]
-		[Authorize(Permission = CommandPermission.Operator)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Mod)]
 		public void CommandBan(MiNET.Player player, string playerName, params string[] args)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mod))
@@ -32,7 +32,7 @@ namespace SkyCore.Punishments
 		}
 
 		[Command(Name = "unban")]
-		[Authorize(Permission = CommandPermission.Operator)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Mod)]
 		public void CommandUnban(MiNET.Player player, string playerName)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mod))
@@ -62,7 +62,7 @@ namespace SkyCore.Punishments
 		}
 
 		[Command(Name = "kick")]
-		[Authorize(Permission = CommandPermission.Operator)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Helper)]
 		public void CommandKick(MiNET.Player player, string playerName, string[] reason)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Helper))
@@ -93,7 +93,7 @@ namespace SkyCore.Punishments
 		}
 
 		[Command(Name = "mute")]
-		[Authorize(Permission = CommandPermission.Operator)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Helper)]
 		public void CommandMute(MiNET.Player player, string playerName, params string[] args)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Helper))
@@ -109,7 +109,7 @@ namespace SkyCore.Punishments
 		}
 
 		[Command(Name = "unmute")]
-		[Authorize(Permission = CommandPermission.Operator)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Mod)]
 		public void CommandUnmute(MiNET.Player player, string playerName)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Mod))

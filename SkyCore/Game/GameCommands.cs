@@ -13,7 +13,7 @@ namespace SkyCore.Game
 	{
 
 		[Command(Name = "gameedit")]
-		[Authorize(Permission = CommandPermission.Normal)]
+		[Authorize(Permission = (int)PlayerGroupCommandPermissions.Admin)]
 		public void CommandGameEdit(MiNET.Player player, params string[] args)
 		{
 			if (!(player is SkyPlayer skyPlayer) || !skyPlayer.PlayerGroup.IsAtLeast(PlayerGroup.Admin))
