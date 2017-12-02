@@ -553,7 +553,16 @@ namespace SkyCore.Games.Murder.State
                 return -1; //Invalid amount
             }
 
-            return PlayerGunPartCounts[player.Username];
+			//Player might not be in the map for any reason
+	        if (!PlayerGunPartCounts.ContainsKey(player.Username))
+	        {
+		        PlayerGunPartCounts[player.Username] = 0;
+		        return 0;
+	        }
+	        else
+	        {
+				return PlayerGunPartCounts[player.Username];
+			}
         }
 
         public int AddPlayerGunParts(MurderLevel gameLevel, SkyPlayer player)
@@ -633,7 +642,7 @@ namespace SkyCore.Games.Murder.State
 				int gunAmmo = GetPlayerAmmo((MurderLevel) gameLevel, player);
 			    player.BarHandler.AddMajorLine(
 				    gunAmmo > 0
-					    ? $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} §fRemaining §7| §d{GetPlayerAmmo((MurderLevel)gameLevel, player)}/{MaxGunAmmo} §fBullets..."
+					    ? $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} §fRemaining §7| §d{gunAmmo}/{MaxGunAmmo} §fBullets..."
 					    : $"§a§lINNOCENT§r §7| {murderInformation.NeatTimeRemaining} §fRemaining §7| §d{GetPlayerGunParts((MurderLevel)gameLevel, player)}/{MaxGunParts} §fGun Parts...",
 				    2);
 			}
