@@ -139,15 +139,22 @@ namespace SkyCore.Restart
 
 			try
 			{
-				foreach (object pluginObject in server.PluginManager.Plugins)
+				if (server.PluginManager.Plugins.Count > 1)
 				{
-					if (pluginObject is IPlugin plugin)
+					foreach (object pluginObject in server.PluginManager.Plugins)
 					{
-						plugin.OnDisable();
+						if (pluginObject is IPlugin plugin)
+						{
+							plugin.OnDisable();
+						}
 					}
-				}
 
-				server.PluginManager.Plugins.Clear();
+					server.PluginManager.Plugins.Clear();
+				}
+				else
+				{
+					SkyCoreAPI.Instance.OnDisable();
+				}
 			}
 			catch (Exception e)
 			{
