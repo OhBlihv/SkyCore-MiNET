@@ -40,7 +40,7 @@ namespace SkyCore.Games.Hub
 					{
 						PlayerNPC.SpawnAllHubNPCs(this);
 
-						SpawnHubMaps();
+						//SpawnHubMaps();
 					}
 					catch (Exception e)
 					{
