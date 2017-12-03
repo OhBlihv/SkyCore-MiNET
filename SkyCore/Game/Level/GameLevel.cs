@@ -193,6 +193,18 @@ namespace SkyCore.Game.Level
 
 			try
 			{
+				if (CurrentState.GetEnumState(this) != StateType.Closing)
+				{
+					UpdateGameState(new VoidGameState());
+				}
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(e, this);
+			}
+
+			try
+			{
 				base.Close();
 			}
 			catch (Exception e)
