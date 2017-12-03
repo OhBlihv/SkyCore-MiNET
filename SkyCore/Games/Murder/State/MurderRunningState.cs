@@ -86,8 +86,23 @@ namespace SkyCore.Games.Murder.State
 		            gameLevel.DoForAllPlayers(player =>
 		            {
 			            //Pre-add all players to the map to avoid any unnecessary contains
-			            PlayerAmmoCounts.Add(player.Username, 0);
-			            PlayerGunPartCounts.Add(player.Username, 0);
+			            if (PlayerAmmoCounts.ContainsKey(player.Username))
+			            {
+				            PlayerAmmoCounts[player.Username] = 0;
+			            }
+			            else
+			            {
+							PlayerAmmoCounts.Add(player.Username, 0);
+						}
+
+			            if (PlayerGunPartCounts.ContainsKey(player.Username))
+			            {
+				            PlayerGunPartCounts[player.Username] = 0;
+			            }
+			            else
+			            {
+							PlayerGunPartCounts.Add(player.Username, 0);
+						}
 
 			            player.SetGameMode(GameMode.Adventure);
 
