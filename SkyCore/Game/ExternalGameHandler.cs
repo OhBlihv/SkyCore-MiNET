@@ -548,7 +548,7 @@ namespace SkyCore.Game
 					MiNET.Worlds.Level playerLevel = player.Level;
 					RunnableTask.RunTaskLater(() =>
 					{
-						if(playerLevel.Players.ContainsKey(player.EntityId))
+						if (playerLevel.Players.ContainsKey(player.EntityId))
 						{
 							if (playerLevel is GameLevel gameLevel)
 							{

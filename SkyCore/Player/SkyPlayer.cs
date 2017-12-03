@@ -272,6 +272,27 @@ namespace SkyCore.Player
 			}
         }
 
+	    public override void Disconnect(string reason, bool sendDisconnect = true)
+	    {
+		    base.Disconnect(reason, sendDisconnect);
+
+		    Level playerLevel = Level;
+		    RunnableTask.RunTaskLater(() =>
+		    {
+			    if (playerLevel.Players.ContainsKey(EntityId))
+			    {
+				    if (playerLevel is GameLevel gameLevel)
+				    {
+					    gameLevel.RemovePlayer(this);
+				    }
+
+				    playerLevel.RemoveEntity(this);
+
+				    playerLevel.Players.TryRemove(EntityId, out _);
+			    }
+		    }, 1000);
+		}
+
 	    public void PopulateMetadata(Metadata metadata)
 	    {
 		    metadata.AddToTab("SkyPlayer", "Username", Username);
