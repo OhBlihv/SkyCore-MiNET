@@ -544,6 +544,22 @@ namespace SkyCore.Game
 					};
 
 					player.SendPackage(transferPacket);
+
+					MiNET.Worlds.Level playerLevel = player.Level;
+					RunnableTask.RunTaskLater(() =>
+					{
+						if(playerLevel.Players.ContainsKey(player.EntityId))
+						{
+							if (playerLevel is GameLevel gameLevel)
+							{
+								gameLevel.RemovePlayer(player);
+							}
+
+							playerLevel.RemoveEntity(player);
+
+							playerLevel.Players.TryRemove(player.EntityId, out _);
+						}
+					}, 1000);
 				}
 			}
 		}
