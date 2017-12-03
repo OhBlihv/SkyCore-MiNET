@@ -1,4 +1,10 @@
-﻿using System;using System.Diagnostics.CodeAnalysis;using MiNET.Utils;using Newtonsoft.Json;using Newtonsoft.Json.Linq;namespace SkyCore.Game.Level
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using MiNET.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace SkyCore.Game.Level
 {
 
 	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]

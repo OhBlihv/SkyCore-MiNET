@@ -608,6 +608,12 @@ namespace SkyCore.Player
 		    base.OnPlayerLeave(e);
 	    }
 
+	    public override void Teleport(PlayerLocation newPosition)
+	    {
+			//Clone the teleport location as to not modify the original location object
+		    base.Teleport((PlayerLocation) newPosition.Clone());
+	    }
+
 	    public void HandleHeldItemSlotChange(int newHeldSlot)
 	    {
 		    if (Level is GameLevel level)
