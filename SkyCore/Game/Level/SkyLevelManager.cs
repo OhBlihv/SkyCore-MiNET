@@ -2,7 +2,6 @@
 using System.Linq;
 using MiNET;
 using MiNET.Worlds;
-using SkyCore.BugSnag;
 using SkyCore.Player;
 
 namespace SkyCore.Game.Level

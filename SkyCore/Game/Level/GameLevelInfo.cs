@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MiNET.Utils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SkyCore.Games.Murder.Level;
-
-namespace SkyCore.Game.Level
+﻿using System;using System.Diagnostics.CodeAnalysis;using MiNET.Utils;using Newtonsoft.Json;using Newtonsoft.Json.Linq;namespace SkyCore.Game.Level
 {
 
 	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]

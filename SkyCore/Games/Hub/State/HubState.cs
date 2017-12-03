@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using MiNET.Blocks;
 using MiNET.Effects;
-using MiNET.Entities.ImageProviders;
-using MiNET.Entities.World;
-using MiNET.Net;
-using MiNET.Particles;
 using MiNET.Utils;
-using MiNET.Worlds;
 using SkyCore.BugSnag;
 using SkyCore.Game;
 using SkyCore.Game.Level;

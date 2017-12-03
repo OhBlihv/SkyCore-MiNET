@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Bugsnag;
-using SkyCore.Game.Level;
+﻿using Bugsnag;
 
 namespace SkyCore.BugSnag
 {

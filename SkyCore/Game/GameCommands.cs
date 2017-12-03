@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using MiNET.Net;
 using MiNET.Plugins.Attributes;
 using SkyCore.Game.Level;
 using SkyCore.Game.State;

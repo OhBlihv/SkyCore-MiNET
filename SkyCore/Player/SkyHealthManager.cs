@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using MiNET;
 using MiNET.Entities;
 using MiNET.Items;
 using MiNET.Utils;
-using SkyCore.Game;
 using SkyCore.Game.Level;
 
 namespace SkyCore.Player

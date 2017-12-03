@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MiNET.Net;
 using MiNET.Plugins.Attributes;
 using Newtonsoft.Json;
 using SkyCore.Permissions;

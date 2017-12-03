@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using fNbt;
-using MiNET.Items;
-using MiNET.Utils;
-
-namespace SkyCore.Game.Items
+﻿using fNbt;using MiNET.Items;namespace SkyCore.Game.Items
 {
     class ItemEndNav : ItemCompass
     {

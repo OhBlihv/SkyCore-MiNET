@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using MiNET.Entities;
-using MiNET.Items;
 using MiNET.Utils;
 using MiNET.Worlds;
 using Newtonsoft.Json;

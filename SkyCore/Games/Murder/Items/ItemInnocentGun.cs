@@ -1,22 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using fNbt;
-using MiNET.Entities.Projectiles;
-using MiNET.Items;
-using MiNET.Utils;
-using MiNET.Worlds;
-using SkyCore.Game;
-using SkyCore.Game.Level;
-using SkyCore.Games.Murder.Entities;
-using SkyCore.Games.Murder.Level;
-using SkyCore.Games.Murder.State;
-using SkyCore.Player;
-using SkyCore.Util;
-
-namespace SkyCore.Games.Murder.Items
+﻿using fNbt;using MiNET.Items;using MiNET.Utils;using SkyCore.Game.Level;using SkyCore.Games.Murder.Level;using SkyCore.Games.Murder.State;using SkyCore.Player;namespace SkyCore.Games.Murder.Items
 {
     public class ItemInnocentGun : ItemBow
     {

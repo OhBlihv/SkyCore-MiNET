@@ -11,14 +11,12 @@ using SkyCore.Util;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Security.Policy;
 using System.Threading;
 using Bugsnag;
 using MiNET.Blocks;
 using MiNET.Net;
 using SkyCore.BugSnag;
 using SkyCore.Game.State.Impl;
-using SkyCore.Games.Hub;
 using Button = MiNET.UI.Button;
 
 namespace SkyCore.Game.Level
@@ -163,17 +161,53 @@ namespace SkyCore.Game.Level
 
 		public override void Close()
 		{
-            GameLevelTick.Dispose();
-            GameLevelTickThread.Abort();
-
-			DoForAllPlayers(player =>
+			try
 			{
-				ExternalGameHandler.AddPlayer(player, "hub");
-			});
+				GameLevelTick.Dispose();
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(e, this);
+			}
 
-			base.Close();
+			try
+			{
+				GameLevelTickThread.Abort();
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(e, this);
+			}
 
-	        Plugin.Server.LevelManager.Levels.Remove(this);
+			try
+			{
+				DoForAllPlayers(player =>
+				{
+					ExternalGameHandler.AddPlayer(player, "hub");
+				});
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(e, this);
+			}
+
+			try
+			{
+				base.Close();
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(e, this);
+			}
+
+			try
+			{
+				Plugin.Server.LevelManager.Levels.Remove(this);
+			}
+			catch (Exception e)
+			{
+				BugSnagUtil.ReportBug(e, this);
+			}
         }
 
         public virtual int GetPlayerCount()

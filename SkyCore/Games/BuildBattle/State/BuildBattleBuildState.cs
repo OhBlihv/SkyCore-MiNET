@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using MiNET;
 using MiNET.Blocks;
 using MiNET.Items;
 using MiNET.Utils;
