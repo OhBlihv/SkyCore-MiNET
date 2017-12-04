@@ -308,16 +308,21 @@ namespace SkyCore.Game.Level
 				}
 
 				//Process player action/popup bars
-	            foreach (SkyPlayer player in GetAllPlayers())
+	            foreach (MiNET.Player player in Players.Values)
 	            {
 					//Attempt to clean up any players who are no longer in this game.
 		            if (!player.IsConnected || player.Level != this)
 		            {
+						player.DespawnEntity();
+
 			            RemovePlayer(player);
 			            continue;
 		            }
 
-		            player.BarHandler.DoTick();
+		            if (player is SkyPlayer skyPlayer)
+		            {
+			            skyPlayer.BarHandler.DoTick();
+					}
 	            }
 
 	            /*

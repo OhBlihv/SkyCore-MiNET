@@ -279,6 +279,11 @@ namespace SkyCore.Player
 		    Level playerLevel = Level;
 		    RunnableTask.RunTaskLater(() =>
 		    {
+			    if (playerLevel?.Players == null)
+			    {
+				    return;
+			    }
+
 			    if (playerLevel.Players.ContainsKey(EntityId))
 			    {
 				    if (playerLevel is GameLevel gameLevel)
