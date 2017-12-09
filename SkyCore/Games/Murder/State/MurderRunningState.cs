@@ -54,6 +54,8 @@ namespace SkyCore.Games.Murder.State
 
 		public override void EnterState(GameLevel gameLevel)
         {
+			base.EnterState(gameLevel);
+
             GunPartLocations.Clear();
             PlayerSpawnLocations.Clear();
 
@@ -115,6 +117,8 @@ namespace SkyCore.Games.Murder.State
 
 			            usedSpawnLocations.Add(spawnLocation);
 
+						//Mark spawn position for AFK Check
+			            player.SpawnPosition = spawnLocation;
 			            player.Teleport(spawnLocation);
 
 						player.SetHideNameTag(true);

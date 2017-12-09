@@ -382,6 +382,11 @@ namespace SkyCore.Game
 
 		public static void AddPlayer(SkyPlayer player, string gameName)
 		{
+			if (player == null)
+			{
+				return;
+			}
+
 			if (!GameRegistrations.ContainsKey(gameName))
 			{
 				player.SendMessage($"{ChatColors.Red}No game existed for the name '{gameName}'");

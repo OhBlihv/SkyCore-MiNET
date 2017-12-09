@@ -311,18 +311,25 @@ namespace SkyCore.Game.Level
 	            foreach (MiNET.Player player in Players.Values)
 	            {
 					//Attempt to clean up any players who are no longer in this game.
-		            if (!player.IsConnected || player.Level != this)
+		            if (player == null || !player.IsConnected || player.Level != this)
 		            {
-						player.DespawnEntity();
+						player?.DespawnEntity();
 
 			            RemovePlayer(player);
 			            continue;
 		            }
 
-		            if (player is SkyPlayer skyPlayer)
+		            try
 		            {
-			            skyPlayer.BarHandler.DoTick();
+			            if (player is SkyPlayer skyPlayer)
+			            {
+				            skyPlayer.BarHandler.DoTick();
+			            }
 					}
+		            catch (Exception e)
+		            {
+						//
+		            }
 	            }
 
 	            /*
