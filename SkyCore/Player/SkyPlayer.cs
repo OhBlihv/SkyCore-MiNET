@@ -259,6 +259,44 @@ namespace SkyCore.Player
 							{
 								SkyCoreApi.GameModes[SkyCoreApi.GameType].InstantQueuePlayer(this, targetedGame);
 							}
+
+							//Search this players pending groups
+							new DatabaseAction().Query(
+								"SELECT `group_name` FROM player_pending_groups WHERE `player_name`=@name",
+								(command) => { command.Parameters.AddWithValue("@name", Username); },
+								(reader) =>
+								{
+									PlayerGroup.ValueOf(reader.GetString(0), out var playerGroup);
+
+									if (playerGroup == null)
+									{
+										return;
+									}
+
+									SetPlayerGroup(playerGroup);
+
+									new DatabaseAction().Execute(
+										"DELETE FROM player_pending_groups WHERE `player_name`=@name",
+										(command) => { command.Parameters.AddWithValue("@name", Username); }, 
+										null);
+
+									new DatabaseAction().Execute(
+										"INSERT INTO `player_groups`\n" +
+										"  (`player_xuid`, `group_name`)\n" +
+										"VALUES\n" +
+										"  (@xuid, @group)\n" +
+										"ON DUPLICATE KEY UPDATE\n" +
+										"  `player_xuid`    = VALUES(`player_xuid`),\n" +
+										"  `group_name`     = VALUES(`group_name`);",
+										(command) =>
+										{
+											command.Parameters.AddWithValue("@xuid", CertificateData.ExtraData.Xuid);
+											command.Parameters.AddWithValue("@group", PlayerGroup.GroupName);
+										},
+										null
+									);
+								},
+								null);
 						})
 					);
 				});
